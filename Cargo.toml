@@ -1,0 +1,22 @@
+[package]
+name = "dave"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[profile.dev.package."*"]
+opt-level = 3
+
+
+[dependencies]
+macroquad = {path = "./macroquad"}
+macroquad_macro = {path = "./macroquad/macroquad_macro"}
+macroquad-tiled = {path = "./macroquad/tiled"}
+macroquad-platformer = {path = "./macroquad/physics-platformer"}
+
+
+# macroquad = "0.4.13"
+# macroquad_macro = "0.1.8"
+# macroquad-tiled = "0.2.1"
+# macroquad-platformer = "0.2"
