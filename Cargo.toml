@@ -10,7 +10,7 @@ opt-level = 3
 
 
 [dependencies]
-macroquad = {path = "./macroquad"}
+macroquad = {path = "./macroquad", features = ["audio"]}
 macroquad_macro = {path = "./macroquad/macroquad_macro"}
 macroquad-tiled = {path = "./macroquad/tiled"}
 macroquad-platformer = {path = "./macroquad/physics-platformer"}

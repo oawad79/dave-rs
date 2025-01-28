@@ -1,12 +1,14 @@
-use macroquad::prelude::*;
+use macroquad::{audio::{load_sound, Sound}, prelude::*};
 use macroquad_tiled as tiled;
 
 pub(crate) struct Resources {
     pub tiled_map: tiled::Map,
+    pub sound_collect: Sound,
+    pub sound_jump: Sound,
 }
 
 impl Resources {
-    pub async fn load() -> Self {
+    pub async fn load() -> Result<Resources, macroquad::Error> {
         let tileset = load_texture("examples/mytileset.png").await.unwrap();
         tileset.set_filter(FilterMode::Nearest);
 
@@ -28,6 +30,9 @@ impl Resources {
         let tuple = load_texture("examples/tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
+        let sound_collect = load_sound("examples/collect.wav").await?;
+        let sound_jump = load_sound("examples/jump.wav").await?;
+
         let tiled_map_json = load_string("examples/level1.json").await.unwrap();
    
         let tiled_map = tiled::load_map(
@@ -45,6 +50,31 @@ impl Resources {
         )
         .unwrap();
 
-        Resources { tiled_map }
+        Ok(Resources { tiled_map, sound_collect, sound_jump })
     }
+
+    // pub async fn load() -> Result<(), macroquad::Error> {
+    //     let resources_loading = start_coroutine(async move {
+    //         let resources = Resources::new().await.unwrap();
+    //         storage::store(resources);
+    //     });
+
+    //     while !resources_loading.is_done() {
+    //         clear_background(BLACK);
+    //         let text = format!(
+    //             "Loading resources {}",
+    //             ".".repeat(((get_time() * 2.) as usize) % 4)
+    //         );
+    //         draw_text(
+    //             &text,
+    //             screen_width() / 2. - 160.,
+    //             screen_height() / 2.,
+    //             40.,
+    //             WHITE,
+    //         );
+    //         next_frame().await;
+    //     }
+
+    //     Ok(())
+    // }
 }

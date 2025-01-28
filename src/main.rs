@@ -1,6 +1,7 @@
 mod player;
 mod resources;
 
+use macroquad::audio::play_sound_once;
 use player::animated_player;
 use player::Player;
 
@@ -25,7 +26,7 @@ struct Diamond {
 
 #[macroquad::main("Dave")]
 async fn main() {
-    let resources = Resources::load().await;
+    let resources = Resources::load().await.unwrap();
 
     let mut static_colliders = vec![];
     for (_x, _y, tile) in resources.tiled_map.tiles("platform", None) {
@@ -112,6 +113,7 @@ async fn main() {
 
             if player_rect.overlaps(&diamond_rect) {
                 diamond.collected = true;
+                play_sound_once(&resources.sound_collect);
             }
         }
 
@@ -173,6 +175,7 @@ async fn main() {
         }
 
         if is_key_pressed(KeyCode::Space) && on_ground {
+            play_sound_once(&resources.sound_jump);
             player.speed.y = -260.;
         }
 
