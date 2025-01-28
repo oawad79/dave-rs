@@ -20,6 +20,7 @@ struct Diamond {
     tile_w: u32,
     tile_h: u32,
     name: String,
+    collected: bool,
 }
 
 #[macroquad::main("Dave")]
@@ -39,11 +40,10 @@ async fn main() {
     world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
     
     let objects_layer = resources.tiled_map.layers.get("diamonds").unwrap();
-    let diamonds:Vec<Diamond> = objects_layer
+    let mut diamonds:Vec<Diamond> = objects_layer
         .objects
         .iter()
-        .map(|entry| {
-            //println!("Diamond: {:?}", entry);
+        .map(|entry| 
             Diamond {
                 world_x: entry.world_x,
                 world_y: entry.world_y,
@@ -54,19 +54,10 @@ async fn main() {
                 tile_w: entry.tile_w,
                 tile_h: entry.tile_h,
                 name: entry.name.clone(),
+                collected: false,
             }
-        })
+        )
         .collect::<Vec<Diamond>>();
-
-    for diamond in &diamonds {
-       // println!("Adding diamond: {:?}", vec2(diamond.world_x, diamond.world_y));
-        
-        world.add_solid(
-            vec2(diamond.world_x, diamond.world_y - 32.0),
-            30,
-            30,
-        );
-    }    
 
     let mut player = Player::new(world.add_actor(vec2(60.0, 250.0), 32, 32));
 
@@ -102,6 +93,30 @@ async fn main() {
         }
 
         let pos = world.actor_pos(player.collider);
+
+        // Check for collision between player and diamonds
+        for diamond in diamonds.iter_mut() {
+            let diamond_rect = Rect::new(
+                diamond.world_x,
+                diamond.world_y - 32.0,
+                32.0,
+                32.0,
+            );
+
+            let player_rect = Rect::new(
+                pos.x,
+                pos.y,
+                32.0,
+                32.0,
+            );
+
+            if player_rect.overlaps(&diamond_rect) {
+                diamond.collected = true;
+            }
+        }
+
+        diamonds.retain(|diamond| !diamond.collected);
+        
 
         let on_ground = world.collide_check(player.collider, pos + vec2(0., 1.));
         
