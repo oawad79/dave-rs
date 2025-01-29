@@ -24,6 +24,8 @@ struct Diamond {
     collected: bool,
 }
 
+type Cup = Diamond;
+
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -260.0;
 
@@ -79,6 +81,18 @@ async fn main() {
     
     let door = resources.tiled_map.layers.get("door").unwrap().objects.first().unwrap();
     let cup = resources.tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
+    let mut trophy: Cup = Cup {
+        world_x: cup.world_x,
+        world_y: cup.world_y,
+        world_w: cup.world_w,
+        world_h: cup.world_h,
+        tile_x: cup.tile_x,
+        tile_y: cup.tile_y,
+        tile_w: cup.tile_w,
+        tile_h: cup.tile_h,
+        name: cup.name.clone(),
+        collected: false,
+    };
 
     let mut player = Player::new(world.add_actor(vec2(70.0, 250.0), 32, 32));
 
@@ -86,6 +100,7 @@ async fn main() {
 
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 320.0, 608.0, -320.0));
 
+    let mut game_won = false;
     loop {
         clear_background(BLACK);
 
@@ -137,36 +152,37 @@ async fn main() {
             ),
         );
 
-        resources.tiled_map.spr_ex(
-            "cup",
-            Rect::new(
-                0.0,
-                0.0,
-                32.0,
-                32.0,
-            ),
-            Rect::new(
-                cup.world_x,
-                cup.world_y - 32.0,
-                32.0,
-                32.0,
-            ),
-        );
-
+        if !trophy.collected {
+            resources.tiled_map.spr_ex(
+                "cup",
+                Rect::new(
+                    0.0,
+                    0.0,
+                    32.0,
+                    32.0,
+                ),
+                Rect::new(
+                    cup.world_x,
+                    cup.world_y - 32.0,
+                    32.0,
+                    32.0,
+                ),
+            );
+        }
         let pos = world.actor_pos(player.collider);
+
+        let player_rect = Rect::new(
+            pos.x,
+            pos.y,
+            32.0,
+            32.0,
+        );
 
         // Check for collision between player and diamonds
         for diamond in diamonds.iter_mut() {
             let diamond_rect = Rect::new(
                 diamond.world_x,
                 diamond.world_y - 32.0,
-                32.0,
-                32.0,
-            );
-
-            let player_rect = Rect::new(
-                pos.x,
-                pos.y,
                 32.0,
                 32.0,
             );
@@ -178,6 +194,28 @@ async fn main() {
         }
 
         diamonds.retain(|diamond| !diamond.collected);
+        
+        // Check for collision between player and cup
+        if !trophy.collected && player_rect.overlaps(&Rect::new(
+            cup.world_x,
+            cup.world_y - 32.0,
+            32.0,
+            32.0,
+        )) {
+            trophy.collected = true;
+            play_sound_once(&resources.sound_cup);
+        }
+
+        // Check for collision between player and cup
+        if !game_won && trophy.collected && player_rect.overlaps(&Rect::new(
+            door.world_x,
+            door.world_y - 32.0,
+            32.0,
+            32.0,
+        )) {
+            game_won = true;
+            play_sound_once(&resources.sound_win);
+        }
         
 
         let on_ground = world.collide_check(player.collider, pos + vec2(0., 1.));
