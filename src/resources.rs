@@ -32,6 +32,9 @@ impl Resources {
         let tuple = load_texture("examples/tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
+        let cup = load_texture("examples/cup.png").await.unwrap();
+        cup.set_filter(FilterMode::Nearest);
+
         let sound_collect = load_sound("examples/getitem.wav").await?;
         let sound_jump = load_sound("examples/jump.wav").await?;
         let sound_walk = load_sound("examples/hd-walk.wav").await?;
@@ -48,7 +51,8 @@ impl Resources {
                 ("dave_jump.png", player_jump),
                 ("collectibles.png", collectibles),
                 ("door.png", door),
-                ("tuple.png", tuple),        
+                ("tuple.png", tuple),   
+                ("cup.png", cup),     
             ],
             &[],
         )

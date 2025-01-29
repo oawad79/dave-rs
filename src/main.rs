@@ -62,8 +62,9 @@ async fn main() {
             }
         )
         .collect::<Vec<Diamond>>();
-
-    println!("Diamonds: {:?}", diamonds.len());
+    
+    let door = resources.tiled_map.layers.get("door").unwrap().objects.first().unwrap();
+    let cup = resources.tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
 
     let mut player = Player::new(world.add_actor(vec2(70.0, 250.0), 32, 32));
 
@@ -105,6 +106,38 @@ async fn main() {
                 ),
             );
         }
+
+        resources.tiled_map.spr_ex(
+            "door",
+            Rect::new(
+                0.0,
+                0.0,
+                32.0,
+                32.0,
+            ),
+            Rect::new(
+                door.world_x,
+                door.world_y - 32.0,
+                32.0,
+                32.0,
+            ),
+        );
+
+        resources.tiled_map.spr_ex(
+            "cup",
+            Rect::new(
+                0.0,
+                0.0,
+                32.0,
+                32.0,
+            ),
+            Rect::new(
+                cup.world_x,
+                cup.world_y - 32.0,
+                32.0,
+                32.0,
+            ),
+        );
 
         let pos = world.actor_pos(player.collider);
 
