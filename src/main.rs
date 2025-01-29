@@ -1,11 +1,7 @@
 mod player;
 mod resources;
 
-use macroquad::audio::play_sound;
 use macroquad::audio::play_sound_once;
-use macroquad::audio::stop_sound;
-use macroquad::audio::AudioContext;
-use macroquad::audio::PlaySoundParams;
 use player::animated_player;
 use player::Player;
 
@@ -47,7 +43,7 @@ async fn main() {
     let mut world = World::new();
     world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
     
-    let objects_layer = resources.tiled_map.layers.get("diamonds").unwrap();
+    let objects_layer = resources.tiled_map.layers.get("collectibles").unwrap();
     let mut diamonds:Vec<Diamond> = objects_layer
         .objects
         .iter()
@@ -67,7 +63,9 @@ async fn main() {
         )
         .collect::<Vec<Diamond>>();
 
-    let mut player = Player::new(world.add_actor(vec2(60.0, 250.0), 32, 32));
+    println!("Diamonds: {:?}", diamonds.len());
+
+    let mut player = Player::new(world.add_actor(vec2(70.0, 250.0), 32, 32));
 
     let mut animated_player = animated_player();
 
@@ -83,10 +81,18 @@ async fn main() {
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
 
         for diamond in &diamonds {
+            let x = if diamond.name == "ruby" {
+                0.0
+            } else if diamond.name == "diamond" {
+                32.0
+            } else {
+                64.0
+            };
+
             resources.tiled_map.spr_ex(
-                "diamond",
+                "collectibles",
                 Rect::new(
-                    0.0,
+                    x,
                     0.0,
                     32.0,
                     32.0,
@@ -154,6 +160,10 @@ async fn main() {
             animated_player.set_animation(1); // idle
             flip = if player.facing_left { -32.0 } else { 32.0 };
         }
+
+        // if player.speed.y > 0.0 && !on_ground {
+        //     play_sound_once(&resources.sound_falling);
+        // }
 
         resources.tiled_map.spr_ex(
             state,

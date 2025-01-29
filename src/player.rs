@@ -5,6 +5,7 @@ pub struct Player {
     pub collider: Actor,
     pub speed: Vec2,
     pub facing_left: bool,
+    
 }
 
 impl Player {
@@ -13,6 +14,7 @@ impl Player {
             collider,
             speed: vec2(0., 0.),
             facing_left: false,
+            
         }
     }
 }

@@ -6,6 +6,7 @@ pub(crate) struct Resources {
     pub sound_collect: Sound,
     pub sound_jump: Sound,
     pub sound_walk: Sound,
+    pub sound_falling: Sound,
 }
 
 impl Resources {
@@ -22,8 +23,8 @@ impl Resources {
         let player_jump = load_texture("examples/dave_jump.png").await.unwrap();
         player_jump.set_filter(FilterMode::Nearest);
 
-        let diamond = load_texture("examples/diamond.png").await.unwrap();
-        diamond.set_filter(FilterMode::Nearest);
+        let collectibles = load_texture("examples/collectibles.png").await.unwrap();
+        collectibles.set_filter(FilterMode::Nearest);
 
         let door = load_texture("examples/door.png").await.unwrap();
         door.set_filter(FilterMode::Nearest);
@@ -34,6 +35,7 @@ impl Resources {
         let sound_collect = load_sound("examples/getitem.wav").await?;
         let sound_jump = load_sound("examples/jump.wav").await?;
         let sound_walk = load_sound("examples/hd-walk.wav").await?;
+        let sound_falling = load_sound("examples/fall.wav").await?;
 
         let tiled_map_json = load_string("examples/level1.json").await.unwrap();
    
@@ -44,7 +46,7 @@ impl Resources {
                 ("dave_walk.png", player),
                 ("dave_idle.png", player_idle),
                 ("dave_jump.png", player_jump),
-                ("diamond.png", diamond),
+                ("collectibles.png", collectibles),
                 ("door.png", door),
                 ("tuple.png", tuple),        
             ],
@@ -52,7 +54,7 @@ impl Resources {
         )
         .unwrap();
 
-        Ok(Resources { tiled_map, sound_collect, sound_jump, sound_walk })
+        Ok(Resources { tiled_map, sound_collect, sound_jump, sound_walk, sound_falling })
     }
 
     // pub async fn load() -> Result<(), macroquad::Error> {
