@@ -5,6 +5,7 @@ pub(crate) struct Resources {
     pub tiled_map: tiled::Map,
     pub sound_collect: Sound,
     pub sound_jump: Sound,
+    pub sound_walk: Sound,
 }
 
 impl Resources {
@@ -32,6 +33,7 @@ impl Resources {
 
         let sound_collect = load_sound("examples/getitem.wav").await?;
         let sound_jump = load_sound("examples/jump.wav").await?;
+        let sound_walk = load_sound("examples/hd-walk.wav").await?;
 
         let tiled_map_json = load_string("examples/level1.json").await.unwrap();
    
@@ -50,7 +52,7 @@ impl Resources {
         )
         .unwrap();
 
-        Ok(Resources { tiled_map, sound_collect, sound_jump })
+        Ok(Resources { tiled_map, sound_collect, sound_jump, sound_walk })
     }
 
     // pub async fn load() -> Result<(), macroquad::Error> {

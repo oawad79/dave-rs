@@ -1,7 +1,11 @@
 mod player;
 mod resources;
 
+use macroquad::audio::play_sound;
 use macroquad::audio::play_sound_once;
+use macroquad::audio::stop_sound;
+use macroquad::audio::AudioContext;
+use macroquad::audio::PlaySoundParams;
 use player::animated_player;
 use player::Player;
 
@@ -168,10 +172,22 @@ async fn main() {
 
         if is_key_down(KeyCode::Right) {
             player.speed.x = 100.0;
+            
+            //check if sound is Playing
+            // play_sound(&resources.sound_walk, PlaySoundParams {
+            //     looped: false,
+            //     volume: 0.2,
+            // });
+        
         } else if is_key_down(KeyCode::Left) {
             player.speed.x = -100.0;
+            // play_sound(&resources.sound_walk, PlaySoundParams {
+            //     looped: false,
+            //     volume: 0.2,
+            // });
         } else {
             player.speed.x = 0.;
+            //stop_sound(&resources.sound_walk);
         }
 
         if is_key_pressed(KeyCode::Space) && on_ground {
