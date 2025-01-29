@@ -28,6 +28,9 @@ struct Diamond {
     collected: bool,
 }
 
+const GRAVITY: f32 = 500.0;
+const JUMP_VELOCITY: f32 = -260.0;
+
 #[macroquad::main("Dave")]
 async fn main() {
     let resources = Resources::load().await.unwrap();
@@ -167,32 +170,20 @@ async fn main() {
 
         // player movement control
         if !on_ground {
-            player.speed.y += 500. * get_frame_time();
+            player.speed.y += GRAVITY * get_frame_time();
         }
 
         if is_key_down(KeyCode::Right) {
             player.speed.x = 100.0;
-            
-            //check if sound is Playing
-            // play_sound(&resources.sound_walk, PlaySoundParams {
-            //     looped: false,
-            //     volume: 0.2,
-            // });
-        
         } else if is_key_down(KeyCode::Left) {
             player.speed.x = -100.0;
-            // play_sound(&resources.sound_walk, PlaySoundParams {
-            //     looped: false,
-            //     volume: 0.2,
-            // });
         } else {
             player.speed.x = 0.;
-            //stop_sound(&resources.sound_walk);
         }
 
         if is_key_pressed(KeyCode::Space) && on_ground {
             play_sound_once(&resources.sound_jump);
-            player.speed.y = -260.;
+            player.speed.y = JUMP_VELOCITY;
         }
 
         //add mouse click to get location
