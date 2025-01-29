@@ -30,7 +30,7 @@ impl Resources {
         let tuple = load_texture("examples/tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
-        let sound_collect = load_sound("examples/collect.wav").await?;
+        let sound_collect = load_sound("examples/getitem.wav").await?;
         let sound_jump = load_sound("examples/jump.wav").await?;
 
         let tiled_map_json = load_string("examples/level1.json").await.unwrap();
