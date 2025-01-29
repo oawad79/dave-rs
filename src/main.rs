@@ -27,7 +27,21 @@ struct Diamond {
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -260.0;
 
-#[macroquad::main("Dave")]
+fn window_conf() -> Conf {
+    Conf {
+        window_title: "Dave".to_owned(),
+        fullscreen: false,
+        platform: miniquad::conf::Platform {
+            linux_backend: miniquad::conf::LinuxBackend::WaylandOnly,
+            ..Default::default()
+        },
+        window_width: 1000,
+        window_height: 650,
+        ..Default::default()
+    }
+}
+
+#[macroquad::main(window_conf)]
 async fn main() {
     let resources = Resources::load().await.unwrap();
 
