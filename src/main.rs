@@ -2,7 +2,6 @@ mod player;
 mod resources;
 
 use macroquad::audio::play_sound_once;
-use player::animated_player;
 use player::Player;
 
 use resources::Resources;
@@ -25,9 +24,6 @@ struct Diamond {
 }
 
 type Cup = Diamond;
-
-const GRAVITY: f32 = 500.0;
-const JUMP_VELOCITY: f32 = -260.0;
 
 fn window_conf() -> Conf {
     Conf {
@@ -95,8 +91,6 @@ async fn main() {
     };
 
     let mut player = Player::new(world.add_actor(vec2(70.0, 250.0), 32, 32));
-
-    let mut animated_player = animated_player();
 
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 320.0, 608.0, -320.0));
 
@@ -171,13 +165,6 @@ async fn main() {
         }
         let pos = world.actor_pos(player.collider);
 
-        let player_rect = Rect::new(
-            pos.x,
-            pos.y,
-            32.0,
-            32.0,
-        );
-
         // Check for collision between player and diamonds
         for diamond in diamonds.iter_mut() {
             let diamond_rect = Rect::new(
@@ -187,7 +174,7 @@ async fn main() {
                 32.0,
             );
 
-            if player_rect.overlaps(&diamond_rect) {
+            if player.overlaps(pos, &diamond_rect) {
                 diamond.collected = true;
                 play_sound_once(&resources.sound_collect);
             }
@@ -196,7 +183,7 @@ async fn main() {
         diamonds.retain(|diamond| !diamond.collected);
         
         // Check for collision between player and cup
-        if !trophy.collected && player_rect.overlaps(&Rect::new(
+        if !trophy.collected && player.overlaps(pos, &Rect::new(
             cup.world_x,
             cup.world_y - 32.0,
             32.0,
@@ -207,7 +194,7 @@ async fn main() {
         }
 
         // Check for collision between player and cup
-        if !game_won && trophy.collected && player_rect.overlaps(&Rect::new(
+        if !game_won && trophy.collected && player.overlaps(pos, &Rect::new(
             door.world_x,
             door.world_y - 32.0,
             32.0,
@@ -217,75 +204,7 @@ async fn main() {
             play_sound_once(&resources.sound_win);
         }
         
-
-        let on_ground = world.collide_check(player.collider, pos + vec2(0., 1.));
-        
-        // Draw player
-        let state: &str;
-        let flip: f32;
-
-        if player.speed.x != 0.0 {
-            state = if !on_ground {
-                animated_player.set_animation(2); // jump
-                "dave_jump"
-            } else {
-                animated_player.set_animation(0); // walk
-                "dave_walk"
-            };
-
-            if player.speed.x < 0.0 {
-                player.facing_left = true;
-                flip = -32.0;
-            } else {
-                player.facing_left = false;
-                flip = 32.0;
-            }
-        } else {
-            state = "dave_idle";
-            animated_player.set_animation(1); // idle
-            flip = if player.facing_left { -32.0 } else { 32.0 };
-        }
-
-        // if player.speed.y > 0.0 && !on_ground {
-        //     play_sound_once(&resources.sound_falling);
-        // }
-
-        resources.tiled_map.spr_ex(
-            state,
-            animated_player.frame().source_rect,
-            Rect::new(
-                pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
-                pos.y,
-                flip,
-                32.0,
-            ),
-        );
-
-        animated_player.update();
-
-        // player movement control
-        if !on_ground {
-            player.speed.y += GRAVITY * get_frame_time();
-        }
-
-        if is_key_down(KeyCode::Right) {
-            player.speed.x = 100.0;
-        } else if is_key_down(KeyCode::Left) {
-            player.speed.x = -100.0;
-        } else {
-            player.speed.x = 0.;
-        }
-
-        if is_key_pressed(KeyCode::Space) && on_ground {
-            play_sound_once(&resources.sound_jump);
-            player.speed.y = JUMP_VELOCITY;
-        }
-
-        //add mouse click to get location
-        if is_mouse_button_down(MouseButton::Left) {
-            let mouse_pos = mouse_position();
-            println!("Mouse position: {:?}", mouse_pos);
-        }
+        player.update(&world, &resources);
 
         world.move_h(player.collider, player.speed.x * get_frame_time());
         world.move_v(player.collider, player.speed.y * get_frame_time());

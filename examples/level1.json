@@ -159,6 +159,18 @@
                  "width":32,
                  "x":544,
                  "y":64.868778280543
+                }, 
+                {
+                 "gid":1032,
+                 "height":32,
+                 "id":45,
+                 "name":"diamond",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":31.420814479638,
+                 "y":223.782805429864
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -213,7 +225,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":45,
+ "nextobjectid":46,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.1",
