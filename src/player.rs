@@ -36,7 +36,7 @@ impl Player {
         player_rect.overlaps(diamond_rect)
     }
 
-    pub fn update(&mut self, world: &World, resources: &Resources) {
+    pub fn update(&mut self, delta: f32, world: &World, resources: &Resources) {
         let pos = world.actor_pos(self.collider);
 
         let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
@@ -81,7 +81,7 @@ impl Player {
 
         // player movement control
         if !on_ground {
-            self.speed.y += GRAVITY * get_frame_time();
+            self.speed.y += GRAVITY * delta;
         }
 
         if is_key_down(KeyCode::Right) {

@@ -100,6 +100,8 @@ async fn main() {
 
         set_camera(&camera);
 
+        let delta = get_frame_time();
+
         resources
             .tiled_map
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
@@ -193,7 +195,7 @@ async fn main() {
             play_sound_once(&resources.sound_cup);
         }
 
-        // Check for collision between player and cup
+        // Check for collision between player and door
         if !game_won && trophy.collected && player.overlaps(pos, &Rect::new(
             door.world_x,
             door.world_y - 32.0,
@@ -204,7 +206,7 @@ async fn main() {
             play_sound_once(&resources.sound_win);
         }
         
-        player.update(&world, &resources);
+        player.update(delta, &world, &resources);
 
         world.move_h(player.collider, player.speed.x * get_frame_time());
         world.move_v(player.collider, player.speed.y * get_frame_time());
