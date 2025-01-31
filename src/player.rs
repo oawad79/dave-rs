@@ -36,10 +36,10 @@ impl Player {
         player_rect.overlaps(diamond_rect)
     }
 
-    pub fn update(&mut self, delta: f32, world: &World, resources: &Resources) {
-        let pos = world.actor_pos(self.collider);
+    pub fn update(&mut self, delta: f32, resources: &Resources) {
+        let pos = resources.world.actor_pos(self.collider);
 
-        let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
+        let on_ground = resources.world.collide_check(self.collider, pos + vec2(0., 1.));
 
         let state: &str;
         let flip: f32;

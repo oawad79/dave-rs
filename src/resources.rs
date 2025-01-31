@@ -1,8 +1,10 @@
 use macroquad::{audio::{load_sound, Sound}, prelude::*};
+use macroquad_platformer::{Tile, World};
 use macroquad_tiled as tiled;
 
 pub(crate) struct Resources {
     pub tiled_map: tiled::Map,
+    pub world: World,
     pub sound_collect: Sound,
     pub sound_jump: Sound,
     pub sound_walk: Sound,
@@ -62,31 +64,28 @@ impl Resources {
         )
         .unwrap();
 
-        Ok(Resources { tiled_map, sound_collect, sound_jump, sound_walk, sound_falling, sound_cup, sound_win })
+        let mut static_colliders = vec![];
+        for (_x, _y, tile) in tiled_map.tiles("platform", None) {
+            static_colliders.push(if tile.is_some() {
+                Tile::Solid
+            } else {
+                Tile::Empty
+            });
+        }
+
+        let mut world = World::new();
+        world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
+
+        Ok(Resources { 
+            tiled_map, 
+            world, 
+            sound_collect, 
+            sound_jump, 
+            sound_walk, 
+            sound_falling, 
+            sound_cup, 
+            sound_win 
+        })
     }
 
-    // pub async fn load() -> Result<(), macroquad::Error> {
-    //     let resources_loading = start_coroutine(async move {
-    //         let resources = Resources::new().await.unwrap();
-    //         storage::store(resources);
-    //     });
-
-    //     while !resources_loading.is_done() {
-    //         clear_background(BLACK);
-    //         let text = format!(
-    //             "Loading resources {}",
-    //             ".".repeat(((get_time() * 2.) as usize) % 4)
-    //         );
-    //         draw_text(
-    //             &text,
-    //             screen_width() / 2. - 160.,
-    //             screen_height() / 2.,
-    //             40.,
-    //             WHITE,
-    //         );
-    //         next_frame().await;
-    //     }
-
-    //     Ok(())
-    // }
 }

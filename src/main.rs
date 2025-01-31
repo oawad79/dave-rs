@@ -41,19 +41,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let resources = Resources::load().await.unwrap();
-
-    let mut static_colliders = vec![];
-    for (_x, _y, tile) in resources.tiled_map.tiles("platform", None) {
-        static_colliders.push(if tile.is_some() {
-            Tile::Solid
-        } else {
-            Tile::Empty
-        });
-    }
-
-    let mut world = World::new();
-    world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
+    let mut resources = Resources::load().await.unwrap();
     
     let objects_layer = resources.tiled_map.layers.get("collectibles").unwrap();
     let mut diamonds:Vec<Diamond> = objects_layer
@@ -90,7 +78,7 @@ async fn main() {
         collected: false,
     };
 
-    let mut player = Player::new(world.add_actor(vec2(70.0, 250.0), 32, 32));
+    let mut player = Player::new(resources.world.add_actor(vec2(70.0, 250.0), 32, 32));
 
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 320.0, 608.0, -320.0));
 
@@ -165,7 +153,7 @@ async fn main() {
                 ),
             );
         }
-        let pos = world.actor_pos(player.collider);
+        let pos = resources.world.actor_pos(player.collider);
 
         // Check for collision between player and diamonds
         for diamond in diamonds.iter_mut() {
@@ -206,10 +194,10 @@ async fn main() {
             play_sound_once(&resources.sound_win);
         }
         
-        player.update(delta, &world, &resources);
+        player.update(delta, &resources);
 
-        world.move_h(player.collider, player.speed.x * get_frame_time());
-        world.move_v(player.collider, player.speed.y * get_frame_time());
+        resources.world.move_h(player.collider, player.speed.x * get_frame_time());
+        resources.world.move_v(player.collider, player.speed.y * get_frame_time());
 
         next_frame().await
     }
