@@ -196,8 +196,8 @@ async fn main() {
         
         player.update(delta, &resources);
 
-        resources.world.move_h(player.collider, player.speed.x * get_frame_time());
-        resources.world.move_v(player.collider, player.speed.y * get_frame_time());
+        resources.world.move_h(player.collider, player.speed.x * delta);
+        resources.world.move_v(player.collider, player.speed.y * delta);
 
         next_frame().await
     }
