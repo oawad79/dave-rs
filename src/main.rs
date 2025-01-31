@@ -50,7 +50,7 @@ fn window_conf() -> Conf {
 async fn main() {
 
     let resources_loading = start_coroutine(async {
-        let resources = Rc::new(RefCell::new(Resources::load().await.unwrap()));
+        let resources = Resources::load().await.unwrap();
         storage::store(resources);
     });
     
@@ -70,8 +70,7 @@ async fn main() {
         next_frame().await;
     }
     
-    let resources_ref = storage::get::<Rc<RefCell<Resources>>>();
-    let resources = resources_ref.borrow();
+    let resources = storage::get::<Resources>();
     
     let mut static_colliders = vec![];
     for (_x, _y, tile) in resources.tiled_map.tiles("platform", None) {
