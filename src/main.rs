@@ -1,8 +1,6 @@
 mod player;
 mod resources;
 
-use std::{cell::RefCell, rc::Rc};
-
 use macroquad::{
     audio::play_sound_once, 
     prelude::{
@@ -110,8 +108,6 @@ async fn main() {
         )
         .collect::<Vec<Diamond>>();
     
-    
-    
     let door = resources.tiled_map.layers.get("door").unwrap().objects.first().unwrap();
     let cup = tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
     let mut trophy: Cup = Cup {
@@ -127,11 +123,8 @@ async fn main() {
         collected: false,
     };
 
-    
-
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 320.0, 608.0, -320.0));
     
-
     let mut game_won = false;
     loop {
         clear_background(BLACK);
@@ -243,7 +236,7 @@ async fn main() {
             play_sound_once(&resources.sound_win);
         }
         
-        player.update(delta, &mut world, &resources);
+        player.update(delta, &mut world);
 
         next_frame().await
     }
