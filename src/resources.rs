@@ -1,12 +1,7 @@
-use macroquad::{audio::{load_sound, Sound}, prelude::*};
-use macroquad_platformer::{Tile, World};
+use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
 use macroquad_tiled as tiled;
 
-// pub(crate) struct Resources {
-//     pub world: World,
-// }
-
-pub(crate) struct Resources {
+pub struct Resources {
     pub tiled_map: tiled::Map,
     pub sound_collect: Sound,
     pub sound_jump: Sound,
@@ -17,7 +12,7 @@ pub(crate) struct Resources {
 }
 
 impl Resources {
-    pub async fn load() -> Result<Resources, macroquad::Error> {
+    async fn new() -> Result<Resources, macroquad::Error> {
         let tileset = load_texture("examples/mytileset.png").await.unwrap();
         tileset.set_filter(FilterMode::Nearest);
 
@@ -76,6 +71,31 @@ impl Resources {
             sound_cup, 
             sound_win 
         })
+    }
+
+    pub async fn load() -> Result<(), macroquad::Error> {
+        let resources_loading = start_coroutine(async {
+            let resources = Resources::new().await.unwrap();
+            storage::store(resources);
+        });
+        
+        while !resources_loading.is_done() {
+            clear_background(BLACK);
+            draw_text(
+                &format!(
+                    "Loading resources {}",
+                    ".".repeat(((get_time() * 2.0) as usize) % 4)
+                ),
+                screen_width() / 2.0 - 160.0,
+                screen_height() / 2.0,
+                40.,
+                WHITE,
+            );
+    
+            next_frame().await;
+        }
+
+        Ok(())
     }
 
 }

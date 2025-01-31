@@ -12,7 +12,6 @@ pub struct Player {
     pub speed: Vec2,
     pub facing_left: bool,
     animated_player: AnimatedSprite,
-    
 }
 
 impl Player {
@@ -37,8 +36,6 @@ impl Player {
     }
 
     pub fn update(&mut self, delta: f32, world: &mut World) {
-        //let world = &mut storage::get_mut::<Resources>().world;
-        // let tiled_map = resources.tiled_map;
         let resources = storage::get::<Resources>();
 
         let pos = world.actor_pos(self.collider);

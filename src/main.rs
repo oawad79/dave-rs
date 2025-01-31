@@ -3,15 +3,12 @@ mod resources;
 
 use macroquad::{
     audio::play_sound_once, 
-    prelude::{
-        collections::storage, 
-        coroutines::start_coroutine
-    }
+    prelude::collections::storage
 };
+use resources::Resources;
 
 use macroquad_platformer::{Tile, World};
 use player::Player;
-use resources::Resources;
 use macroquad::prelude::*;
 
 #[derive(Debug)]
@@ -46,27 +43,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-
-    let resources_loading = start_coroutine(async {
-        let resources = Resources::load().await.unwrap();
-        storage::store(resources);
-    });
-    
-    while !resources_loading.is_done() {
-        clear_background(BLACK);
-        draw_text(
-            &format!(
-                "Loading resources {}",
-                ".".repeat(((get_time() * 2.0) as usize) % 4)
-            ),
-            screen_width() / 2.0 - 160.0,
-            screen_height() / 2.0,
-            40.,
-            WHITE,
-        );
-
-        next_frame().await;
-    }
+    let _ = Resources::load().await;
     
     let resources = storage::get::<Resources>();
     
