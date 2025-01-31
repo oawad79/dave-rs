@@ -1,13 +1,20 @@
 mod player;
 mod resources;
 
-use macroquad::audio::play_sound_once;
+use std::{cell::RefCell, rc::Rc};
+
+use macroquad::{
+    audio::play_sound_once, 
+    prelude::{
+        collections::storage, 
+        coroutines::start_coroutine
+    }
+};
+
+use macroquad_platformer::{Tile, World};
 use player::Player;
-
 use resources::Resources;
-
 use macroquad::prelude::*;
-use macroquad_platformer::*;
 
 #[derive(Debug)]
 struct Diamond {
@@ -41,8 +48,49 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut resources = Resources::load().await.unwrap();
+
+    let resources_loading = start_coroutine(async {
+        let resources = Rc::new(RefCell::new(Resources::load().await.unwrap()));
+        storage::store(resources);
+    });
     
+    while !resources_loading.is_done() {
+        clear_background(BLACK);
+        draw_text(
+            &format!(
+                "Loading resources {}",
+                ".".repeat(((get_time() * 2.0) as usize) % 4)
+            ),
+            screen_width() / 2.0 - 160.0,
+            screen_height() / 2.0,
+            40.,
+            WHITE,
+        );
+
+        next_frame().await;
+    }
+    
+    let resources_ref = storage::get::<Rc<RefCell<Resources>>>();
+    let resources = resources_ref.borrow();
+    
+    let mut static_colliders = vec![];
+    for (_x, _y, tile) in resources.tiled_map.tiles("platform", None) {
+        static_colliders.push(if tile.is_some() {
+            Tile::Solid
+        } else {
+            Tile::Empty
+        });
+    }
+
+    let mut world = World::new();
+    world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
+
+    let actor = world.add_actor(vec2(70.0, 250.0), 32, 32);
+
+    let tiled_map = &resources.tiled_map;
+    
+    let mut player = Player::new(actor);
+
     let objects_layer = resources.tiled_map.layers.get("collectibles").unwrap();
     let mut diamonds:Vec<Diamond> = objects_layer
         .objects
@@ -63,8 +111,10 @@ async fn main() {
         )
         .collect::<Vec<Diamond>>();
     
+    
+    
     let door = resources.tiled_map.layers.get("door").unwrap().objects.first().unwrap();
-    let cup = resources.tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
+    let cup = tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
     let mut trophy: Cup = Cup {
         world_x: cup.world_x,
         world_y: cup.world_y,
@@ -78,9 +128,10 @@ async fn main() {
         collected: false,
     };
 
-    let mut player = Player::new(resources.world.add_actor(vec2(70.0, 250.0), 32, 32));
+    
 
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 320.0, 608.0, -320.0));
+    
 
     let mut game_won = false;
     loop {
@@ -90,8 +141,7 @@ async fn main() {
 
         let delta = get_frame_time();
 
-        resources
-            .tiled_map
+        tiled_map
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
 
         for diamond in &diamonds {
@@ -103,7 +153,7 @@ async fn main() {
                 64.0
             };
 
-            resources.tiled_map.spr_ex(
+            tiled_map.spr_ex(
                 "collectibles",
                 Rect::new(
                     x,
@@ -120,7 +170,7 @@ async fn main() {
             );
         }
 
-        resources.tiled_map.spr_ex(
+        tiled_map.spr_ex(
             "door",
             Rect::new(
                 0.0,
@@ -137,7 +187,7 @@ async fn main() {
         );
 
         if !trophy.collected {
-            resources.tiled_map.spr_ex(
+            tiled_map.spr_ex(
                 "cup",
                 Rect::new(
                     0.0,
@@ -153,7 +203,7 @@ async fn main() {
                 ),
             );
         }
-        let pos = resources.world.actor_pos(player.collider);
+        let pos = world.actor_pos(player.collider);
 
         // Check for collision between player and diamonds
         for diamond in diamonds.iter_mut() {
@@ -194,10 +244,7 @@ async fn main() {
             play_sound_once(&resources.sound_win);
         }
         
-        player.update(delta, &resources);
-
-        resources.world.move_h(player.collider, player.speed.x * delta);
-        resources.world.move_v(player.collider, player.speed.y * delta);
+        player.update(delta, &mut world, &resources);
 
         next_frame().await
     }

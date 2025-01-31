@@ -2,9 +2,12 @@ use macroquad::{audio::{load_sound, Sound}, prelude::*};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled as tiled;
 
+// pub(crate) struct Resources {
+//     pub world: World,
+// }
+
 pub(crate) struct Resources {
     pub tiled_map: tiled::Map,
-    pub world: World,
     pub sound_collect: Sound,
     pub sound_jump: Sound,
     pub sound_walk: Sound,
@@ -64,21 +67,8 @@ impl Resources {
         )
         .unwrap();
 
-        let mut static_colliders = vec![];
-        for (_x, _y, tile) in tiled_map.tiles("platform", None) {
-            static_colliders.push(if tile.is_some() {
-                Tile::Solid
-            } else {
-                Tile::Empty
-            });
-        }
-
-        let mut world = World::new();
-        world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
-
         Ok(Resources { 
             tiled_map, 
-            world, 
             sound_collect, 
             sound_jump, 
             sound_walk, 

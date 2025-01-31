@@ -1,4 +1,4 @@
-use macroquad::{audio::play_sound_once, math::{vec2, Rect, Vec2}, prelude::animation::{AnimatedSprite, Animation}};
+use macroquad::{audio::play_sound_once, math::{vec2, Rect, Vec2}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage}};
 use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 
@@ -36,10 +36,13 @@ impl Player {
         player_rect.overlaps(diamond_rect)
     }
 
-    pub fn update(&mut self, delta: f32, resources: &Resources) {
-        let pos = resources.world.actor_pos(self.collider);
+    pub fn update(&mut self, delta: f32, world: &mut World, resources: &Resources) {
+        //let world = &mut storage::get_mut::<Resources>().world;
+        // let tiled_map = resources.tiled_map;
 
-        let on_ground = resources.world.collide_check(self.collider, pos + vec2(0., 1.));
+        let pos = world.actor_pos(self.collider);
+
+        let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
 
         let state: &str;
         let flip: f32;
@@ -96,6 +99,9 @@ impl Player {
             play_sound_once(&resources.sound_jump);
             self.speed.y = JUMP_VELOCITY;
         }
+
+        world.move_h(self.collider, self.speed.x * delta);
+        world.move_v(self.collider, self.speed.y * delta);
 
     }
 
