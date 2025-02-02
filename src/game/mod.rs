@@ -68,8 +68,6 @@ impl Game {
     
         let actor = world.add_actor(vec2(70.0, 250.0), 32, 32);
     
-        //let tiled_map = &resources.tiled_map;
-        
         let player = Player::new(actor);
 
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
@@ -141,11 +139,35 @@ impl Scene for Game {
         }
 
         self.diamonds.retain(|diamond| !diamond.collected);
+
+        let pos = self.world.actor_pos(self.player.collider);
+
+        // Check for collision between player and cup
+        if !self.game_won && self.player.overlaps(pos, &Rect::new(
+            self.trophy.world_x,
+            self.trophy.world_y - 32.0,
+            32.0,
+            32.0,
+        )) {
+            self.game_won = true;
+            play_sound_once(&resources.sound_cup);
+        }
+
+        // Check for collision between player and door
+        if self.game_won && self.player.overlaps(pos, &Rect::new(
+            self.door.world_x,
+            self.door.world_y - 32.0,
+            32.0,
+            32.0,
+        )) {
+            self.game_won = false;
+            play_sound_once(&resources.sound_win);
+        }
+        
+        self.player.update(get_frame_time(), &mut self.world, &self.tiled_map);
     }
 
-    fn draw(&mut self) {
-        let resources = storage::get::<Resources>();
-        
+    fn draw(&self) {
         self.tiled_map
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
 
@@ -208,31 +230,5 @@ impl Scene for Game {
                 ),
             );
         }
-
-        let pos = self.world.actor_pos(self.player.collider);
-
-        // Check for collision between player and cup
-        if !self.game_won && self.player.overlaps(pos, &Rect::new(
-            self.trophy.world_x,
-            self.trophy.world_y - 32.0,
-            32.0,
-            32.0,
-        )) {
-            self.game_won = true;
-            play_sound_once(&resources.sound_cup);
-        }
-
-        // Check for collision between player and door
-        if self.game_won && self.player.overlaps(pos, &Rect::new(
-            self.door.world_x,
-            self.door.world_y - 32.0,
-            32.0,
-            32.0,
-        )) {
-            self.game_won = false;
-            play_sound_once(&resources.sound_win);
-        }
-        
-        self.player.update(get_frame_time(), &mut self.world, &self.tiled_map);
     }
 }

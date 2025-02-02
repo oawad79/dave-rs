@@ -9,7 +9,7 @@ use macroquad::prelude::*;
 
 pub trait Scene {
     fn update(&mut self);
-    fn draw(&mut self);
+    fn draw(&self);
 }
 
 fn window_conf() -> Conf {

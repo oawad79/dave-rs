@@ -3,7 +3,7 @@ use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::Resources;
+use crate::{game, Resources};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -260.0;
@@ -26,14 +26,14 @@ impl Player {
         }
     }
 
-    pub fn overlaps(&self, pos: Vec2, diamond_rect: &Rect) -> bool {
+    pub fn overlaps(&self, pos: Vec2, game_object: &Rect) -> bool {
         let player_rect = Rect::new(
             pos.x,
             pos.y,
             32.0,
             32.0,
         );
-        player_rect.overlaps(diamond_rect)
+        player_rect.overlaps(game_object)
     }
 
     pub fn update(&mut self, delta: f32, world: &mut World, tiled_map: &Map) {
