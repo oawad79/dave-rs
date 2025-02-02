@@ -1,8 +1,15 @@
 use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
-use macroquad_tiled as tiled;
 
 pub struct Resources {
-    pub tiled_map: tiled::Map,
+    pub tileset: Texture2D,
+    pub tiled_map_json: String,
+    pub player_idle: Texture2D,
+    pub player_walk: Texture2D,
+    pub player_jump: Texture2D,
+    pub collectibles: Texture2D,
+    pub tuple: Texture2D,
+    pub cup: Texture2D,
+    pub door: Texture2D,
     pub sound_collect: Sound,
     pub sound_jump: Sound,
     pub sound_walk: Sound,
@@ -16,8 +23,8 @@ impl Resources {
         let tileset = load_texture("examples/mytileset.png").await.unwrap();
         tileset.set_filter(FilterMode::Nearest);
 
-        let player = load_texture("examples/dave_walk.png").await.unwrap();
-        player.set_filter(FilterMode::Nearest);
+        let player_walk = load_texture("examples/dave_walk.png").await.unwrap();
+        player_walk.set_filter(FilterMode::Nearest);
 
         let player_idle = load_texture("examples/dave_idle.png").await.unwrap();
         player_idle.set_filter(FilterMode::Nearest);
@@ -46,24 +53,16 @@ impl Resources {
 
         let tiled_map_json = load_string("examples/level1.json").await.unwrap();
    
-        let tiled_map = tiled::load_map(
-            &tiled_map_json,
-            &[
-                ("mytileset.png", tileset),
-                ("dave_walk.png", player),
-                ("dave_idle.png", player_idle),
-                ("dave_jump.png", player_jump),
-                ("collectibles.png", collectibles),
-                ("door.png", door),
-                ("tuple.png", tuple),   
-                ("cup.png", cup),     
-            ],
-            &[],
-        )
-        .unwrap();
-
         Ok(Resources { 
-            tiled_map, 
+            tileset,
+            tiled_map_json,
+            player_idle,
+            player_walk,
+            player_jump,
+            collectibles,
+            tuple,
+            cup,
+            door,
             sound_collect, 
             sound_jump, 
             sound_walk, 

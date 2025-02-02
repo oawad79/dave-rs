@@ -1,6 +1,7 @@
 use macroquad::{audio::play_sound_once, math::{vec2, Rect, Vec2}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage}};
 use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
+use macroquad_tiled::Map;
 
 use crate::Resources;
 
@@ -35,7 +36,7 @@ impl Player {
         player_rect.overlaps(diamond_rect)
     }
 
-    pub fn update(&mut self, delta: f32, world: &mut World) {
+    pub fn update(&mut self, delta: f32, world: &mut World, tiled_map: &Map) {
         let resources = storage::get::<Resources>();
 
         let pos = world.actor_pos(self.collider);
@@ -67,7 +68,7 @@ impl Player {
             flip = if self.facing_left { -32.0 } else { 32.0 };
         }
 
-        resources.tiled_map.spr_ex(
+        tiled_map.spr_ex(
             state,
             self.animated_player.frame().source_rect,
             Rect::new(
