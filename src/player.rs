@@ -3,7 +3,7 @@ use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::Resources;
+use crate::{Resources, Scene};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -260.0;
@@ -22,7 +22,6 @@ impl Player {
             speed: vec2(0., 0.),
             facing_left: false,
             animated_player: animated_player(),
-            
         }
     }
 
@@ -36,8 +35,9 @@ impl Player {
         player_rect.overlaps(game_object)
     }
 
-    pub fn update(&mut self, delta: f32, world: &mut World, tiled_map: &Map) {
+    pub fn update(&mut self, delta: f32, world: &mut World) {
         let resources = storage::get::<Resources>();
+        let tiled_map = storage::get::<Map>();
 
         let pos = world.actor_pos(self.collider);
 
@@ -150,3 +150,13 @@ pub fn animated_player() -> AnimatedSprite {
     )
 }
 
+// impl Scene for Player {
+//     fn update(&mut self) {
+        
+        
+//     }
+
+//     fn draw(&self) {
+        
+//     }
+// }

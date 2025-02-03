@@ -17,8 +17,7 @@ pub struct Game {
     collectibles: Vec<GameObject>,
     door: GameObject,
     trophy: GameObject,
-    game_won: bool,
-    tiled_map: Map,
+    game_won: bool
 }
 
 impl Game {
@@ -40,6 +39,10 @@ impl Game {
             &[],
         )
         .unwrap();
+
+        storage::store(tiled_map);
+
+        let tiled_map = storage::get::<Map>();
 
         let mut static_colliders = vec![];
         for (_x, _y, tile) in tiled_map.tiles("platform", None) {
@@ -93,8 +96,7 @@ impl Game {
             collectibles,
             door,
             trophy,
-            game_won: false,
-            tiled_map,
+            game_won: false
         }
     }
 }
@@ -146,11 +148,13 @@ impl Scene for Game {
             play_sound_once(&resources.sound_win);
         }
         
-        self.player.update(get_frame_time(), &mut self.world, &self.tiled_map);
+        self.player.update(get_frame_time(), &mut self.world);
     }
 
     fn draw(&self) {
-        self.tiled_map
+        let tiled_map = storage::get::<Map>();
+
+        tiled_map
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
 
         for diamond in &self.collectibles {
@@ -162,7 +166,7 @@ impl Scene for Game {
                 64.0
             };
 
-            self.tiled_map.spr_ex(
+            tiled_map.spr_ex(
                 "collectibles",
                 Rect::new(
                     x,
@@ -179,7 +183,7 @@ impl Scene for Game {
             );
         }
 
-        self.tiled_map.spr_ex(
+        tiled_map.spr_ex(
             "door",
             Rect::new(
                 0.0,
@@ -196,7 +200,7 @@ impl Scene for Game {
         );
 
         if !self.game_won {
-            self.tiled_map.spr_ex(
+            tiled_map.spr_ex(
                 "cup",
                 Rect::new(
                     0.0,
