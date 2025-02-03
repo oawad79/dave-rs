@@ -3,7 +3,7 @@ use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::{game, Resources};
+use crate::Resources;
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -260.0;
