@@ -148,7 +148,7 @@ impl Scene for Game {
             play_sound_once(&resources.sound_win);
         }
         
-        self.player.update(get_frame_time(), &mut self.world);
+        self.player.update(&mut self.world);
     }
 
     fn draw(&self) {
