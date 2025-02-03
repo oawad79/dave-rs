@@ -30,7 +30,7 @@ fn window_conf() -> Conf {
 async fn main() {
     macroquad::logging::info!("started program..!!!");
     
-    set_pc_assets_folder("examples");
+    set_pc_assets_folder("assets");
 
     let _ = Resources::load().await;
     
