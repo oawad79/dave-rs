@@ -20,38 +20,38 @@ pub struct Resources {
 
 impl Resources {
     async fn new() -> Result<Resources, macroquad::Error> {
-        let tileset = load_texture("examples/mytileset.png").await.unwrap();
+        let tileset = load_texture("mytileset.png").await.unwrap();
         tileset.set_filter(FilterMode::Nearest);
 
-        let player_walk = load_texture("examples/dave_walk.png").await.unwrap();
+        let player_walk = load_texture("dave_walk.png").await.unwrap();
         player_walk.set_filter(FilterMode::Nearest);
 
-        let player_idle = load_texture("examples/dave_idle.png").await.unwrap();
+        let player_idle = load_texture("dave_idle.png").await.unwrap();
         player_idle.set_filter(FilterMode::Nearest);
 
-        let player_jump = load_texture("examples/dave_jump.png").await.unwrap();
+        let player_jump = load_texture("dave_jump.png").await.unwrap();
         player_jump.set_filter(FilterMode::Nearest);
 
-        let collectibles = load_texture("examples/collectibles.png").await.unwrap();
+        let collectibles = load_texture("collectibles.png").await.unwrap();
         collectibles.set_filter(FilterMode::Nearest);
 
-        let door = load_texture("examples/door.png").await.unwrap();
+        let door = load_texture("door.png").await.unwrap();
         door.set_filter(FilterMode::Nearest);
 
-        let tuple = load_texture("examples/tuple.png").await.unwrap();
+        let tuple = load_texture("tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
-        let cup = load_texture("examples/cup.png").await.unwrap();
+        let cup = load_texture("cup.png").await.unwrap();
         cup.set_filter(FilterMode::Nearest);
 
-        let sound_collect = load_sound("examples/getitem.wav").await?;
-        let sound_jump = load_sound("examples/jump.wav").await?;
-        let sound_walk = load_sound("examples/hd-walk.wav").await?;
-        let sound_falling = load_sound("examples/fall.wav").await?;
-        let sound_cup = load_sound("examples/trophy.wav").await?;
-        let sound_win = load_sound("examples/win.wav").await?;
+        let sound_collect = load_sound("getitem.wav").await?;
+        let sound_jump = load_sound("jump.wav").await?;
+        let sound_walk = load_sound("hd-walk.wav").await?;
+        let sound_falling = load_sound("fall.wav").await?;
+        let sound_cup = load_sound("trophy.wav").await?;
+        let sound_win = load_sound("win.wav").await?;
 
-        let tiled_map_json = load_string("examples/level1.json").await.unwrap();
+        let tiled_map_json = load_string("level1.json").await.unwrap();
    
         Ok(Resources { 
             tileset,
