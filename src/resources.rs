@@ -3,6 +3,7 @@ use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coro
 pub struct Resources {
     pub tileset: Texture2D,
     pub tiled_map_json: String,
+    pub intro_map_json: String,
     pub player_idle: Texture2D,
     pub player_walk: Texture2D,
     pub player_jump: Texture2D,
@@ -16,6 +17,9 @@ pub struct Resources {
     pub sound_falling: Sound,
     pub sound_cup: Sound,
     pub sound_win: Sound,
+    pub fire1: Texture2D,
+    pub logo1: Texture2D,
+    pub king: Texture2D,
 }
 
 impl Resources {
@@ -44,6 +48,15 @@ impl Resources {
         let cup = load_texture("cup.png").await.unwrap();
         cup.set_filter(FilterMode::Nearest);
 
+        let fire1 = load_texture("fire1-sheet.png").await.unwrap();
+        fire1.set_filter(FilterMode::Nearest);
+
+        let logo1 = load_texture("dangerousdave1-sheet.png").await.unwrap();
+        logo1.set_filter(FilterMode::Nearest);
+
+        let king = load_texture("king.png").await.unwrap();
+        king.set_filter(FilterMode::Nearest);
+
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
         let sound_walk = load_sound("hd-walk.wav").await?;
@@ -52,10 +65,12 @@ impl Resources {
         let sound_win = load_sound("win.wav").await?;
 
         let tiled_map_json = load_string("level1.json").await.unwrap();
+        let intro_map_json = load_string("intro.json").await.unwrap();
    
         Ok(Resources { 
             tileset,
             tiled_map_json,
+            intro_map_json,
             player_idle,
             player_walk,
             player_jump,
@@ -68,7 +83,10 @@ impl Resources {
             sound_walk, 
             sound_falling, 
             sound_cup, 
-            sound_win 
+            sound_win,
+            fire1,
+            logo1,
+            king
         })
     }
 

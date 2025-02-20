@@ -1,0 +1,108 @@
+{ "compressionlevel":-1,
+ "height":12,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[0, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 0,
+            0, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 0,
+            0, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            9, 0, 9, 9, 9, 9, 0, 9, 0, 9,
+            9, 0, 9, 1025, 0, 0, 0, 0, 0, 9,
+            9, 0, 9, 0, 0, 9, 9, 9, 0, 9,
+            9, 0, 9, 0, 0, 0, 0, 0, 1025, 9,
+            9, 0, 9, 1026, 9, 9, 9, 0, 0, 9,
+            9, 0, 0, 0, 0, 0, 0, 0, 0, 9,
+            9, 9, 9, 9, 9, 9, 9, 9, 1026, 9,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":12,
+         "id":1,
+         "name":"logo",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":10,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":2,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.11.2",
+ "tileheight":32,
+ "tilesets":[
+        {
+         "columns":32,
+         "firstgid":1,
+         "image":"mytileset.png",
+         "imageheight":1024,
+         "imagewidth":1024,
+         "margin":0,
+         "name":"mytileset",
+         "spacing":0,
+         "tilecount":1024,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1025,
+         "image":"king.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"king",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":3,
+         "firstgid":1026,
+         "image":"fire1-sheet.png",
+         "imageheight":33,
+         "imagewidth":105,
+         "margin":0,
+         "name":"fire1-sheet",
+         "spacing":0,
+         "tilecount":3,
+         "tileheight":32,
+         "tiles":[
+                {
+                 "animation":[
+                        {
+                         "duration":100,
+                         "tileid":0
+                        }, 
+                        {
+                         "duration":100,
+                         "tileid":1
+                        }, 
+                        {
+                         "duration":100,
+                         "tileid":2
+                        }],
+                 "id":0
+                }],
+         "tilewidth":32
+        }, 
+        {
+         "columns":32,
+         "firstgid":1029,
+         "image":"dangerousdave1-sheet.png",
+         "imageheight":96,
+         "imagewidth":1024,
+         "margin":0,
+         "name":"dangerousdave1-sheet",
+         "spacing":0,
+         "tilecount":96,
+         "tileheight":32,
+         "tilewidth":32
+        }],
+ "tilewidth":32,
+ "type":"map",
+ "version":"1.10",
+ "width":10
+}

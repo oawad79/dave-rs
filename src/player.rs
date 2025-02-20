@@ -1,4 +1,11 @@
-use macroquad::{audio::play_sound_once, math::{vec2, Rect, Vec2}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage}};
+use macroquad::{
+    audio::play_sound_once, 
+    math::{vec2, Rect, Vec2}, 
+    prelude::{
+        animation::{AnimatedSprite, Animation}, 
+        collections::storage
+    }
+};
 use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;

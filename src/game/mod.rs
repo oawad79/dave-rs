@@ -2,7 +2,7 @@ use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::collections
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map};
 
-use crate::{player::Player, resources::Resources, Scene};
+use crate::{player::Player, resources::Resources, Scene, SceneChange};
 
 struct GameObject {
     world_x: f32,
@@ -102,7 +102,7 @@ impl Game {
 }
 
 impl Scene for Game {
-    fn update(&mut self) {
+    fn update(&mut self) -> Option<SceneChange> {
         let resources = storage::get::<Resources>();
 
         let pos = self.world.actor_pos(self.player.collider);
@@ -146,9 +146,11 @@ impl Scene for Game {
         )) {
             self.game_won = false;
             play_sound_once(&resources.sound_win);
+            return Some(SceneChange::MainMenu);
         }
         
         self.player.update(&mut self.world);
+        None
     }
 
     fn draw(&self) {
@@ -156,6 +158,7 @@ impl Scene for Game {
 
         tiled_map
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
+
 
         for diamond in &self.collectibles {
             let x = if diamond.name == "ruby" {

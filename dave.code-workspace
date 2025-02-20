@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../fishgame-macroquad"
+		},
+		{
+			"path": "../breakout"
+		},
+		{
+			"path": "../macroquad-book-game"
+		}
+	],
+	"settings": {}
+}
