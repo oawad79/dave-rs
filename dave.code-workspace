@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../macroquad-book-game"
+		},
+		{
+			"path": "../../Downloads/RonenNess-RPGUI-1.0.3-7-g048859e/RonenNess-RPGUI-048859e"
 		}
 	],
 	"settings": {}

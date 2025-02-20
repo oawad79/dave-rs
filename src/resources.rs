@@ -1,4 +1,4 @@
-use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
+use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}, ui::{root_ui, Skin}};
 
 pub struct Resources {
     pub tileset: Texture2D,
@@ -21,6 +21,7 @@ pub struct Resources {
     pub logo1: Texture2D,
     pub king: Texture2D,
     pub font: Font,
+    pub quit_texture: Texture2D,
 }
 
 impl Resources {
@@ -69,7 +70,9 @@ impl Resources {
         let intro_map_json = load_string("intro.json").await.unwrap();
 
         let font = load_ttf_font("fonts/NotoSans-Regular.ttf").await.unwrap();
-   
+        
+        let quit_texture = load_texture("quit.png").await.unwrap();
+        
         Ok(Resources { 
             tileset,
             tiled_map_json,
@@ -90,7 +93,8 @@ impl Resources {
             fire1,
             logo1,
             king,
-            font
+            font,
+            quit_texture
         })
     }
 

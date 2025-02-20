@@ -6,7 +6,7 @@ mod main_menu;
 use game::Game;
 use main_menu::MainMenu;
 use resources::Resources;
-use macroquad::prelude::*;
+use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     MainMenu,
@@ -43,6 +43,10 @@ async fn main() {
     
     let mut scene: Box<dyn Scene> = Box::new(MainMenu::new());
     
+    let resources = storage::get::<Resources>();
+
+    let mut show_quit = false;
+
     loop {
         clear_background(BLACK);
         
@@ -58,7 +62,35 @@ async fn main() {
 
         scene.draw();
 
+        if handle_quit_menu(&resources, &mut show_quit) {
+            break;
+        }
+
         next_frame().await
     }
 }
 
+
+fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
+    if is_key_down(KeyCode::Escape) || *show_quit {
+        *show_quit = true;
+        draw_texture_ex(
+            &resources.quit_texture,
+            220.0,
+            150.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(resources.quit_texture.width() * 0.7, resources.quit_texture.height() * 0.7)), 
+                ..Default::default()
+            },
+        );
+    }
+
+    if *show_quit && is_key_down(KeyCode::Y) {
+        return true;
+    } else if *show_quit && is_key_down(KeyCode::N) {
+        *show_quit = false;
+    }
+
+    false
+}
