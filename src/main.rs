@@ -17,8 +17,6 @@ pub trait Scene {
     fn draw(&self);
 }
 
-
-
 fn window_conf() -> Conf {
     Conf {
         window_title: "Dave".to_owned(),
@@ -57,7 +55,7 @@ async fn main() {
                 SceneChange::Game => Box::new(Game::new()),
             };
         }
-        
+
         scene.draw();
 
         next_frame().await
