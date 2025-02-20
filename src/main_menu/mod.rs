@@ -53,6 +53,8 @@ impl Scene for MainMenu {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
+        let resources = storage::get::<Resources>();
+
         let shift_by = (screen_width() / 2.0) - 350.0;
 
         tiled_map.spr_ex(
@@ -77,11 +79,31 @@ impl Scene for MainMenu {
             ),
         );
         
-        //on click, log mouse position
-        if is_mouse_button_down(MouseButton::Left) {
-            macroquad::logging::info!("mouse x: {:?}, mouse y: {:?}", mouse_position().0, mouse_position().1);
-            macroquad::logging::info!("fire x: {:?}, fire y: {:?}", self.fires[0].world_x, self.fires[0].world_y);
-        }
+        draw_text_ex(
+            "A Rust version BY oawad",
+            235.0,
+            100.0,
+            TextParams {
+                font: Some(&resources.font), 
+                font_size: 12,     
+                color: WHITE,  
+
+                ..Default::default()
+            },
+        );
+
+        draw_text_ex(
+            "Press SPACEBAR to Start",
+            240.0,
+            310.0,
+            TextParams {
+                font: Some(&resources.font), 
+                font_size: 12,
+                font_scale: 1.2,
+                color: WHITE, 
+                ..Default::default()
+            },
+        );
 
         tiled_map
             .draw_tiles("logo", Rect::new(shift_by, 0.0, 320.0, 320.0), None);

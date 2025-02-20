@@ -16,7 +16,4 @@ macroquad-tiled = {path = "./macroquad/tiled"}
 macroquad-platformer = {path = "./macroquad/physics-platformer"}
 
 
-# macroquad = "0.4.13"
-# macroquad_macro = "0.1.8"
-# macroquad-tiled = "0.2.1"
-# macroquad-platformer = "0.2"
+

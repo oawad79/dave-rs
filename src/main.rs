@@ -34,7 +34,7 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     macroquad::logging::info!("started program..!!!");
-   
+
     set_pc_assets_folder("assets");
 
     let _ = Resources::load().await;
@@ -45,7 +45,7 @@ async fn main() {
     
     loop {
         clear_background(BLACK);
-    
+        
         set_camera(&main_camera);
 
         let change = scene.update();

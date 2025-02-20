@@ -20,6 +20,7 @@ pub struct Resources {
     pub fire1: Texture2D,
     pub logo1: Texture2D,
     pub king: Texture2D,
+    pub font: Font,
 }
 
 impl Resources {
@@ -66,6 +67,8 @@ impl Resources {
 
         let tiled_map_json = load_string("level1.json").await.unwrap();
         let intro_map_json = load_string("intro.json").await.unwrap();
+
+        let font = load_ttf_font("fonts/NotoSans-Regular.ttf").await.unwrap();
    
         Ok(Resources { 
             tileset,
@@ -86,7 +89,8 @@ impl Resources {
             sound_win,
             fire1,
             logo1,
-            king
+            king,
+            font
         })
     }
 
