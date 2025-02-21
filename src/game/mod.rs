@@ -157,7 +157,7 @@ impl Scene for Game {
         let tiled_map = storage::get::<Map>();
 
         tiled_map
-            .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 320.0), None);
+            .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 352.0), None);
 
 
         for diamond in &self.collectibles {
