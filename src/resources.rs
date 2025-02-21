@@ -18,7 +18,7 @@ pub struct Resources {
     pub sound_cup: Sound,
     pub sound_win: Sound,
     pub fire1: Texture2D,
-    pub logo1: Texture2D,
+    pub banner: Texture2D,
     pub king: Texture2D,
     pub font: Font,
     pub quit_texture: Texture2D,
@@ -53,8 +53,8 @@ impl Resources {
         let fire1 = load_texture("fire1-sheet.png").await.unwrap();
         fire1.set_filter(FilterMode::Nearest);
 
-        let logo1 = load_texture("dangerousdave1-sheet.png").await.unwrap();
-        logo1.set_filter(FilterMode::Nearest);
+        let banner = load_texture("dangerousdave1-sheet.png").await.unwrap();
+        banner.set_filter(FilterMode::Nearest);
 
         let king = load_texture("king.png").await.unwrap();
         king.set_filter(FilterMode::Nearest);
@@ -91,7 +91,7 @@ impl Resources {
             sound_cup, 
             sound_win,
             fire1,
-            logo1,
+            banner,
             king,
             font,
             quit_texture

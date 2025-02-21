@@ -3,9 +3,9 @@
  "infinite":false,
  "layers":[
         {
-         "data":[0, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 0,
-            0, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 0,
-            0, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 0,
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             9, 0, 9, 9, 9, 9, 0, 9, 0, 9,
             9, 0, 9, 1025, 0, 0, 0, 0, 0, 9,
@@ -59,9 +59,32 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":3,
+         "name":"banner",
+         "objects":[
+                {
+                 "gid":1029,
+                 "height":96,
+                 "id":4,
+                 "name":"banner",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":256,
+                 "x":32,
+                 "y":96
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":3,
- "nextobjectid":3,
+ "nextlayerid":4,
+ "nextobjectid":5,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -124,7 +147,7 @@
          "tilewidth":32
         }, 
         {
-         "columns":32,
+         "columns":4,
          "firstgid":1029,
          "image":"dangerousdave1-sheet.png",
          "imageheight":96,
@@ -132,9 +155,9 @@
          "margin":0,
          "name":"dangerousdave1-sheet",
          "spacing":0,
-         "tilecount":96,
-         "tileheight":32,
-         "tilewidth":32
+         "tilecount":4,
+         "tileheight":96,
+         "tilewidth":256
         }],
  "tilewidth":32,
  "type":"map",
