@@ -22,6 +22,11 @@ pub struct Resources {
     pub king: Texture2D,
     pub font: Font,
     pub quit_texture: Texture2D,
+    pub score_texture: Texture2D,
+    pub level_texture: Texture2D,
+    pub daves_texture: Texture2D,
+    pub dave_face: Texture2D,
+    pub numbers: Vec<Texture2D>,
 }
 
 impl Resources {
@@ -72,6 +77,19 @@ impl Resources {
         let font = load_ttf_font("fonts/NotoSans-Regular.ttf").await.unwrap();
         
         let quit_texture = load_texture("quit.png").await.unwrap();
+
+        let score_texture = load_texture("score.png").await.unwrap();
+
+        let level_texture = load_texture("level.png").await.unwrap();
+
+        let daves_texture = load_texture("daves.png").await.unwrap();
+
+        let dave_face = load_texture("DaveFace.png").await.unwrap();
+
+        let mut numbers: Vec<Texture2D> = Vec::new();
+        for i in 0..=9 {
+            numbers.push(load_texture(&format!("num{}.png", i)).await.unwrap());
+        }
         
         Ok(Resources { 
             tileset,
@@ -94,7 +112,12 @@ impl Resources {
             banner,
             king,
             font,
-            quit_texture
+            quit_texture,
+            score_texture,
+            level_texture,
+            daves_texture,
+            dave_face,
+            numbers
         })
     }
 
