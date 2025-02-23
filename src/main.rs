@@ -2,15 +2,19 @@ mod player;
 mod resources;
 mod game;
 mod main_menu;
+mod separator;
+mod score_board;
 
 use game::Game;
 use main_menu::MainMenu;
+use separator::Separator;
 use resources::Resources;
 use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     MainMenu,
     Game,
+    Separator
 }
 pub trait Scene {
     fn update(&mut self) -> Option<SceneChange>;
@@ -57,6 +61,7 @@ async fn main() {
             scene = match change {
                 SceneChange::MainMenu => Box::new(MainMenu::new()),
                 SceneChange::Game => Box::new(Game::new()),
+                SceneChange::Separator => Box::new(Separator::new())
             };
         }
 

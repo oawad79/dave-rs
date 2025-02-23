@@ -4,6 +4,7 @@ pub struct Resources {
     pub tileset: Texture2D,
     pub tiled_map_json: String,
     pub intro_map_json: String,
+    pub separator_map_json: String,
     pub player_idle: Texture2D,
     pub player_walk: Texture2D,
     pub player_jump: Texture2D,
@@ -73,6 +74,7 @@ impl Resources {
 
         let tiled_map_json = load_string("level1.json").await.unwrap();
         let intro_map_json = load_string("intro.json").await.unwrap();
+        let separator_map_json = load_string("seperator.json").await.unwrap();
 
         let font = load_ttf_font("fonts/NotoSans-Regular.ttf").await.unwrap();
         
@@ -95,6 +97,7 @@ impl Resources {
             tileset,
             tiled_map_json,
             intro_map_json,
+            separator_map_json,
             player_idle,
             player_walk,
             player_jump,
