@@ -128,8 +128,6 @@ impl Scene for Game {
 
         self.collectibles.retain(|diamond| !diamond.collected.unwrap_or(false));
 
-        let pos = self.world.actor_pos(self.player.collider);
-
         // Check for collision between player and cup
         if !self.game_won && self.player.overlaps(pos, &Rect::new(
             self.trophy.world_x,

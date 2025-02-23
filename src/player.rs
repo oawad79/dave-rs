@@ -49,7 +49,7 @@ impl Player {
         let delta = get_frame_time();
 
         let pos = world.actor_pos(self.collider);
-
+        
         let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
 
         let state: &str;

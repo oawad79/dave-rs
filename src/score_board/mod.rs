@@ -112,5 +112,16 @@ impl Scene for ScoreBoard {
                 },
             );
         }
+
+        draw_texture_ex(
+            &resources.thin,
+            5.0,
+            30.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(resources.thin.width() , resources.thin.height() * 0.5)), 
+                ..Default::default()
+            },
+        );
     }
 }

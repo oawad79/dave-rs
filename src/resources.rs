@@ -28,6 +28,7 @@ pub struct Resources {
     pub daves_texture: Texture2D,
     pub dave_face: Texture2D,
     pub numbers: Vec<Texture2D>,
+    pub thin: Texture2D,
 }
 
 impl Resources {
@@ -88,6 +89,8 @@ impl Resources {
 
         let dave_face = load_texture("DaveFace.png").await.unwrap();
 
+        let thin = load_texture("thin.png").await.unwrap();
+
         let mut numbers: Vec<Texture2D> = Vec::new();
         for i in 0..=9 {
             numbers.push(load_texture(&format!("num{}.png", i)).await.unwrap());
@@ -120,7 +123,8 @@ impl Resources {
             level_texture,
             daves_texture,
             dave_face,
-            numbers
+            numbers,
+            thin
         })
     }
 

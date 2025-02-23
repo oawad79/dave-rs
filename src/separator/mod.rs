@@ -7,6 +7,7 @@ use crate::{player::Player, resources::Resources, score_board::{self, ScoreBoard
 pub struct Separator {
     player: Player,
     score_board: ScoreBoard,
+    world: World,
 }
 
 impl Separator {
@@ -18,6 +19,8 @@ impl Separator {
             &[
                 ("mytileset.png", resources.tileset.clone()),
                 ("dave_walk.png", resources.player_walk.clone()),
+                ("dave_idle.png", resources.player_idle.clone()),
+                ("dave_jump.png", resources.player_jump.clone()),
                 ("collectibles.png", resources.collectibles.clone()),
                 ("door.png", resources.door.clone()),
             ],
@@ -37,11 +40,12 @@ impl Separator {
                 Tile::Empty
             });
         }
-        
+
         let mut world = World::new();
         world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
     
-        let actor = world.add_actor(vec2(10.0, 250.0), 32, 32);
+        let actor = world.add_actor(vec2(50.0, 192.0), 32, 32);
+        //let actor = world.add_actor(vec2(150.0, 100.0), 32, 32);
     
         let player = Player::new(actor);
 
@@ -50,12 +54,16 @@ impl Separator {
         Separator {
             player,
             score_board,
+            world
         }
     }
 }
 
 impl Scene for Separator {
     fn update(&mut self) -> Option<SceneChange> {
+
+        self.player.update(&mut self.world);
+
         None
     }
 
@@ -64,7 +72,7 @@ impl Scene for Separator {
 
         tiled_map
             .draw_tiles("seperator", Rect::new(0.0, 0.0, 608.0, 352.0), None);
-
+        
         self.score_board.draw();
     }
 }
