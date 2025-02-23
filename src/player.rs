@@ -20,6 +20,9 @@ pub struct Player {
     pub speed: Vec2,
     pub facing_left: bool,
     animated_player: AnimatedSprite,
+    simulate_jump: bool,
+    pub simulate_left: bool,
+    pub simulate_right: bool,
 }
 
 impl Player {
@@ -29,6 +32,9 @@ impl Player {
             speed: vec2(0., 0.),
             facing_left: false,
             animated_player: animated_player(),
+            simulate_jump: false,
+            simulate_left: false,
+            simulate_right: false,
         }
     }
 
@@ -95,9 +101,9 @@ impl Player {
             self.speed.y += GRAVITY * delta;
         }
 
-        if is_key_down(KeyCode::Right) {
+        if self.simulate_right || is_key_down(KeyCode::Right) {
             self.speed.x = 100.0;
-        } else if is_key_down(KeyCode::Left) {
+        } else if self.simulate_left || is_key_down(KeyCode::Left) {
             self.speed.x = -100.0;
         } else {
             self.speed.x = 0.;

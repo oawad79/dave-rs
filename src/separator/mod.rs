@@ -1,13 +1,14 @@
-use macroquad::{math::{vec2, Rect}, prelude::collections::storage};
+use macroquad::{audio::{play_sound, play_sound_once, stop_sound, PlaySoundParams}, input::KeyCode, math::{vec2, Rect}, prelude::collections::storage};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map};
 
-use crate::{player::Player, resources::Resources, score_board::{self, ScoreBoard}, Scene, SceneChange};
+use crate::{player::Player, resources::{self, Resources}, score_board::{self, ScoreBoard}, Scene, SceneChange};
 
 pub struct Separator {
     player: Player,
     score_board: ScoreBoard,
     world: World,
+    sound_playing: bool,
 }
 
 impl Separator {
@@ -45,7 +46,6 @@ impl Separator {
         world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
     
         let actor = world.add_actor(vec2(50.0, 192.0), 32, 32);
-        //let actor = world.add_actor(vec2(150.0, 100.0), 32, 32);
     
         let player = Player::new(actor);
 
@@ -54,15 +54,32 @@ impl Separator {
         Separator {
             player,
             score_board,
-            world
+            world,
+            sound_playing: false,
         }
     }
 }
 
 impl Scene for Separator {
     fn update(&mut self) -> Option<SceneChange> {
+        let pos = self.world.actor_pos(self.player.collider);
+        let resources = storage::get::<Resources>();
 
+        if !self.sound_playing {
+            play_sound(&resources.sound_walk, PlaySoundParams {
+                looped: true, 
+                ..Default::default()
+            });
+            self.sound_playing = true;
+        }
+
+        self.player.simulate_right = true;
         self.player.update(&mut self.world);
+
+        if pos.x > 608.0 {
+            stop_sound(&resources.sound_walk);
+            return Some(SceneChange::MainMenu);
+        }
 
         None
     }
