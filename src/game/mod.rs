@@ -58,9 +58,12 @@ impl Game {
                 Tile::Empty
             });
         }
+
+        let height = tiled_map.layers.get("platform").unwrap().height;
+        let width = tiled_map.layers.get("platform").unwrap().width;
         
         let mut world = World::new();
-        world.add_static_tiled_layer(static_colliders, 32., 32., 19, 1);
+        world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
     
         let actor = world.add_actor(vec2(70.0, 250.0), 32, 32);
     
@@ -95,9 +98,6 @@ impl Game {
             name: cup.name.clone(),
             collected: None,
         };
-
-        let height = tiled_map.layers.get("platform").unwrap().height;
-        let width = tiled_map.layers.get("platform").unwrap().width;
 
         Game {
             world,
