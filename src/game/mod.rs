@@ -23,11 +23,11 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new() -> Game {
+    pub fn new(level: i32) -> Game {
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
-            &resources.tiled_map_json,
+            &resources.levels[(level - 1) as usize],
             &[
                 ("mytileset.png", resources.tileset.clone()),
                 ("dave_walk.png", resources.player_walk.clone()),
@@ -36,7 +36,8 @@ impl Game {
                 ("collectibles.png", resources.collectibles.clone()),
                 ("door.png", resources.door.clone()),
                 ("tuple.png", resources.tuple.clone()),   
-                ("cup.png", resources.cup.clone()),     
+                ("cup.png", resources.cup.clone()),    
+                ("deadly.png", resources.deadly_grass_texture.clone()),     
             ],
             &[],
         )

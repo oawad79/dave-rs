@@ -1,8 +1,8 @@
-use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}, ui::{root_ui, Skin}};
+use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
 
 pub struct Resources {
     pub tileset: Texture2D,
-    pub tiled_map_json: String,
+    pub levels: Vec<String>,
     pub intro_map_json: String,
     pub separator_map_json: String,
     pub player_idle: Texture2D,
@@ -29,6 +29,7 @@ pub struct Resources {
     pub dave_face: Texture2D,
     pub numbers: Vec<Texture2D>,
     pub thin: Texture2D,
+    pub deadly_grass_texture: Texture2D,
 }
 
 impl Resources {
@@ -73,7 +74,13 @@ impl Resources {
         let sound_cup = load_sound("trophy.wav").await?;
         let sound_win = load_sound("win.wav").await?;
 
-        let tiled_map_json = load_string("level1.json").await.unwrap();
+        let mut levels: Vec<String> = Vec::new();
+        for i in 1..=2 {
+            let level = load_string(&format!("level{}.json", i)).await.unwrap();
+            levels.push(level);
+        }
+
+        //let tiled_map_json = load_string("level1.json").await.unwrap();
         let intro_map_json = load_string("intro.json").await.unwrap();
         let separator_map_json = load_string("seperator.json").await.unwrap();
 
@@ -91,6 +98,8 @@ impl Resources {
 
         let thin = load_texture("thin.png").await.unwrap();
 
+        let deadly_grass_texture = load_texture("deadly.png").await.unwrap();
+
         let mut numbers: Vec<Texture2D> = Vec::new();
         for i in 0..=9 {
             numbers.push(load_texture(&format!("num{}.png", i)).await.unwrap());
@@ -98,7 +107,7 @@ impl Resources {
         
         Ok(Resources { 
             tileset,
-            tiled_map_json,
+            levels,
             intro_map_json,
             separator_map_json,
             player_idle,
@@ -124,7 +133,8 @@ impl Resources {
             daves_texture,
             dave_face,
             numbers,
-            thin
+            thin,
+            deadly_grass_texture
         })
     }
 
