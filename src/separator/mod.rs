@@ -78,7 +78,7 @@ impl Scene for Separator {
 
         if pos.x > 608.0 {
             stop_sound(&resources.sound_walk);
-            return Some(SceneChange::MainMenu);
+            return Some(SceneChange::Game { level: self.score_board.level });
         }
 
         None

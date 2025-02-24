@@ -38,6 +38,7 @@ impl Game {
                 ("tuple.png", resources.tuple.clone()),   
                 ("cup.png", resources.cup.clone()),    
                 ("deadly.png", resources.deadly_grass_texture.clone()),     
+                ("fire1-sheet.png", resources.fire1.clone())
             ],
             &[],
         )
@@ -150,6 +151,7 @@ impl Scene for Game {
         )) {
             self.game_won = false;
             play_sound_once(&resources.sound_win);
+            self.score_board.level += 1;
             storage::store(self.score_board.clone());
             return Some(SceneChange::Separator);
         }

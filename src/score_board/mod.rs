@@ -13,8 +13,8 @@ use crate::{resources::Resources, Scene, SceneChange};
 #[derive(Clone)]
 pub struct ScoreBoard {
     pub score: i32,
-    lives: i32,
-    level: i32,
+    pub lives: i32,
+    pub level: i32,
 }
 
 impl ScoreBoard {
