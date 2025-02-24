@@ -20,6 +20,8 @@ pub struct Game {
     trophy: GameObject,
     game_won: bool,
     score_board: ScoreBoard,
+    height_tiles: i32,
+    width_tiles: i32,
 }
 
 impl Game {
@@ -94,6 +96,9 @@ impl Game {
             collected: None,
         };
 
+        let height = tiled_map.layers.get("platform").unwrap().height;
+        let width = tiled_map.layers.get("platform").unwrap().width;
+
         Game {
             world,
             player,
@@ -102,6 +107,8 @@ impl Game {
             trophy,
             game_won: false,
             score_board: ScoreBoard::new(),
+            height_tiles: height as i32,
+            width_tiles: width as i32,
         }
     }
 }
@@ -167,7 +174,8 @@ impl Scene for Game {
         self.score_board.draw();
 
         tiled_map
-            .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 352.0), None);
+            .draw_tiles("platform", 
+                    Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32), None);
 
 
         for diamond in &self.collectibles {
