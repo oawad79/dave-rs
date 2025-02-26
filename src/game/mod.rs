@@ -140,6 +140,70 @@ impl Game {
             waters
         }
     }
+
+    fn draw_collectibles(&self, tiled_map: &Map) {
+        for diamond in &self.collectibles {
+            let x = match diamond.name.as_str() {
+                "ruby" => 0.0,
+                "diamond" => 32.0,
+                _ => 64.0,
+            };
+
+            tiled_map.spr_ex(
+                "collectibles",
+                Rect::new(x, 0.0, 32.0, 32.0),
+                Rect::new(diamond.world_x, diamond.world_y - 32.0, 32.0, 32.0),
+            );
+        }
+    }
+
+    fn draw_door(&self, tiled_map: &Map) {
+        tiled_map.spr_ex(
+            "door",
+            Rect::new(0.0, 0.0, 32.0, 32.0),
+            Rect::new(self.door.world_x, self.door.world_y - 32.0, 32.0, 32.0),
+        );
+    }
+
+    fn draw_trophy(&self, tiled_map: &Map) {
+        if !self.game_won {
+            tiled_map.spr_ex(
+                "cup",
+                Rect::new(0.0, 0.0, 32.0, 32.0),
+                Rect::new(self.trophy.world_x, self.trophy.world_y - 32.0, 32.0, 32.0),
+            );
+        }
+    }
+
+    fn draw_animated_objects(&self, tiled_map: &Map) {
+        if let Some(animated_fire) = &self.animated_fire {
+            for fire in &self.fires {
+                tiled_map.spr_ex(
+                    "fire1-sheet",
+                    animated_fire.frame().source_rect,
+                    Rect::new(fire.world_x, fire.world_y - 32.0, 32.0, 32.0),
+                );
+            }
+        }
+
+        if let Some(animated_water) = &self.animated_water {
+            for water in &self.waters {
+                tiled_map.spr_ex(
+                    "water1-sheet",
+                    animated_water.frame().source_rect,
+                    Rect::new(water.world_x, water.world_y - 32.0, 32.0, 32.0),
+                );
+            }
+        }
+    }
+
+    fn draw_tiles(&self, tiled_map: &Map) {
+        tiled_map.draw_tiles(
+            "platform",
+            Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+            None,
+        );
+    }
 }
 
 impl Scene for Game {
@@ -210,101 +274,11 @@ impl Scene for Game {
         let tiled_map = storage::get::<Map>();
 
         self.score_board.draw();
-
-        tiled_map
-            .draw_tiles("platform", 
-                    Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32), None);
-
-
-        for diamond in &self.collectibles {
-            let x = if diamond.name == "ruby" {
-                0.0
-            } else if diamond.name == "diamond" {
-                32.0
-            } else {
-                64.0
-            };
-
-            tiled_map.spr_ex(
-                "collectibles",
-                Rect::new(
-                    x,
-                    0.0,
-                    32.0,
-                    32.0,
-                ),
-                Rect::new(
-                    diamond.world_x,
-                    diamond.world_y - 32.0,
-                    32.0,
-                    32.0,
-                ),
-            );
-        }
-
-        tiled_map.spr_ex(
-            "door",
-            Rect::new(
-                0.0,
-                0.0,
-                32.0,
-                32.0,
-            ),
-            Rect::new(
-                self.door.world_x,
-                self.door.world_y - 32.0,
-                32.0,
-                32.0,
-            ),
-        );
-
-        if !self.game_won {
-            tiled_map.spr_ex(
-                "cup",
-                Rect::new(
-                    0.0,
-                    0.0,
-                    32.0,
-                    32.0,
-                ),
-                Rect::new(
-                    self.trophy.world_x,
-                    self.trophy.world_y - 32.0,
-                    32.0,
-                    32.0,
-                ),
-            );
-        }
-
-        if self.animated_fire.is_some() {
-            for fire in &self.fires {
-                tiled_map.spr_ex(
-                    "fire1-sheet",
-                    self.animated_fire.as_ref().unwrap().frame().source_rect,
-                    Rect::new(
-                        fire.world_x,
-                        fire.world_y - 32.0,
-                        32.0,
-                        32.0,
-                    ),
-                );
-            }
-        }
-
-        if self.animated_water.is_some() {
-            for water in &self.waters {
-                tiled_map.spr_ex(
-                    "water1-sheet",
-                    self.animated_water.as_ref().unwrap().frame().source_rect,
-                    Rect::new(
-                        water.world_x,
-                        water.world_y - 32.0,
-                        32.0,
-                        32.0,
-                    ),
-                );
-            }
-        }
+        self.draw_tiles(&tiled_map);
+        self.draw_collectibles(&tiled_map);
+        self.draw_door(&tiled_map);
+        self.draw_trophy(&tiled_map);
+        self.draw_animated_objects(&tiled_map);
     }
 }
 
