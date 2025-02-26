@@ -239,7 +239,9 @@ impl Scene for Game {
            (pos.x > screen_width() / 2.0) && 
            (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
             self.camera.target.x = pos.x;
+            self.score_board.position = (pos.x - 300.0, pos.y);
         }
+        
 
         // Check for collision between player and diamonds
         for diamond in self.collectibles.iter_mut() {
@@ -299,14 +301,12 @@ impl Scene for Game {
             self.animated_grass.as_mut().unwrap().update();
         }
         
-        
         None
     }
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
 
-        //set_default_camera();
         self.score_board.draw();
         self.draw_tiles(&tiled_map);
         self.draw_collectibles(&tiled_map);

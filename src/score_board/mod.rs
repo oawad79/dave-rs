@@ -15,6 +15,7 @@ pub struct ScoreBoard {
     pub score: i32,
     pub lives: i32,
     pub level: i32,
+    pub position: (f32, f32),
 }
 
 impl ScoreBoard {
@@ -23,6 +24,7 @@ impl ScoreBoard {
             score: 0,
             lives: 3,
             level: 1,
+            position: (5.0, 5.0),
         }
     }
 
@@ -44,7 +46,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             &resources.score_texture,
-            5.0,
+            if self.level == 1 {5.0} else {self.position.0},
             5.0,
             WHITE,
             DrawTextureParams {
@@ -57,7 +59,7 @@ impl Scene for ScoreBoard {
         for (i, n) in score.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                120.0 + (i as f32 * 20.0),
+                if self.level == 1 {120.0 + (i as f32 * 20.0)} else {self.position.0 + 120.0 + (i as f32 * 20.0)},
                 7.0,
                 WHITE,
                 DrawTextureParams {
@@ -69,7 +71,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             &resources.level_texture,
-            220.0,
+            if self.level == 1 {220.0} else {self.position.0 + 220.0},
             5.0,
             WHITE,
             DrawTextureParams {
@@ -80,7 +82,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             &resources.numbers[self.level as usize],
-            320.0,
+            if self.level == 1 {320.0} else {self.position.0 + 320.0},
             7.0,
             WHITE,
             DrawTextureParams {
@@ -91,7 +93,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             &resources.daves_texture,
-            400.0,
+            if self.level == 1 {400.0} else {self.position.0 + 400.0},
             5.0,
             WHITE,
             DrawTextureParams {
@@ -103,7 +105,7 @@ impl Scene for ScoreBoard {
         for i in 0..self.lives {
             draw_texture_ex(
                 &resources.dave_face,
-                510.0 + (i as f32 * 30.0),
+                if self.level == 1 {510.0 + (i as f32 * 30.0)} else {self.position.0 + 510.0 + (i as f32 * 30.0)},
                 2.0,
                 WHITE,
                 DrawTextureParams {
@@ -115,7 +117,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             &resources.thin,
-            5.0,
+            if self.level == 1 {5.0} else {self.position.0 + 5.0},
             30.0,
             WHITE,
             DrawTextureParams {
