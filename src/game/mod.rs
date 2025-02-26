@@ -104,26 +104,11 @@ impl Game {
             collected: None,
         };
 
+        let (animated_fire, fires) = 
+                            Game::load_animation(&tiled_map, "fire", 3);
+        let (animated_water, waters) = 
+                            Game::load_animation(&tiled_map, "water", 5);
         
-
-        let mut fires = vec![];
-        let mut animated_fire: Option<AnimatedSprite> = None;
-        if tiled_map.layers.contains_key("fire") {
-            animated_fire = Some(create_animation("fire", 3));
-            
-            let fire_layer = tiled_map.layers.get("fire").unwrap();
-            fires = fire_layer.objects.clone();
-        }
-
-        let mut waters = vec![];
-        let mut animated_water: Option<AnimatedSprite> = None;
-        if tiled_map.layers.contains_key("water") {
-            animated_water = Some(create_animation("water", 5));
-            
-            let water_layer = tiled_map.layers.get("water").unwrap();
-            waters = water_layer.objects.clone();
-        }
-
         Game {
             world,
             player,
@@ -140,6 +125,19 @@ impl Game {
             waters
         }
     }
+
+    fn load_animation(tiled_map: &Map, name: &str, frames: i32) -> (Option<AnimatedSprite>, Vec<Object>) {
+        let mut waters = vec![];
+        let mut animated_water: Option<AnimatedSprite> = None;
+        if tiled_map.layers.contains_key(name) {
+            animated_water = Some(create_animation(name, frames));
+            
+            let water_layer = tiled_map.layers.get(name).unwrap();
+            waters = water_layer.objects.clone();
+        }
+
+        (animated_water, waters)
+    } 
 
     fn draw_collectibles(&self, tiled_map: &Map) {
         for diamond in &self.collectibles {
