@@ -1,8 +1,8 @@
-use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage}};
+use macroquad::{audio::play_sound_once, camera::set_default_camera, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage, set_camera, Camera2D}};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 
-use crate::{player::Player, resources::Resources, score_board::{self, ScoreBoard}, Scene, SceneChange};
+use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 
 struct GameObject {
@@ -26,6 +26,7 @@ pub struct Game {
     animated_water: Option<AnimatedSprite>,
     fires: Vec<Object>,
     waters: Vec<Object>,
+    camera: Camera2D,
 }
 
 impl Game {
@@ -109,6 +110,8 @@ impl Game {
         let (animated_water, waters) = 
                             Game::load_animation(&tiled_map, "water", 5);
         
+        let camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
+
         Game {
             world,
             player,
@@ -122,7 +125,8 @@ impl Game {
             animated_fire,
             fires,
             animated_water,
-            waters
+            waters,
+            camera,
         }
     }
 
@@ -208,7 +212,16 @@ impl Scene for Game {
     fn update(&mut self) -> Option<SceneChange> {
         let resources = storage::get::<Resources>();
 
+        // Set the camera to follow the player
+        set_camera(&self.camera);
+
         let pos = self.world.actor_pos(self.player.collider);
+
+        // Update camera position to follow the player
+        if self.score_board.level != 1 {
+            self.camera.target = vec2(pos.x, pos.y);
+            //self.camera.offset = vec2(pos.x, pos.y);
+        }
 
         // Check for collision between player and diamonds
         for diamond in self.collectibles.iter_mut() {
@@ -270,15 +283,14 @@ impl Scene for Game {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
-        //let score_board = storage::get::<ScoreBoard>();
 
+        //set_default_camera();
         self.score_board.draw();
         self.draw_tiles(&tiled_map);
         self.draw_collectibles(&tiled_map);
         self.draw_door(&tiled_map);
         self.draw_trophy(&tiled_map);
         self.draw_animated_objects(&tiled_map);
-        
     }
 }
 
@@ -295,7 +307,6 @@ fn create_animation(name: &str, frames: i32) -> AnimatedSprite {
             }
         ],
         true,
-        
     );
 
     ani.set_animation(0);
