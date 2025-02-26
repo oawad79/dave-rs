@@ -1,4 +1,4 @@
-use macroquad::{audio::play_sound_once, camera::set_default_camera, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage, set_camera, Camera2D}};
+use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage, set_camera, Camera2D}, window::screen_width};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 
@@ -27,6 +27,8 @@ pub struct Game {
     fires: Vec<Object>,
     waters: Vec<Object>,
     camera: Camera2D,
+    animated_grass: Option<AnimatedSprite>,
+    grasses: Vec<Object>,
 }
 
 impl Game {
@@ -109,6 +111,9 @@ impl Game {
                             Game::load_animation(&tiled_map, "fire", 3);
         let (animated_water, waters) = 
                             Game::load_animation(&tiled_map, "water", 5);
+
+        let (animated_grass, grasses) = 
+                            Game::load_animation(&tiled_map, "grass", 4);
         
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
 
@@ -127,20 +132,22 @@ impl Game {
             animated_water,
             waters,
             camera,
+            animated_grass,
+            grasses,
         }
     }
 
     fn load_animation(tiled_map: &Map, name: &str, frames: i32) -> (Option<AnimatedSprite>, Vec<Object>) {
-        let mut waters = vec![];
-        let mut animated_water: Option<AnimatedSprite> = None;
+        let mut objects = vec![];
+        let mut animated_object: Option<AnimatedSprite> = None;
         if tiled_map.layers.contains_key(name) {
-            animated_water = Some(create_animation(name, frames));
+            animated_object = Some(create_animation(name, frames));
             
-            let water_layer = tiled_map.layers.get(name).unwrap();
-            waters = water_layer.objects.clone();
+            let object_layer = tiled_map.layers.get(name).unwrap();
+            objects = object_layer.objects.clone();
         }
 
-        (animated_water, waters)
+        (animated_object, objects)
     } 
 
     fn draw_collectibles(&self, tiled_map: &Map) {
@@ -197,6 +204,16 @@ impl Game {
                 );
             }
         }
+
+        if let Some(animated_grass) = &self.animated_grass {
+            for grass in &self.grasses {
+                tiled_map.spr_ex(
+                    "deadly",
+                    animated_grass.frame().source_rect,
+                    Rect::new(grass.world_x, grass.world_y - 32.0, 32.0, 32.0),
+                );
+            }
+        }
     }
 
     fn draw_tiles(&self, tiled_map: &Map) {
@@ -218,9 +235,10 @@ impl Scene for Game {
         let pos = self.world.actor_pos(self.player.collider);
 
         // Update camera position to follow the player
-        if self.score_board.level != 1 {
-            self.camera.target = vec2(pos.x, pos.y);
-            //self.camera.offset = vec2(pos.x, pos.y);
+        if (self.score_board.level != 1) && 
+           (pos.x > screen_width() / 2.0) && 
+           (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
+            self.camera.target.x = pos.x;
         }
 
         // Check for collision between player and diamonds
@@ -275,6 +293,10 @@ impl Scene for Game {
 
         if self.animated_water.is_some() {
             self.animated_water.as_mut().unwrap().update();
+        }
+
+        if self.animated_grass.is_some() {
+            self.animated_grass.as_mut().unwrap().update();
         }
         
         
