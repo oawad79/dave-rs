@@ -1,6 +1,6 @@
-use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::collections::storage};
+use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage}};
 use macroquad_platformer::{Tile, World};
-use macroquad_tiled::{load_map, Map};
+use macroquad_tiled::{load_map, Map, Object};
 
 use crate::{player::Player, resources::Resources, Scene, SceneChange, score_board::ScoreBoard};
 
@@ -22,6 +22,10 @@ pub struct Game {
     score_board: ScoreBoard,
     height_tiles: i32,
     width_tiles: i32,
+    animated_fire: Option<AnimatedSprite>,
+    animated_water: Option<AnimatedSprite>,
+    fires: Vec<Object>,
+    waters: Vec<Object>,
 }
 
 impl Game {
@@ -40,7 +44,8 @@ impl Game {
                 ("tuple.png", resources.tuple.clone()),   
                 ("cup.png", resources.cup.clone()),    
                 ("deadly.png", resources.deadly_grass_texture.clone()),     
-                ("fire1-sheet.png", resources.fire1.clone())
+                ("fire1-sheet.png", resources.fire1.clone()),
+                ("water1-sheet.png", resources.water_texture.clone()),
             ],
             &[],
         )
@@ -99,6 +104,26 @@ impl Game {
             collected: None,
         };
 
+        
+
+        let mut fires = vec![];
+        let mut animated_fire: Option<AnimatedSprite> = None;
+        if tiled_map.layers.contains_key("fire") {
+            animated_fire = Some(create_animation("fire", 3));
+            
+            let fire_layer = tiled_map.layers.get("fire").unwrap();
+            fires = fire_layer.objects.clone();
+        }
+
+        let mut waters = vec![];
+        let mut animated_water: Option<AnimatedSprite> = None;
+        if tiled_map.layers.contains_key("water") {
+            animated_water = Some(create_animation("water", 5));
+            
+            let water_layer = tiled_map.layers.get("water").unwrap();
+            waters = water_layer.objects.clone();
+        }
+
         Game {
             world,
             player,
@@ -109,6 +134,10 @@ impl Game {
             score_board: ScoreBoard::new(),
             height_tiles: height as i32,
             width_tiles: width as i32,
+            animated_fire,
+            fires,
+            animated_water,
+            waters
         }
     }
 }
@@ -164,6 +193,15 @@ impl Scene for Game {
         }
         
         self.player.update(&mut self.world);
+
+        if self.animated_fire.is_some() {
+            self.animated_fire.as_mut().unwrap().update();
+        }
+
+        if self.animated_water.is_some() {
+            self.animated_water.as_mut().unwrap().update();
+        }
+        
         
         None
     }
@@ -237,5 +275,55 @@ impl Scene for Game {
                 ),
             );
         }
+
+        if self.animated_fire.is_some() {
+            for fire in &self.fires {
+                tiled_map.spr_ex(
+                    "fire1-sheet",
+                    self.animated_fire.as_ref().unwrap().frame().source_rect,
+                    Rect::new(
+                        fire.world_x,
+                        fire.world_y - 32.0,
+                        32.0,
+                        32.0,
+                    ),
+                );
+            }
+        }
+
+        if self.animated_water.is_some() {
+            for water in &self.waters {
+                tiled_map.spr_ex(
+                    "water1-sheet",
+                    self.animated_water.as_ref().unwrap().frame().source_rect,
+                    Rect::new(
+                        water.world_x,
+                        water.world_y - 32.0,
+                        32.0,
+                        32.0,
+                    ),
+                );
+            }
+        }
     }
+}
+
+fn create_animation(name: &str, frames: i32) -> AnimatedSprite {
+    let mut ani = AnimatedSprite::new(
+        32,
+        32,
+        &[
+            Animation {
+                name: name.to_string(),
+                row: 0,
+                frames: frames as u32,
+                fps: 4,
+            }
+        ],
+        true,
+        
+    );
+
+    ani.set_animation(0);
+    ani
 }

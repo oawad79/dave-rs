@@ -30,6 +30,7 @@ pub struct Resources {
     pub numbers: Vec<Texture2D>,
     pub thin: Texture2D,
     pub deadly_grass_texture: Texture2D,
+    pub water_texture: Texture2D,
 }
 
 impl Resources {
@@ -63,6 +64,9 @@ impl Resources {
 
         let banner = load_texture("dangerousdave1-sheet.png").await.unwrap();
         banner.set_filter(FilterMode::Nearest);
+
+        let water_texture = load_texture("water1-sheet.png").await.unwrap();
+        water_texture.set_filter(FilterMode::Nearest);
 
         let king = load_texture("king.png").await.unwrap();
         king.set_filter(FilterMode::Nearest);
@@ -134,7 +138,8 @@ impl Resources {
             dave_face,
             numbers,
             thin,
-            deadly_grass_texture
+            deadly_grass_texture,
+            water_texture
         })
     }
 

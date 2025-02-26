@@ -1,8 +1,8 @@
-use macroquad::{audio::{play_sound, play_sound_once, stop_sound, PlaySoundParams}, input::KeyCode, math::{vec2, Rect}, prelude::collections::storage};
+use macroquad::{audio::{play_sound, stop_sound, PlaySoundParams}, math::{vec2, Rect}, prelude::collections::storage};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map};
 
-use crate::{player::Player, resources::{self, Resources}, score_board::{self, ScoreBoard}, Scene, SceneChange};
+use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 pub struct Separator {
     player: Player,
