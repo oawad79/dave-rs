@@ -2,7 +2,7 @@ use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::{animation:
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 
-use crate::{player::Player, resources::Resources, Scene, SceneChange, score_board::ScoreBoard};
+use crate::{player::Player, resources::Resources, score_board::{self, ScoreBoard}, Scene, SceneChange};
 
 
 struct GameObject {
@@ -131,7 +131,7 @@ impl Game {
             door,
             trophy,
             game_won: false,
-            score_board: ScoreBoard::new(),
+            score_board: if level == 1 { ScoreBoard::new()} else { storage::get::<ScoreBoard>().clone() },
             height_tiles: height as i32,
             width_tiles: width as i32,
             animated_fire,
@@ -272,6 +272,7 @@ impl Scene for Game {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
+        //let score_board = storage::get::<ScoreBoard>();
 
         self.score_board.draw();
         self.draw_tiles(&tiled_map);
@@ -279,6 +280,7 @@ impl Scene for Game {
         self.draw_door(&tiled_map);
         self.draw_trophy(&tiled_map);
         self.draw_animated_objects(&tiled_map);
+        
     }
 }
 
