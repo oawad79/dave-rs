@@ -1,8 +1,8 @@
-use macroquad::{audio::play_sound_once, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage, set_camera, Camera2D}, window::screen_width};
+use macroquad::{audio::play_sound_once, camera::set_default_camera, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage, set_camera, Camera2D}, window::screen_width};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 
-use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
+use crate::{player::Player, resources::Resources, score_board::{self, ScoreBoard}, Scene, SceneChange};
 
 
 struct GameObject {
@@ -73,7 +73,7 @@ impl Game {
         let mut world = World::new();
         world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
     
-        let actor = world.add_actor(vec2(70.0, 250.0), 32, 32);
+        let actor = world.add_actor(vec2(65.0, 250.0), 32, 32);
     
         let player = Player::new(actor);
 
@@ -116,6 +116,8 @@ impl Game {
                             Game::load_animation(&tiled_map, "grass", 4);
         
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
+
+        //let mut score_board = if level == 1 { ScoreBoard::new()} else { storage::get::<ScoreBoard>().clone() }
 
         Game {
             world,
@@ -234,14 +236,37 @@ impl Scene for Game {
 
         let pos = self.world.actor_pos(self.player.collider);
 
-        // Update camera position to follow the player
-        if (self.score_board.level != 1) && 
-           (pos.x > screen_width() / 2.0) && 
-           (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
-            self.camera.target.x = pos.x;
-            self.score_board.position = (pos.x - 300.0, pos.y);
+        println!("Player position: {:?}", pos.x);
+
+        //Update camera position to follow the player
+        // if self.width_tiles as f32 * 32.0 > screen_width() {
+        //     if (pos.x > screen_width() / 2.0) && 
+        //        (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
+        //         self.camera.target.x = pos.x;
+        //         self.score_board.position = (pos.x - 300.0, pos.y);
+        //     }
+        //     else if pos.x > 200.0 {
+        //         self.camera.target.x = pos.x + 150.0;
+        //     }
+        //     else if pos.x < 200.0 {
+        //         self.camera.target.x = 305.0;
+        //     }
+        // }
+
+        //Update camera position to follow the player
+        if self.width_tiles as f32 * 32.0 > screen_width() {
+            let target_x = if (pos.x > screen_width() / 2.0) && 
+                              (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
+                pos.x
+            } else if pos.x > 200.0 {
+                pos.x + 150.0
+            } else {
+                305.0
+            };
+
+            self.camera.target.x = self.camera.target.x + (target_x - self.camera.target.x) * 0.1;
+            self.score_board.position = (self.camera.target.x - 300.0, pos.y);
         }
-        
 
         // Check for collision between player and diamonds
         for diamond in self.collectibles.iter_mut() {
@@ -287,6 +312,21 @@ impl Scene for Game {
             return Some(SceneChange::Separator);
         }
         
+
+        for fire in &self.fires {
+            let fire_rect = Rect::new(
+                fire.world_x,
+                fire.world_y - 32.0,
+                32.0,
+                32.0,
+            );
+
+            if self.player.overlaps(pos, &fire_rect) {
+                play_sound_once(&resources.sound_die);
+            }
+        }
+
+
         self.player.update(&mut self.world);
 
         if self.animated_fire.is_some() {
@@ -306,6 +346,9 @@ impl Scene for Game {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
+
+        // Set the camera to follow the player
+        //set_camera(&self.camera);
 
         self.score_board.draw();
         self.draw_tiles(&tiled_map);

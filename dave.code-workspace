@@ -13,16 +13,13 @@
 			"path": "../macroquad-book-game"
 		},
 		{
-			"path": "../../Downloads/RonenNess-RPGUI-1.0.3-7-g048859e/RonenNess-RPGUI-048859e"
-		},
-		{
 			"path": "../brkjam2025-RobomaidRush"
 		},
 		{
 			"path": "../miniquad"
 		},
 		{
-			"path": "../../CLionProjects/c-test"
+			"path": "../../CLionProjects/opengl-training"
 		}
 	],
 	"settings": {

@@ -18,6 +18,7 @@ pub struct Resources {
     pub sound_falling: Sound,
     pub sound_cup: Sound,
     pub sound_win: Sound,
+    pub sound_die: Sound,
     pub fire1: Texture2D,
     pub banner: Texture2D,
     pub king: Texture2D,
@@ -77,6 +78,7 @@ impl Resources {
         let sound_falling = load_sound("fall.wav").await?;
         let sound_cup = load_sound("trophy.wav").await?;
         let sound_win = load_sound("win.wav").await?;
+        let sound_die = load_sound("hd-die-dave-7.wav").await?;
 
         let mut levels: Vec<String> = Vec::new();
         for i in 1..=2 {
@@ -127,6 +129,7 @@ impl Resources {
             sound_falling, 
             sound_cup, 
             sound_win,
+            sound_die,
             fire1,
             banner,
             king,

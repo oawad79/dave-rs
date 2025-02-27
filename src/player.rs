@@ -109,7 +109,7 @@ impl Player {
             self.speed.x = 0.;
         }
 
-        if is_key_pressed(KeyCode::Space) && on_ground {
+        if is_key_pressed(KeyCode::Up) && on_ground {
             play_sound_once(&resources.sound_jump);
             self.speed.y = JUMP_VELOCITY;
         }
