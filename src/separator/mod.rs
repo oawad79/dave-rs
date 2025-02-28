@@ -50,7 +50,6 @@ impl Separator {
         let player = Player::new(actor);
 
         let score_board = storage::get::<ScoreBoard>().clone();
-        //score_board.separator = true;
 
         Separator {
             player,
@@ -83,6 +82,8 @@ impl Scene for Separator {
             return Some(SceneChange::Game { level: self.score_board.level });
         }
 
+        self.score_board.position = (5.0, 5.0);
+
         None
     }
 
@@ -91,6 +92,7 @@ impl Scene for Separator {
 
         tiled_map
             .draw_tiles("seperator", Rect::new(0.0, 0.0, 608.0, 352.0), None);
+        
         
         self.score_board.draw();
     }

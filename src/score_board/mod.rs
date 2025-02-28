@@ -120,7 +120,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             &resources.thin,
-            self.position.0 + 5.0,
+            self.position.0,
             30.0,
             WHITE,
             DrawTextureParams {
