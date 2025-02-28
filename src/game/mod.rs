@@ -238,32 +238,17 @@ impl Scene for Game {
 
         let pos = self.world.actor_pos(self.player.collider);
 
-        println!("Player position: {:?}", pos.x);
-
-        //Update camera position to follow the player
-        // if self.width_tiles as f32 * 32.0 > screen_width() {
-        //     if (pos.x > screen_width() / 2.0) && 
-        //        (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
-        //         self.camera.target.x = pos.x;
-        //         self.score_board.position = (pos.x - 300.0, pos.y);
-        //     }
-        //     else if pos.x > 200.0 {
-        //         self.camera.target.x = pos.x + 150.0;
-        //     }
-        //     else if pos.x < 200.0 {
-        //         self.camera.target.x = 305.0;
-        //     }
-        // }
-
         //Update camera position to follow the player
         if self.width_tiles as f32 * 32.0 > screen_width() {
             let target_x = if (pos.x > screen_width() / 2.0) && 
                               (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
                 pos.x
-            } else if pos.x > 200.0 {
+            } else if pos.x > 200.0 && pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0 {
                 pos.x + 150.0
-            } else {
+            } else if pos.x < 200.0 {
                 305.0
+            } else {
+                self.camera.target.x
             };
 
             self.camera.target.x = self.camera.target.x + (target_x - self.camera.target.x) * 0.1;
