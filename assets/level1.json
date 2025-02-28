@@ -181,6 +181,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":13,
+         "name":"player",
+         "objects":[
+                {
+                 "gid":1025,
+                 "height":32,
+                 "id":47,
+                 "name":"dave",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":63.8644833427442,
+                 "y":318.473178994918
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":12,
          "name":"cup",
          "objects":[
@@ -225,8 +248,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":13,
- "nextobjectid":46,
+ "nextlayerid":14,
+ "nextobjectid":48,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

@@ -26,6 +26,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":8,
+         "name":"player",
+         "objects":[
+                {
+                 "gid":5,
+                 "height":32,
+                 "id":115,
+                 "name":"dave",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":33.6666666666667,
+                 "y":319.333333333333
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":6,
          "name":"grass",
          "objects":[
@@ -1026,8 +1049,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":112,
+ "nextlayerid":9,
+ "nextobjectid":116,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

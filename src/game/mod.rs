@@ -72,8 +72,10 @@ impl Game {
         
         let mut world = World::new();
         world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
-    
-        let actor = world.add_actor(vec2(65.0, 250.0), 32, 32);
+        
+        let player_loc = tiled_map.layers.get("player").unwrap().objects.first().unwrap();
+
+        let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
     
         let player = Player::new(actor);
 
