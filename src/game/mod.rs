@@ -6,6 +6,7 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
+use crate::resources;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
@@ -254,9 +255,13 @@ impl Game {
             None,
         );
     }
+
+    
 }
 
 impl Scene for Game {
+    
+
     fn update(&mut self) -> Option<SceneChange> {
         let resources = storage::get::<Resources>();
 
@@ -350,8 +355,31 @@ impl Scene for Game {
                 }
                 play_sound_once(&resources.sound_explosion);
                 play_sound_once(&resources.sound_die);
+            }
+        }
 
-                
+        for water in &self.waters {
+            let water_rect = Rect::new(
+                water.world_x,
+                water.world_y - 32.0,
+                32.0,
+                32.0,
+            );
+
+            if self.player.overlaps(pos, &water_rect) && !self.player.is_dead {
+                self.player.is_dead = true;    
+                self.explosion_active = true;
+                self.explosion_timer = EXPLOSION_DURATION;
+
+                if self.explosions.is_empty() {
+                    self.explosions.push((Emitter::new(EmitterConfig {
+                        amount: 40,
+                        texture: Some(resources.explosion.clone()),
+                        ..Game::particle_explosion()
+                    }), vec2(pos.x + 32.0, pos.y)));
+                }
+                play_sound_once(&resources.sound_explosion);
+                play_sound_once(&resources.sound_die);
             }
         }
 
