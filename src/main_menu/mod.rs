@@ -54,7 +54,7 @@ impl Scene for MainMenu {
     fn update(&mut self) -> Option<SceneChange> {
         
         if is_key_down(KeyCode::Space) {
-            return Some(SceneChange::Game{level: 1});
+            return Some(SceneChange::Game{level: 1, retry: false});
         }
 
         self.animated_fire.update();

@@ -34,10 +34,12 @@ pub struct Game {
     animated_grass: Option<AnimatedSprite>,
     grasses: Vec<Object>,
     explosions: Vec<(Emitter, Vec2)>,
+    explosion_active: bool,
+    explosion_timer: f32,
 }
 
 impl Game {
-    pub fn new(level: i32) -> Game {
+    pub fn new(level: i32, retry: bool) -> Game {
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
@@ -131,7 +133,7 @@ impl Game {
             door,
             trophy,
             game_won: false,
-            score_board: if level == 1 { ScoreBoard::new()} else { storage::get::<ScoreBoard>().clone() },
+            score_board: if level == 1 && !retry { ScoreBoard::new()} else { storage::get::<ScoreBoard>().clone() },
             height_tiles: height as i32,
             width_tiles: width as i32,
             animated_fire,
@@ -142,6 +144,8 @@ impl Game {
             animated_grass,
             grasses,
             explosions: vec![],
+            explosion_active: false,
+            explosion_timer: 2.0,
         }
     }
 
@@ -321,8 +325,6 @@ impl Scene for Game {
             return Some(SceneChange::Separator);
         }
         
-
-        //self.explosions.clear();
         self.explosions.retain(|(explosion, _)| explosion.config.emitting);
 
         for fire in &self.fires {
@@ -335,6 +337,9 @@ impl Scene for Game {
 
             if self.player.overlaps(pos, &fire_rect) && !self.player.is_dead {
                 self.player.is_dead = true;    
+                self.explosion_active = true;
+                self.explosion_timer = 2.0;
+
                 if self.explosions.is_empty() {
                     self.explosions.push((Emitter::new(EmitterConfig {
                         amount: 40,
@@ -344,12 +349,31 @@ impl Scene for Game {
                 }
                 play_sound_once(&resources.sound_explosion);
                 play_sound_once(&resources.sound_die);
+
+                
+            }
+        }
+
+        if !self.explosion_active && self.player.is_dead {
+            if self.score_board.lives == 0 {
+                return Some(SceneChange::MainMenu);
+            } else {
+                self.score_board.lives -= 1;
+                storage::store(self.score_board.clone());
+                return Some(SceneChange::Game{level: self.score_board.level, retry: true});
             }
         }
 
 
         for (explosion, coords) in &mut self.explosions {
             explosion.draw(vec2(coords.x, coords.y));
+        }
+
+        if self.explosion_active {
+            self.explosion_timer -= get_frame_time();
+            if self.explosion_timer <= 0.0 {
+                self.explosion_active = false;
+            }
         }
         
         self.player.update(&mut self.world);

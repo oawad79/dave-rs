@@ -13,7 +13,7 @@ use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     MainMenu,
-    Game{level: i32},
+    Game{level: i32, retry: bool},
     Separator
 }
 pub trait Scene {
@@ -60,7 +60,7 @@ async fn main() {
         if let Some(change) = change {
             scene = match change {
                 SceneChange::MainMenu => Box::new(MainMenu::new()),
-                SceneChange::Game{level} => Box::new(Game::new(level)),
+                SceneChange::Game{level, retry} => Box::new(Game::new(level, retry)),
                 SceneChange::Separator => Box::new(Separator::new())
             };
         }
