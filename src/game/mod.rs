@@ -8,6 +8,7 @@ use macroquad_particles::*;
 
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
+const EXPLOSION_DURATION: f32 = 2.0;
 
 struct GameObject {
     world_x: f32,
@@ -154,7 +155,7 @@ impl Game {
             local_coords: false,
             one_shot: true,
             emitting: true,
-            lifetime: 2.0,
+            lifetime: EXPLOSION_DURATION,
             lifetime_randomness: 0.3,
             explosiveness: 0.65,
             initial_direction_spread: 2.0 * std::f32::consts::PI,
@@ -338,7 +339,7 @@ impl Scene for Game {
             if self.player.overlaps(pos, &fire_rect) && !self.player.is_dead {
                 self.player.is_dead = true;    
                 self.explosion_active = true;
-                self.explosion_timer = 2.0;
+                self.explosion_timer = EXPLOSION_DURATION;
 
                 if self.explosions.is_empty() {
                     self.explosions.push((Emitter::new(EmitterConfig {
