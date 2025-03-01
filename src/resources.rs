@@ -34,6 +34,7 @@ pub struct Resources {
     pub water_texture: Texture2D,
     pub explosion: Texture2D,
     pub sound_explosion: Sound,
+    pub sound_gameover: Sound,
 }
 
 impl Resources {
@@ -85,6 +86,7 @@ impl Resources {
         let sound_win = load_sound("win.wav").await?;
         let sound_die = load_sound("hd-die-dave-7.wav").await?;
         let sound_explosion = load_sound("explosion.wav").await?;
+        let sound_gameover = load_sound("gameoverman.wav").await?;
 
         let mut levels: Vec<String> = Vec::new();
         for i in 1..=2 {
@@ -152,7 +154,8 @@ impl Resources {
             deadly_grass_texture,
             water_texture,
             explosion,
-            sound_explosion
+            sound_explosion,
+            sound_gameover
         })
     }
 

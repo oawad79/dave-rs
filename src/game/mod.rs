@@ -385,6 +385,7 @@ impl Scene for Game {
 
         if !self.explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
+                play_sound_once(&resources.sound_gameover);
                 return Some(SceneChange::MainMenu);
             } else {
                 self.score_board.lives -= 1;
