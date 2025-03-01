@@ -23,6 +23,7 @@ pub struct Player {
     simulate_jump: bool,
     pub simulate_left: bool,
     pub simulate_right: bool,
+    pub is_dead: bool,
 }
 
 impl Player {
@@ -35,6 +36,7 @@ impl Player {
             simulate_jump: false,
             simulate_left: false,
             simulate_right: false,
+            is_dead: false,
         }
     }
 
@@ -83,16 +85,18 @@ impl Player {
             flip = if self.facing_left { -32.0 } else { 32.0 };
         }
 
-        tiled_map.spr_ex(
-            state,
-            self.animated_player.frame().source_rect,
-            Rect::new(
-                pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
-                pos.y,
-                flip,
-                32.0,
-            ),
-        );
+        if !self.is_dead {
+            tiled_map.spr_ex(
+                state,
+                self.animated_player.frame().source_rect,
+                Rect::new(
+                    pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
+                    pos.y,
+                    flip,
+                    32.0,
+                ),
+            );
+        }
 
         self.animated_player.update();
 

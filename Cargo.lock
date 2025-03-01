@@ -148,6 +148,7 @@ name = "dave"
 version = "0.1.0"
 dependencies = [
  "macroquad",
+ "macroquad-particles",
  "macroquad-platformer",
  "macroquad-tiled",
  "macroquad_macro",

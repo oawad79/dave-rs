@@ -1,8 +1,12 @@
-use macroquad::{audio::play_sound_once, camera::set_default_camera, math::{vec2, Rect}, prelude::{animation::{AnimatedSprite, Animation}, collections::storage, set_camera, Camera2D}, window::screen_width};
+use std::vec;
+
+use macroquad::prelude::{*, animation::*, collections::storage};
+use macroquad::audio::*;
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
+use macroquad_particles::*;
 
-use crate::{player::Player, resources::Resources, score_board::{self, ScoreBoard}, Scene, SceneChange};
+use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 
 struct GameObject {
@@ -29,6 +33,7 @@ pub struct Game {
     camera: Camera2D,
     animated_grass: Option<AnimatedSprite>,
     grasses: Vec<Object>,
+    explosions: Vec<(Emitter, Vec2)>,
 }
 
 impl Game {
@@ -119,8 +124,6 @@ impl Game {
         
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
 
-        //let mut score_board = if level == 1 { ScoreBoard::new()} else { storage::get::<ScoreBoard>().clone() }
-
         Game {
             world,
             player,
@@ -138,9 +141,28 @@ impl Game {
             camera,
             animated_grass,
             grasses,
+            explosions: vec![],
         }
     }
 
+    fn particle_explosion() -> EmitterConfig {
+        EmitterConfig {
+            local_coords: false,
+            one_shot: true,
+            emitting: true,
+            lifetime: 2.0,
+            lifetime_randomness: 0.3,
+            explosiveness: 0.65,
+            initial_direction_spread: 2.0 * std::f32::consts::PI,
+            initial_velocity: 200.0,
+            initial_velocity_randomness: 0.8,
+            size: 16.0,
+            size_randomness: 0.3,
+            atlas: Some(AtlasConfig::new(5, 1, 0..)),
+            ..Default::default()
+        }
+    }
+    
     fn load_animation(tiled_map: &Map, name: &str, frames: i32) -> (Option<AnimatedSprite>, Vec<Object>) {
         let mut objects = vec![];
         let mut animated_object: Option<AnimatedSprite> = None;
@@ -300,6 +322,9 @@ impl Scene for Game {
         }
         
 
+        //self.explosions.clear();
+        self.explosions.retain(|(explosion, _)| explosion.config.emitting);
+
         for fire in &self.fires {
             let fire_rect = Rect::new(
                 fire.world_x,
@@ -308,12 +333,25 @@ impl Scene for Game {
                 32.0,
             );
 
-            if self.player.overlaps(pos, &fire_rect) {
+            if self.player.overlaps(pos, &fire_rect) && !self.player.is_dead {
+                self.player.is_dead = true;    
+                if self.explosions.is_empty() {
+                    self.explosions.push((Emitter::new(EmitterConfig {
+                        amount: 40,
+                        texture: Some(resources.explosion.clone()),
+                        ..Game::particle_explosion()
+                    }), vec2(pos.x + 32.0, pos.y)));
+                }
+                play_sound_once(&resources.sound_explosion);
                 play_sound_once(&resources.sound_die);
             }
         }
 
 
+        for (explosion, coords) in &mut self.explosions {
+            explosion.draw(vec2(coords.x, coords.y));
+        }
+        
         self.player.update(&mut self.world);
 
         if self.animated_fire.is_some() {
@@ -333,10 +371,7 @@ impl Scene for Game {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
-
-        // Set the camera to follow the player
-        //set_camera(&self.camera);
-
+        
         self.score_board.draw();
         self.draw_tiles(&tiled_map);
         self.draw_collectibles(&tiled_map);

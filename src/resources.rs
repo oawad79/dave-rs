@@ -32,6 +32,8 @@ pub struct Resources {
     pub thin: Texture2D,
     pub deadly_grass_texture: Texture2D,
     pub water_texture: Texture2D,
+    pub explosion: Texture2D,
+    pub sound_explosion: Sound,
 }
 
 impl Resources {
@@ -72,6 +74,9 @@ impl Resources {
         let king = load_texture("king.png").await.unwrap();
         king.set_filter(FilterMode::Nearest);
 
+        let explosion = load_texture("explosion.png").await.unwrap();
+        explosion.set_filter(FilterMode::Nearest);
+
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
         let sound_walk = load_sound("hd-walk.wav").await?;
@@ -79,6 +84,7 @@ impl Resources {
         let sound_cup = load_sound("trophy.wav").await?;
         let sound_win = load_sound("win.wav").await?;
         let sound_die = load_sound("hd-die-dave-7.wav").await?;
+        let sound_explosion = load_sound("explosion.wav").await?;
 
         let mut levels: Vec<String> = Vec::new();
         for i in 1..=2 {
@@ -111,6 +117,8 @@ impl Resources {
             numbers.push(load_texture(&format!("num{}.png", i)).await.unwrap());
         }
         
+        //build_textures_atlas();
+
         Ok(Resources { 
             tileset,
             levels,
@@ -142,7 +150,9 @@ impl Resources {
             numbers,
             thin,
             deadly_grass_texture,
-            water_texture
+            water_texture,
+            explosion,
+            sound_explosion
         })
     }
 
