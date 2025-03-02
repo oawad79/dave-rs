@@ -104,8 +104,8 @@ impl Scene for MainMenu {
         
         draw_text_ex(
             "A Rust version BY oawad",
-            235.0,
-            100.0,
+            250.0,
+            105.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 12,     

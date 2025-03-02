@@ -1,8 +1,8 @@
-use macroquad::{audio::{play_sound, stop_sound, PlaySoundParams}, math::{vec2, Rect}, prelude::collections::storage};
+use macroquad::{audio::{play_sound, stop_sound, PlaySoundParams}, color::{Color, WHITE}, math::{vec2, Rect}, prelude::collections::storage, text::{draw_text_ex, TextParams}};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map};
 
-use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
+use crate::{player::Player, resources::{self, Resources}, score_board::ScoreBoard, Scene, SceneChange};
 
 pub struct Separator {
     player: Player,
@@ -89,11 +89,24 @@ impl Scene for Separator {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
+        let resources = storage::get::<Resources>();
 
         tiled_map
             .draw_tiles("seperator", Rect::new(0.0, 0.0, 608.0, 352.0), None);
         
         
         self.score_board.draw();
+
+        draw_text_ex(
+            format!("GOOD WORK! ONLY {} MORE TO GO!", (10 - self.score_board.level + 1)).as_str(),
+            200.0,
+            155.0,
+            TextParams {
+                font: Some(&resources.font), 
+                font_size: 16,     
+                color: Color{r: 255.0, g: 255.0, b: 255.0, a: 1.0},  
+                ..Default::default()
+            },
+        );
     }
 }

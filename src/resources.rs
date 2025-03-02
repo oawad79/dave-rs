@@ -102,11 +102,10 @@ impl Resources {
             levels.push(level);
         }
 
-        //let tiled_map_json = load_string("level1.json").await.unwrap();
         let intro_map_json = load_string("intro.json").await.unwrap();
         let separator_map_json = load_string("seperator.json").await.unwrap();
 
-        let font = load_ttf_font("fonts/NotoSans-Regular.ttf").await.unwrap();
+        let font = load_ttf_font("fonts/MightySouly-lxggD.ttf").await.unwrap();
         
         let quit_texture = load_texture("quit.png").await.unwrap();
 
