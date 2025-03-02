@@ -35,6 +35,7 @@ pub struct Resources {
     pub explosion: Texture2D,
     pub sound_explosion: Sound,
     pub sound_gameover: Sound,
+    pub gun: Texture2D
 }
 
 impl Resources {
@@ -78,6 +79,9 @@ impl Resources {
         let explosion = load_texture("explosion.png").await.unwrap();
         explosion.set_filter(FilterMode::Nearest);
 
+        let gun = load_texture("gun_icon.png").await.unwrap();
+        gun.set_filter(FilterMode::Nearest);
+
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
         let sound_walk = load_sound("hd-walk.wav").await?;
@@ -89,7 +93,7 @@ impl Resources {
         let sound_gameover = load_sound("gameoverman.wav").await?;
 
         let mut levels: Vec<String> = Vec::new();
-        for i in 1..=2 {
+        for i in 1..=3 {
             let level = load_string(&format!("level{}.json", i)).await.unwrap();
             levels.push(level);
         }
@@ -155,7 +159,8 @@ impl Resources {
             water_texture,
             explosion,
             sound_explosion,
-            sound_gameover
+            sound_gameover,
+            gun
         })
     }
 

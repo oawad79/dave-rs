@@ -58,6 +58,8 @@ impl Game {
                 ("deadly.png", resources.deadly_grass_texture.clone()),     
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("water1-sheet.png", resources.water_texture.clone()),
+                ("gun_icon.png", resources.gun.clone()),
+                ("king.png", resources.king.clone()),
             ],
             &[],
         )
