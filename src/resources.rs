@@ -35,7 +35,7 @@ pub struct Resources {
     pub sound_explosion: Sound,
     pub sound_gameover: Sound,
     pub gun: Texture2D,
-    pub lolipop: Texture2D
+    pub lolipop: Texture2D,
 
 }
 
@@ -62,8 +62,8 @@ impl Resources {
         let tuple = load_texture("tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
-        // let cup = load_texture("cup.png").await.unwrap();
-        // cup.set_filter(FilterMode::Nearest);
+        //let go_thru = load_texture("door_enable_banner.png").await.unwrap();
+        //go_thru.set_filter(FilterMode::Nearest);
 
         let fire1 = load_texture("fire1-sheet.png").await.unwrap();
         fire1.set_filter(FilterMode::Nearest);

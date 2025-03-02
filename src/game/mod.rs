@@ -6,6 +6,7 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
+use crate::resources;
 use crate::score_board::GameObject;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
@@ -51,7 +52,7 @@ impl Game {
                 ("water1-sheet.png", resources.water_texture.clone()),
                 ("gun_icon.png", resources.gun.clone()),
                 ("king.png", resources.king.clone()),
-                ("lolipop.png", resources.lolipop.clone()),
+                ("lolipop.png", resources.lolipop.clone())
             ],
             &[],
         )
@@ -73,6 +74,8 @@ impl Game {
         let height = tiled_map.layers.get("platform").unwrap().height;
         let width = tiled_map.layers.get("platform").unwrap().width;
         
+        println!("height = {}", height);
+
         let mut world = World::new();
         world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
         
@@ -247,6 +250,7 @@ impl Game {
             Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
             None,
         );
+
     }
 
     
@@ -395,6 +399,7 @@ impl Scene for Game {
         self.draw_collectibles(&tiled_map);
         self.draw_door(&tiled_map);
         self.draw_animated_objects(&tiled_map);
+
     }
 }
 

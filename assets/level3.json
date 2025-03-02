@@ -485,18 +485,6 @@
                 {
                  "gid":10,
                  "height":32,
-                 "id":39,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":448,
-                 "y":224
-                }, 
-                {
-                 "gid":10,
-                 "height":32,
                  "id":40,
                  "name":"",
                  "rotation":0,
