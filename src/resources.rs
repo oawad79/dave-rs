@@ -10,7 +10,6 @@ pub struct Resources {
     pub player_jump: Texture2D,
     pub collectibles: Texture2D,
     pub tuple: Texture2D,
-    pub cup: Texture2D,
     pub door: Texture2D,
     pub sound_collect: Sound,
     pub sound_jump: Sound,
@@ -63,8 +62,8 @@ impl Resources {
         let tuple = load_texture("tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
-        let cup = load_texture("cup.png").await.unwrap();
-        cup.set_filter(FilterMode::Nearest);
+        // let cup = load_texture("cup.png").await.unwrap();
+        // cup.set_filter(FilterMode::Nearest);
 
         let fire1 = load_texture("fire1-sheet.png").await.unwrap();
         fire1.set_filter(FilterMode::Nearest);
@@ -140,7 +139,6 @@ impl Resources {
             player_jump,
             collectibles,
             tuple,
-            cup,
             door,
             sound_collect, 
             sound_jump, 

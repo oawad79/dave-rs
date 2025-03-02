@@ -25,6 +25,7 @@ pub struct ScoreBoard {
     pub level: i32,
     pub position: (f32, f32),
     pub collectibles: Vec<GameObject>,
+    pub game_won: bool
 }
 
 impl ScoreBoard {
@@ -35,6 +36,7 @@ impl ScoreBoard {
             level: 1,
             position: (5.0, 5.0),
             collectibles: Vec::new(),
+            game_won: false
         }
     }
 

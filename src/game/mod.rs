@@ -16,8 +16,6 @@ pub struct Game {
     player: Player,
     collectibles: Vec<GameObject>,
     door: GameObject,
-    cup: GameObject,
-    game_won: bool,
     score_board: ScoreBoard,
     height_tiles: i32,
     width_tiles: i32,
@@ -48,7 +46,6 @@ impl Game {
                 ("collectibles.png", resources.collectibles.clone()),
                 ("door.png", resources.door.clone()),
                 ("tuple.png", resources.tuple.clone()),   
-                ("cup.png", resources.cup.clone()),    
                 ("deadly.png", resources.deadly_grass_texture.clone()),     
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("water1-sheet.png", resources.water_texture.clone()),
@@ -117,14 +114,6 @@ impl Game {
             collected: None,
         };
         
-        let cup_object = tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
-        let cup: GameObject = GameObject {
-            world_x: cup_object.world_x,
-            world_y: cup_object.world_y,
-            name: cup_object.name.clone(),
-            collected: None,
-        };
-
         let (animated_fire, fires) = 
                             Game::load_animation(&tiled_map, "fire", 3);
         let (animated_water, waters) = 
@@ -146,8 +135,6 @@ impl Game {
             player,
             collectibles,
             door,
-            cup,
-            game_won: false,
             score_board,
             height_tiles: height as i32,
             width_tiles: width as i32,
@@ -202,7 +189,8 @@ impl Game {
                 "ruby" => 0.0,
                 "diamond" => 32.0,
                 "red" => 64.0,
-                _ => 96.0
+                "loli" => 96.0,
+                _ => 128.0
             };
 
             tiled_map.spr_ex(
@@ -219,16 +207,6 @@ impl Game {
             Rect::new(0.0, 0.0, 32.0, 32.0),
             Rect::new(self.door.world_x, self.door.world_y - 32.0, 32.0, 32.0),
         );
-    }
-
-    fn draw_trophy(&self, tiled_map: &Map) {
-        if !self.game_won {
-            tiled_map.spr_ex(
-                "cup",
-                Rect::new(0.0, 0.0, 32.0, 32.0),
-                Rect::new(self.cup.world_x, self.cup.world_y - 32.0, 32.0, 32.0),
-            );
-        }
     }
 
     fn draw_animated_objects(&self, tiled_map: &Map) {
@@ -312,34 +290,29 @@ impl Scene for Game {
             );
 
             if self.player.overlaps(pos, &jewellery_rect) {
-                self.score_board.score += 10;
-                jewellery.collected = Option::Some(true);
-                play_sound_once(&resources.sound_collect);
+                if !self.score_board.game_won && jewellery.name == "cup" {
+                    self.score_board.score += 100;
+                    self.score_board.game_won = true;
+                    play_sound_once(&resources.sound_cup);
+                }
+                else {
+                    self.score_board.score += 10;
+                    jewellery.collected = Option::Some(true);
+                    play_sound_once(&resources.sound_collect);
+                }
             }
         }
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
-        // Check for collision between player and cup
-        if !self.game_won && self.player.overlaps(pos, &Rect::new(
-            self.cup.world_x,
-            self.cup.world_y - 32.0,
-            32.0,
-            32.0,
-        )) {
-            self.score_board.score += 100;
-            self.game_won = true;
-            play_sound_once(&resources.sound_cup);
-        }
-
         // Check for collision between player and door
-        if self.game_won && self.player.overlaps(pos, &Rect::new(
+        if self.score_board.game_won && self.player.overlaps(pos, &Rect::new(
             self.door.world_x,
             self.door.world_y - 32.0,
             32.0,
             32.0,
         )) {
-            self.game_won = false;
+            self.score_board.game_won = false;
             play_sound_once(&resources.sound_win);
             self.score_board.level += 1;
             storage::store(self.score_board.clone());
@@ -421,7 +394,6 @@ impl Scene for Game {
         self.draw_tiles(&tiled_map);
         self.draw_collectibles(&tiled_map);
         self.draw_door(&tiled_map);
-        self.draw_trophy(&tiled_map);
         self.draw_animated_objects(&tiled_map);
     }
 }
