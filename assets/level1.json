@@ -187,14 +187,14 @@
                 {
                  "gid":1025,
                  "height":32,
-                 "id":47,
+                 "id":48,
                  "name":"dave",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":63.8644833427442,
-                 "y":318.473178994918
+                 "x":64,
+                 "y":320
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -208,7 +208,7 @@
          "name":"cup",
          "objects":[
                 {
-                 "gid":1034,
+                 "gid":1035,
                  "height":32,
                  "id":44,
                  "name":"cup",
@@ -249,7 +249,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":48,
+ "nextobjectid":49,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -334,21 +334,21 @@
          "tilewidth":32
         }, 
         {
-         "columns":3,
+         "columns":4,
          "firstgid":1031,
          "image":"collectibles.png",
          "imageheight":32,
-         "imagewidth":96,
+         "imagewidth":128,
          "margin":0,
          "name":"collectibles",
          "spacing":0,
-         "tilecount":3,
+         "tilecount":4,
          "tileheight":32,
          "tilewidth":32
         }, 
         {
          "columns":1,
-         "firstgid":1034,
+         "firstgid":1035,
          "image":"cup.png",
          "imageheight":32,
          "imagewidth":32,
