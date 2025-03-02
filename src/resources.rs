@@ -35,7 +35,9 @@ pub struct Resources {
     pub explosion: Texture2D,
     pub sound_explosion: Sound,
     pub sound_gameover: Sound,
-    pub gun: Texture2D
+    pub gun: Texture2D,
+    pub lolipop: Texture2D
+
 }
 
 impl Resources {
@@ -81,6 +83,9 @@ impl Resources {
 
         let gun = load_texture("gun_icon.png").await.unwrap();
         gun.set_filter(FilterMode::Nearest);
+
+        let lolipop = load_texture("lolipop.png").await.unwrap();
+        lolipop.set_filter(FilterMode::Nearest);
 
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
@@ -160,7 +165,8 @@ impl Resources {
             explosion,
             sound_explosion,
             sound_gameover,
-            gun
+            gun, 
+            lolipop
         })
     }
 

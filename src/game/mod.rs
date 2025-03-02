@@ -61,6 +61,7 @@ impl Game {
                 ("water1-sheet.png", resources.water_texture.clone()),
                 ("gun_icon.png", resources.gun.clone()),
                 ("king.png", resources.king.clone()),
+                ("lolipop.png", resources.lolipop.clone()),
             ],
             &[],
         )
@@ -197,7 +198,8 @@ impl Game {
             let x = match diamond.name.as_str() {
                 "ruby" => 0.0,
                 "diamond" => 32.0,
-                _ => 64.0,
+                "red" => 64.0,
+                _ => 96.0
             };
 
             tiled_map.spr_ex(
