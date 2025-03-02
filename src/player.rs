@@ -14,7 +14,7 @@ use crate::Resources;
 
 const GRAVITY: f32 = 500.0;
 //const JUMP_VELOCITY: f32 = -260.0;
-const JUMP_VELOCITY: f32 = -300.0;
+const JUMP_VELOCITY: f32 = -280.0;
 
 pub struct Player {
     pub collider: Actor,

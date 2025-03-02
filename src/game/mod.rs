@@ -6,17 +6,17 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
-use crate::resources;
+use crate::score_board::GameObject;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
 
-struct GameObject {
-    world_x: f32,
-    world_y: f32,
-    name: String,
-    collected: Option<bool>,
-}
+// struct GameObject {
+//     world_x: f32,
+//     world_y: f32,
+//     name: String,
+//     collected: Option<bool>,
+// }
 
 pub struct Game {
     world: World,
@@ -92,18 +92,28 @@ impl Game {
     
         let player = Player::new(actor);
 
+        let score_board = 
+                        if level == 1 && !retry { 
+                            ScoreBoard::new()
+                        } 
+                        else { 
+                            storage::get::<ScoreBoard>().clone() 
+                        };
+
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
-        let collectibles = objects_layer
-            .objects
-            .iter()
-            .map(|entry| 
-                GameObject {
-                    world_x: entry.world_x,
-                    world_y: entry.world_y,
-                    name: entry.name.clone(),
-                    collected: None,
-                }
-            ).collect::<Vec<GameObject>>();
+        let collectibles = 
+            if retry { score_board.collectibles.clone() } 
+            else { 
+                objects_layer.objects
+                .iter()
+                .map(|entry| 
+                    GameObject {
+                        world_x: entry.world_x,
+                        world_y: entry.world_y,
+                        name: entry.name.clone(),
+                        collected: None,
+                    }
+            ).collect::<Vec<GameObject>>()};
         
         let door = tiled_map.layers.get("door").unwrap().objects.first().unwrap();
 
@@ -122,7 +132,7 @@ impl Game {
             collected: None,
         };
 
-        let (animated_fire, mut fires) = 
+        let (animated_fire, fires) = 
                             Game::load_animation(&tiled_map, "fire", 3);
         let (animated_water, waters) = 
                             Game::load_animation(&tiled_map, "water", 5);
@@ -145,7 +155,7 @@ impl Game {
             door,
             trophy,
             game_won: false,
-            score_board: if level == 1 && !retry { ScoreBoard::new()} else { storage::get::<ScoreBoard>().clone() },
+            score_board,
             height_tiles: height as i32,
             width_tiles: width as i32,
             animated_fire,
@@ -299,23 +309,23 @@ impl Scene for Game {
             self.score_board.position = (self.camera.target.x - 300.0, pos.y);
         }
 
-        // Check for collision between player and diamonds
-        for diamond in self.collectibles.iter_mut() {
-            let diamond_rect = Rect::new(
-                diamond.world_x,
-                diamond.world_y - 32.0,
+        // Check for collision between player and Jewellery
+        for jewellery in self.collectibles.iter_mut() {
+            let jewellery_rect = Rect::new(
+                jewellery.world_x,
+                jewellery.world_y - 32.0,
                 32.0,
                 32.0,
             );
 
-            if self.player.overlaps(pos, &diamond_rect) {
+            if self.player.overlaps(pos, &jewellery_rect) {
                 self.score_board.score += 10;
-                diamond.collected = Option::Some(true);
+                jewellery.collected = Option::Some(true);
                 play_sound_once(&resources.sound_collect);
             }
         }
 
-        self.collectibles.retain(|diamond| !diamond.collected.unwrap_or(false));
+        self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
         // Check for collision between player and cup
         if !self.game_won && self.player.overlaps(pos, &Rect::new(
@@ -349,8 +359,8 @@ impl Scene for Game {
             let deadly_rect = Rect::new(
                 deadly_object.world_x,
                 deadly_object.world_y - 32.0,
-                32.0,
-                32.0,
+                10.0,
+                10.0,
             );
 
             if self.player.overlaps(pos, &deadly_rect) && !self.player.is_dead {
@@ -376,6 +386,7 @@ impl Scene for Game {
                 return Some(SceneChange::MainMenu);
             } else {
                 self.score_board.lives -= 1;
+                self.score_board.collectibles = self.collectibles.clone();
                 storage::store(self.score_board.clone());
                 return Some(SceneChange::Game{level: self.score_board.level, retry: true});
             }
