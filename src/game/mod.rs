@@ -53,7 +53,8 @@ impl Game {
                 ("gun_icon.png", resources.gun.clone()),
                 ("king.png", resources.king.clone()),
                 ("lolipop.png", resources.lolipop.clone()),
-                ("door_enable_banner.png", resources.go_thru.clone())
+                ("door_enable_banner.png", resources.go_thru.clone()),
+                ("yussuk.png", resources.yussuk.clone())
             ],
             &[],
         )
@@ -62,7 +63,7 @@ impl Game {
         storage::store(tiled_map);
 
         let tiled_map = storage::get::<Map>();
-
+//tiled_map.raw_tiled_map.layers[0].objects[0].polygon
         let mut static_colliders = vec![];
         for (_x, _y, tile) in tiled_map.tiles("platform", None) {
             static_colliders.push(if tile.is_some() {
@@ -83,6 +84,16 @@ impl Game {
         let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
     
         let player = Player::new(actor);
+
+        if tiled_map.layers.contains_key("monster") {
+            let monster_layer = tiled_map.layers.get("monster").unwrap();
+            for object in &monster_layer.objects {
+                if object.name == "another" {
+                    println!("{:?}", object);
+                }
+            }
+        }
+
 
         let score_board = 
                         if level == 1 && !retry { 
@@ -198,7 +209,8 @@ impl Game {
                 "diamond" => 32.0,
                 "red" => 64.0,
                 "loli" => 96.0,
-                _ => 128.0
+                "cup" => 128.0,
+                _ => 160.0
             };
 
             tiled_map.spr_ex(

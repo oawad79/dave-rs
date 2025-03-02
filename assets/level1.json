@@ -50,6 +50,64 @@
         }, 
         {
          "draworder":"topdown",
+         "id":15,
+         "name":"monster",
+         "objects":[
+                {
+                 "height":0,
+                 "id":52,
+                 "name":"monster1",
+                 "polygon":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":105.883681535856,
+                         "y":1.08413325804631
+                        }, 
+                        {
+                         "x":139.491812535291,
+                         "y":33.6081309994353
+                        }, 
+                        {
+                         "x":97.5719932241672,
+                         "y":103.354037267081
+                        }, 
+                        {
+                         "x":36.4991530208922,
+                         "y":114.918125352908
+                        }, 
+                        {
+                         "x":11.2027103331451,
+                         "y":54.9294184076793
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":172.01581027668,
+                 "y":75.8893280632411
+                }, 
+                {
+                 "height":0,
+                 "id":53,
+                 "name":"another",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":139.130434782609,
+                 "y":79.14172783738
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":5,
          "name":"collectibles",
          "objects":[
@@ -261,8 +319,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":15,
- "nextobjectid":52,
+ "nextlayerid":16,
+ "nextobjectid":54,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
