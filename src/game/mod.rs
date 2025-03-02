@@ -6,7 +6,6 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
-use crate::resources;
 use crate::score_board::GameObject;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
@@ -30,7 +29,8 @@ pub struct Game {
     explosions: Vec<(Emitter, Vec2)>,
     explosion_active: bool,
     explosion_timer: f32,
-    deadly_objects: Vec<Object>
+    deadly_objects: Vec<Object>,
+    message_coord: (f32, f32)
 }
 
 impl Game {
@@ -52,7 +52,8 @@ impl Game {
                 ("water1-sheet.png", resources.water_texture.clone()),
                 ("gun_icon.png", resources.gun.clone()),
                 ("king.png", resources.king.clone()),
-                ("lolipop.png", resources.lolipop.clone())
+                ("lolipop.png", resources.lolipop.clone()),
+                ("door_enable_banner.png", resources.go_thru.clone())
             ],
             &[],
         )
@@ -74,8 +75,6 @@ impl Game {
         let height = tiled_map.layers.get("platform").unwrap().height;
         let width = tiled_map.layers.get("platform").unwrap().width;
         
-        println!("height = {}", height);
-
         let mut world = World::new();
         world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
         
@@ -131,7 +130,12 @@ impl Game {
         deadly_objects.extend(waters.iter().cloned());
         deadly_objects.extend(grasses.iter().cloned());
         
-        let camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
+        let camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
+
+        let message_coord = (
+            tiled_map.layers.get("message").unwrap().objects[0].world_x, 
+            tiled_map.layers.get("message").unwrap().objects[0].world_y
+        );
 
         Game {
             world,
@@ -151,7 +155,8 @@ impl Game {
             explosions: vec![],
             explosion_active: false,
             explosion_timer: 2.0,
-            deadly_objects
+            deadly_objects,
+            message_coord
         }
     }
 
@@ -374,6 +379,8 @@ impl Scene for Game {
             }
         }
         
+        
+
         self.player.update(&mut self.world);
 
         if self.animated_fire.is_some() {
@@ -393,12 +400,28 @@ impl Scene for Game {
 
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
-        
+        let resources = storage::get::<Resources>();
+
         self.score_board.draw();
         self.draw_tiles(&tiled_map);
         self.draw_collectibles(&tiled_map);
         self.draw_door(&tiled_map);
         self.draw_animated_objects(&tiled_map);
+
+        if self.score_board.game_won {
+            draw_texture_ex(
+                &resources.go_thru,
+                self.message_coord.0 + self.camera.target.x - 300.0,
+                self.message_coord.1 - 32.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(resources.go_thru.width() , resources.go_thru.height() )), 
+                    ..Default::default()
+                },
+            );
+        }
+
+        
 
     }
 }

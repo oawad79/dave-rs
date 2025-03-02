@@ -1,5 +1,5 @@
 { "compressionlevel":-1,
- "height":11,
+ "height":12,
  "infinite":false,
  "layers":[
         {
@@ -13,14 +13,38 @@
             5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
             5, 0, 0, 0, 5, 5, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5,
             5, 1030, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-         "height":11,
+            5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":12,
          "id":1,
          "name":"platform",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
          "width":19,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":14,
+         "name":"message",
+         "objects":[
+                {
+                 "gid":1036,
+                 "height":24,
+                 "id":51,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":343,
+                 "x":128,
+                 "y":384
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -237,8 +261,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":14,
- "nextobjectid":51,
+ "nextlayerid":15,
+ "nextobjectid":52,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -334,6 +358,19 @@
          "tilecount":5,
          "tileheight":32,
          "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1036,
+         "image":"door_enable_banner.png",
+         "imageheight":28,
+         "imagewidth":344,
+         "margin":0,
+         "name":"door_enable_banner",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":24,
+         "tilewidth":343
         }],
  "tilewidth":32,
  "type":"map",

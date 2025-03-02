@@ -43,7 +43,7 @@ async fn main() {
 
     let _ = Resources::load().await;
     
-    let main_camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
+    let main_camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
     
     let mut scene: Box<dyn Scene> = Box::new(MainMenu::new());
     
