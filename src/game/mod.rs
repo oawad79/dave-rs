@@ -11,13 +11,6 @@ use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene
 
 const EXPLOSION_DURATION: f32 = 2.0;
 
-// struct GameObject {
-//     world_x: f32,
-//     world_y: f32,
-//     name: String,
-//     collected: Option<bool>,
-// }
-
 pub struct Game {
     world: World,
     player: Player,
