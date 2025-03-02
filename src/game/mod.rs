@@ -16,7 +16,7 @@ pub struct Game {
     player: Player,
     collectibles: Vec<GameObject>,
     door: GameObject,
-    trophy: GameObject,
+    cup: GameObject,
     game_won: bool,
     score_board: ScoreBoard,
     height_tiles: i32,
@@ -117,11 +117,11 @@ impl Game {
             collected: None,
         };
         
-        let cup = tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
-        let trophy: GameObject = GameObject {
-            world_x: cup.world_x,
-            world_y: cup.world_y,
-            name: cup.name.clone(),
+        let cup_object = tiled_map.layers.get("cup").unwrap().objects.first().unwrap();    
+        let cup: GameObject = GameObject {
+            world_x: cup_object.world_x,
+            world_y: cup_object.world_y,
+            name: cup_object.name.clone(),
             collected: None,
         };
 
@@ -146,7 +146,7 @@ impl Game {
             player,
             collectibles,
             door,
-            trophy,
+            cup,
             game_won: false,
             score_board,
             height_tiles: height as i32,
@@ -226,7 +226,7 @@ impl Game {
             tiled_map.spr_ex(
                 "cup",
                 Rect::new(0.0, 0.0, 32.0, 32.0),
-                Rect::new(self.trophy.world_x, self.trophy.world_y - 32.0, 32.0, 32.0),
+                Rect::new(self.cup.world_x, self.cup.world_y - 32.0, 32.0, 32.0),
             );
         }
     }
@@ -322,8 +322,8 @@ impl Scene for Game {
 
         // Check for collision between player and cup
         if !self.game_won && self.player.overlaps(pos, &Rect::new(
-            self.trophy.world_x,
-            self.trophy.world_y - 32.0,
+            self.cup.world_x,
+            self.cup.world_y - 32.0,
             32.0,
             32.0,
         )) {
