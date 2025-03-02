@@ -38,6 +38,7 @@ pub struct Game {
     explosions: Vec<(Emitter, Vec2)>,
     explosion_active: bool,
     explosion_timer: f32,
+    deadly_objects: Vec<Object>
 }
 
 impl Game {
@@ -120,13 +121,19 @@ impl Game {
             collected: None,
         };
 
-        let (animated_fire, fires) = 
+        let (animated_fire, mut fires) = 
                             Game::load_animation(&tiled_map, "fire", 3);
         let (animated_water, waters) = 
                             Game::load_animation(&tiled_map, "water", 5);
 
         let (animated_grass, grasses) = 
                             Game::load_animation(&tiled_map, "grass", 4);
+
+        let mut deadly_objects: Vec<Object> = Vec::new();
+
+        deadly_objects.extend(fires.iter().cloned());
+        deadly_objects.extend(waters.iter().cloned());
+        deadly_objects.extend(grasses.iter().cloned());
         
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 352.0, 608.0, -352.0));
 
@@ -150,6 +157,7 @@ impl Game {
             explosions: vec![],
             explosion_active: false,
             explosion_timer: 2.0,
+            deadly_objects
         }
     }
 
@@ -335,40 +343,15 @@ impl Scene for Game {
         
         self.explosions.retain(|(explosion, _)| explosion.config.emitting);
 
-        for fire in &self.fires {
-            let fire_rect = Rect::new(
-                fire.world_x,
-                fire.world_y - 32.0,
+        for deadly_object in &self.deadly_objects {
+            let deadly_rect = Rect::new(
+                deadly_object.world_x,
+                deadly_object.world_y - 32.0,
                 32.0,
                 32.0,
             );
 
-            if self.player.overlaps(pos, &fire_rect) && !self.player.is_dead {
-                self.player.is_dead = true;    
-                self.explosion_active = true;
-                self.explosion_timer = EXPLOSION_DURATION;
-
-                if self.explosions.is_empty() {
-                    self.explosions.push((Emitter::new(EmitterConfig {
-                        amount: 40,
-                        texture: Some(resources.explosion.clone()),
-                        ..Game::particle_explosion()
-                    }), vec2(pos.x + 32.0, pos.y)));
-                }
-                play_sound_once(&resources.sound_explosion);
-                play_sound_once(&resources.sound_die);
-            }
-        }
-
-        for water in &self.waters {
-            let water_rect = Rect::new(
-                water.world_x,
-                water.world_y - 32.0,
-                32.0,
-                32.0,
-            );
-
-            if self.player.overlaps(pos, &water_rect) && !self.player.is_dead {
+            if self.player.overlaps(pos, &deadly_rect) && !self.player.is_dead {
                 self.player.is_dead = true;    
                 self.explosion_active = true;
                 self.explosion_timer = EXPLOSION_DURATION;
