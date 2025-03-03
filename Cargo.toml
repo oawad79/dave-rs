@@ -15,6 +15,7 @@ macroquad_macro = {path = "./macroquad/macroquad_macro"}
 macroquad-tiled = {path = "./macroquad/tiled"}
 macroquad-platformer = {path = "./macroquad/physics-platformer"}
 macroquad-particles = {path = "./macroquad/particles"}
+glam = "0.30.0"
 
 
 

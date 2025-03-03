@@ -6,10 +6,26 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
+
+
 use crate::score_board::GameObject;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
+
+#[derive(Debug, Clone)]
+struct PolyPoint {
+    x: f32,
+    y: f32
+}
+
+#[derive(Debug)]
+struct Monster {
+    location: PolyPoint,
+    waypoints: Vec<Vec2>,
+    current_waypoint: usize,
+    alive: bool
+}
 
 pub struct Game {
     world: World,
@@ -30,7 +46,9 @@ pub struct Game {
     explosion_active: bool,
     explosion_timer: f32,
     deadly_objects: Vec<Object>,
-    message_coord: (f32, f32)
+    message_coord: (f32, f32),
+    monsters: Vec<Monster>,
+    timer: f32
 }
 
 impl Game {
@@ -63,7 +81,7 @@ impl Game {
         storage::store(tiled_map);
 
         let tiled_map = storage::get::<Map>();
-//tiled_map.raw_tiled_map.layers[0].objects[0].polygon
+
         let mut static_colliders = vec![];
         for (_x, _y, tile) in tiled_map.tiles("platform", None) {
             static_colliders.push(if tile.is_some() {
@@ -148,6 +166,41 @@ impl Game {
             tiled_map.layers.get("message").unwrap().objects[0].world_y
         );
 
+        let mut monsters: Vec<Monster>  = Vec::new();
+        
+        if tiled_map.contains_layer("monsters") {
+            for layer in &tiled_map.raw_tiled_map.layers {
+                if layer.name == "monsters" {
+                    for monster_obj in &layer.objects {
+                        let mut monster: Monster = Monster {
+                            location: PolyPoint {
+                                x: monster_obj.x,
+                                y: monster_obj.y
+                            },
+                            current_waypoint: 0, 
+                            alive: true,
+                            waypoints: Vec::new()
+                        };
+
+                        let polygon_pts = monster_obj.polygon.as_ref().unwrap();
+                        let mapped_points = polygon_pts
+                                                .iter()
+                                                .map(|p| Vec2::new(p.x, p.y))
+                                                .collect::<Vec<Vec2>>();
+                        
+                        let pairs = Game::generate_pairs(&mapped_points);    
+                        
+                        for (p1, p2) in pairs {
+                            let points_between = Game::get_line_points_lerp(p1, p2, 10);
+                            monster.waypoints.extend(points_between.iter());
+                        }
+                        
+                        monsters.push(monster);
+                    }
+                }
+            }
+        }
+
         Game {
             world,
             player,
@@ -167,7 +220,9 @@ impl Game {
             explosion_active: false,
             explosion_timer: 2.0,
             deadly_objects,
-            message_coord
+            message_coord,
+            monsters,
+            timer: 0.1
         }
     }
 
@@ -270,12 +325,37 @@ impl Game {
 
     }
 
+    fn get_line_points_lerp(p1: Vec2, p2: Vec2, steps: usize) -> Vec<Vec2> {
+        let mut points = Vec::new();
+    
+        for i in 0..=steps {
+            let t = i as f32 / steps as f32;  // Interpolation factor (0.0 to 1.0)
+            let interpolated = p1.lerp(p2, t); // Using glam's built-in lerp()
+            points.push(interpolated);
+        }
+    
+        points
+    }
+
+    fn generate_pairs(points: &[Vec2]) -> Vec<(Vec2, Vec2)> {
+        let mut pairs = Vec::new();
+        
+        if points.len() < 2 {
+            return pairs; // Not enough points to form pairs
+        }
+    
+        for i in 0..points.len() {
+            let next_index = (i + 1) % points.len(); // Wrap around to form a closed loop
+            pairs.push((points[i], points[next_index]));
+        }
+    
+        pairs
+    }
+
     
 }
 
 impl Scene for Game {
-    
-
     fn update(&mut self) -> Option<SceneChange> {
         let resources = storage::get::<Resources>();
 
@@ -391,8 +471,6 @@ impl Scene for Game {
             }
         }
         
-        
-
         self.player.update(&mut self.world);
 
         if self.animated_fire.is_some() {
@@ -407,6 +485,38 @@ impl Scene for Game {
             self.animated_grass.as_mut().unwrap().update();
         }
         
+        for monster in &mut self.monsters {
+            if monster.alive {
+                let point = &monster.waypoints[monster.current_waypoint];
+                
+                draw_texture_ex(
+                    &resources.monster1,
+                    monster.location.x + point.x,
+                    monster.location.y + point.y,
+                    WHITE,
+                    DrawTextureParams {
+                        dest_size: Some(vec2(resources.monster1.width() , resources.monster1.height() )), 
+                        ..Default::default()
+                    },
+                );
+
+                
+
+                if self.timer > 0.0 {
+                    self.timer -= 10.0 * get_frame_time();
+                }
+                else {
+                    if monster.current_waypoint < monster.waypoints.len() - 1 {
+                        monster.current_waypoint += 1;
+                    }    
+                    else {
+                        monster.current_waypoint = 0;
+                    }
+                    self.timer = 0.1;
+                }
+            }
+        }
+
         None
     }
 
@@ -432,6 +542,7 @@ impl Scene for Game {
                 },
             );
         }
+
 
         
 

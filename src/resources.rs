@@ -37,7 +37,8 @@ pub struct Resources {
     pub gun: Texture2D,
     pub lolipop: Texture2D,
     pub go_thru: Texture2D,
-    pub yussuk: Texture2D
+    pub yussuk: Texture2D,
+    pub monster1: Texture2D
 
 }
 
@@ -90,6 +91,9 @@ impl Resources {
 
         let yussuk = load_texture("yussuk.png").await.unwrap();
         yussuk.set_filter(FilterMode::Nearest);
+
+        let monster1 = load_texture("monster1.png").await.unwrap();
+        monster1.set_filter(FilterMode::Nearest);
 
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
@@ -170,7 +174,8 @@ impl Resources {
             gun, 
             lolipop,
             go_thru,
-            yussuk
+            yussuk,
+            monster1
         })
     }
 

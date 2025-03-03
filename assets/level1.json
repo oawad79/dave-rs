@@ -31,7 +31,7 @@
          "name":"message",
          "objects":[
                 {
-                 "gid":1036,
+                 "gid":1037,
                  "height":24,
                  "id":51,
                  "name":"",
@@ -41,64 +41,6 @@
                  "width":343,
                  "x":128,
                  "y":384
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":15,
-         "name":"monster",
-         "objects":[
-                {
-                 "height":0,
-                 "id":52,
-                 "name":"monster1",
-                 "polygon":[
-                        {
-                         "x":0,
-                         "y":0
-                        }, 
-                        {
-                         "x":105.883681535856,
-                         "y":1.08413325804631
-                        }, 
-                        {
-                         "x":139.491812535291,
-                         "y":33.6081309994353
-                        }, 
-                        {
-                         "x":97.5719932241672,
-                         "y":103.354037267081
-                        }, 
-                        {
-                         "x":36.4991530208922,
-                         "y":114.918125352908
-                        }, 
-                        {
-                         "x":11.2027103331451,
-                         "y":54.9294184076793
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":172.01581027668,
-                 "y":75.8893280632411
-                }, 
-                {
-                 "height":0,
-                 "id":53,
-                 "name":"another",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":139.130434782609,
-                 "y":79.14172783738
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -320,7 +262,7 @@
          "y":0
         }],
  "nextlayerid":16,
- "nextobjectid":54,
+ "nextobjectid":55,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -405,21 +347,21 @@
          "tilewidth":32
         }, 
         {
-         "columns":5,
+         "columns":6,
          "firstgid":1031,
          "image":"collectibles.png",
          "imageheight":32,
-         "imagewidth":160,
+         "imagewidth":192,
          "margin":0,
          "name":"collectibles",
          "spacing":0,
-         "tilecount":5,
+         "tilecount":6,
          "tileheight":32,
          "tilewidth":32
         }, 
         {
          "columns":1,
-         "firstgid":1036,
+         "firstgid":1037,
          "image":"door_enable_banner.png",
          "imageheight":28,
          "imagewidth":344,
