@@ -12,6 +12,7 @@ use crate::score_board::GameObject;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
+const MONSTER_SPEED: f32 = 10.0;
 
 #[derive(Debug, Clone)]
 struct PolyPoint {
@@ -500,10 +501,8 @@ impl Scene for Game {
                     },
                 );
 
-                
-
                 if self.timer > 0.0 {
-                    self.timer -= 10.0 * get_frame_time();
+                    self.timer -= MONSTER_SPEED * get_frame_time();
                 }
                 else {
                     if monster.current_waypoint < monster.waypoints.len() - 1 {
