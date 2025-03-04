@@ -72,35 +72,24 @@ impl Scene for MainMenu {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();
 
-        let shift_by = (screen_width() / 2.0) - 350.0;
-
-        tiled_map.spr_ex(
-            "fire1-sheet",
-            self.animated_fire.frame().source_rect,
-            Rect::new(
-                self.fires[0].world_x + shift_by,
-                self.fires[0].world_y - 80.0,
-                32.0,
-                32.0,
-            ),
-        );
-
-        tiled_map.spr_ex(
-            "fire1-sheet",
-            self.animated_fire.frame().source_rect,
-            Rect::new(
-                self.fires[1].world_x + shift_by,
-                self.fires[1].world_y - 90.0,
-                32.0,
-                32.0,
-            ),
-        );
-
+        for fire in &self.fires {
+            tiled_map.spr_ex(
+                "fire1-sheet",
+                self.animated_fire.frame().source_rect,
+                Rect::new(
+                    fire.world_x,
+                    fire.world_y - 32.0,
+                    32.0,
+                    32.0,
+                ),
+            );
+        }
+       
         for collect in &self.collects {
             tiled_map.spr_ex(
                 "collectibles",
                 Rect::new(192.0, 0.0, 32.0, 32.0),
-                Rect::new(collect.world_x + shift_by, collect.world_y - 32.0, 32.0, 32.0),
+                Rect::new(collect.world_x, collect.world_y - 32.0, 32.0, 32.0),
             );
         }
 
@@ -108,8 +97,8 @@ impl Scene for MainMenu {
             "dangerousdave1-sheet",
             self.animated_banner.frame().source_rect,
             Rect::new(
-                self.banner[0].world_x + shift_by,
-                self.banner[0].world_y - 95.0,
+                self.banner[0].world_x,
+                self.banner[0].world_y - 96.0,
                 256.0,
                 96.0,
             ),
@@ -117,8 +106,8 @@ impl Scene for MainMenu {
         
         draw_text_ex(
             "A Rust version BY oawad",
-            250.0,
-            105.0,
+            260.0,
+            115.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 12,     
@@ -130,8 +119,8 @@ impl Scene for MainMenu {
 
         draw_text_ex(
             "Press SPACEBAR to Start",
-            240.0,
-            310.0,
+            250.0,
+            370.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 12,
@@ -142,7 +131,7 @@ impl Scene for MainMenu {
         );
 
         tiled_map
-            .draw_tiles("logo", Rect::new(shift_by, 0.0, 320.0, 320.0), None);
+            .draw_tiles("logo", Rect::new(0.0, 0.0, 640.0, 384.0), None);
     }
 }
 
