@@ -366,12 +366,14 @@ impl Scene for Game {
         let pos = self.world.actor_pos(self.player.collider);
 
         //Update camera position to follow the player
-        if self.width_tiles as f32 * 32.0 > screen_width() {
-            let target_x = if (pos.x > screen_width() / 2.0) && 
-                              (pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0) {
+        if self.score_board.level > 1 {
+            let screen_width = screen_width();
+            let target_x = if (pos.x > screen_width / 2.0) && 
+                              (pos.x < (self.width_tiles * 32) as f32 - screen_width / 3.0) {
                 pos.x
-            } else if pos.x > 200.0 && pos.x < (self.width_tiles * 32) as f32 - screen_width() / 3.0 {
-                pos.x + 150.0
+            } else if pos.x > 200.0 && pos.x < (self.width_tiles * 32) as f32 - 
+                              (if screen_width > 1000.0 {screen_width / 5.0} else {screen_width / 3.0}) {
+                pos.x + 170.0
             } else if pos.x < 200.0 {
                 305.0
             } else {
