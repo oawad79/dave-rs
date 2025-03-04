@@ -18,6 +18,7 @@ pub struct Resources {
     pub sound_cup: Sound,
     pub sound_win: Sound,
     pub sound_die: Sound,
+    pub sound_gun: Sound,
     pub fire1: Texture2D,
     pub banner: Texture2D,
     pub font: Font,
@@ -33,9 +34,12 @@ pub struct Resources {
     pub explosion: Texture2D,
     pub sound_explosion: Sound,
     pub sound_gameover: Sound,
-    pub gun: Texture2D,
+    pub gun_icon: Texture2D,
+    pub gun_text: Texture2D,
     pub go_thru: Texture2D,
-    pub monster1: Texture2D
+    pub monster1: Texture2D,
+    pub bullet: Texture2D,
+    pub monster_bullet: Texture2D
 
 }
 
@@ -77,11 +81,20 @@ impl Resources {
         let explosion = load_texture("explosion.png").await.unwrap();
         explosion.set_filter(FilterMode::Nearest);
 
-        let gun = load_texture("gun_icon.png").await.unwrap();
-        gun.set_filter(FilterMode::Nearest);
+        let gun_icon = load_texture("gun_icon.png").await.unwrap();
+        gun_icon.set_filter(FilterMode::Nearest);
+
+        let gun_text = load_texture("gun.png").await.unwrap();
+        gun_text.set_filter(FilterMode::Nearest);
 
         let monster1 = load_texture("monster1.png").await.unwrap();
         monster1.set_filter(FilterMode::Nearest);
+
+        let bullet = load_texture("bullet.png").await.unwrap();
+        bullet.set_filter(FilterMode::Nearest);
+
+        let monster_bullet = load_texture("monster_bullet.png").await.unwrap();
+        monster_bullet.set_filter(FilterMode::Nearest);
 
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
@@ -92,6 +105,8 @@ impl Resources {
         let sound_die = load_sound("hd-die-dave-7.wav").await?;
         let sound_explosion = load_sound("explosion.wav").await?;
         let sound_gameover = load_sound("gameoverman.wav").await?;
+        let sound_gun = load_sound("gotspecial.wav").await?;
+
 
         let mut levels: Vec<String> = Vec::new();
         for i in 1..=3 {
@@ -143,6 +158,7 @@ impl Resources {
             sound_cup, 
             sound_win,
             sound_die,
+            sound_gun,
             fire1,
             banner,
             font,
@@ -158,9 +174,12 @@ impl Resources {
             explosion,
             sound_explosion,
             sound_gameover,
-            gun, 
+            gun_icon, 
+            gun_text,
             go_thru,
-            monster1
+            monster1,
+            bullet,
+            monster_bullet
         })
     }
 

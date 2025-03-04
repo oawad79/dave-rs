@@ -49,7 +49,8 @@ pub struct Game {
     deadly_objects: Vec<Object>,
     message_coord: (f32, f32),
     monsters: Vec<Monster>,
-    timer: f32
+    timer: f32,
+    gun: Option<GameObject>
 }
 
 impl Game {
@@ -69,8 +70,9 @@ impl Game {
                 ("deadly.png", resources.deadly_grass_texture.clone()),     
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("water1-sheet.png", resources.water_texture.clone()),
-                ("gun_icon.png", resources.gun.clone()),
-                ("door_enable_banner.png", resources.go_thru.clone())
+                ("door_enable_banner.png", resources.go_thru.clone()),
+                ("gun_icon.png", resources.gun_icon.clone()),
+                ("gun.png", resources.gun_text.clone()),
             ],
             &[],
         )
@@ -123,7 +125,20 @@ impl Game {
                         collected: None,
                     }
             ).collect::<Vec<GameObject>>()};
-        
+
+        let gun = if tiled_map.contains_layer("gun") {     
+            let gun_object = tiled_map.layers.get("gun").unwrap().objects.first().unwrap();    
+            Some(GameObject {
+                world_x: gun_object.world_x,
+                world_y: gun_object.world_y,
+                name: gun_object.name.clone(),
+                collected: None,
+            })
+        }
+        else {
+            None
+        };
+
         let door = tiled_map.layers.get("door").unwrap().objects.first().unwrap();
 
         let door = GameObject {
@@ -210,7 +225,8 @@ impl Game {
             deadly_objects,
             message_coord,
             monsters,
-            timer: 0.1
+            timer: 0.1,
+            gun
         }
     }
 
@@ -271,6 +287,39 @@ impl Game {
             Rect::new(0.0, 0.0, 32.0, 32.0),
             Rect::new(self.door.world_x, self.door.world_y - 32.0, 32.0, 32.0),
         );
+    }
+
+    fn draw_gun(&self, tiled_map: &Map, gun: &GameObject, resources: &Resources) {
+        if !self.player.has_gun {
+            tiled_map.spr_ex(
+                "gun_icon",
+                Rect::new(0.0, 0.0, 32.0, 32.0),
+                Rect::new(gun.world_x, gun.world_y - 32.0, 32.0, 32.0),
+            );
+        }
+        else {
+            draw_texture_ex(
+                &resources.gun_text,
+                self.message_coord.0 + self.camera.target.x - 20.0,
+                self.message_coord.1 - 32.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(resources.gun_text.width() , resources.gun_text.height() )), 
+                    ..Default::default()
+                },
+            );
+
+            draw_texture_ex(
+                &resources.gun_icon,
+                self.message_coord.0 + self.camera.target.x + 60.0,
+                self.message_coord.1 - 32.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(resources.gun_icon.width() , resources.gun_icon.height() )), 
+                    ..Default::default()
+                },
+            );
+        }
     }
 
     fn draw_animated_objects(&self, tiled_map: &Map) {
@@ -397,6 +446,19 @@ impl Scene for Game {
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
+        // Check for collision between player and gun
+        if let Some(g) = &self.gun { 
+            if !self.player.has_gun && self.player.overlaps(pos, &Rect::new(
+                g.world_x,
+                g.world_y - 32.0,
+                32.0,
+                32.0,
+            )) {
+                play_sound_once(&resources.sound_gun);
+                self.player.has_gun = true;
+            }
+        }
+
         // Check for collision between player and door
         if self.score_board.game_won && self.player.overlaps(pos, &Rect::new(
             self.door.world_x,
@@ -503,6 +565,28 @@ impl Scene for Game {
                     }
                     self.timer = 0.1;
                 }
+
+                if self.player.overlaps(pos, &Rect::new(
+                    monster.location.x + point.x,
+                    monster.location.y + point.y - 32.0,
+                    32.0,
+                    32.0,
+                )) {
+                    self.player.is_dead = true;
+                    monster.alive = false;
+                    self.explosion_active = true;
+                    self.explosion_timer = EXPLOSION_DURATION;
+
+                    if self.explosions.is_empty() {
+                        self.explosions.push((Emitter::new(EmitterConfig {
+                            amount: 40,
+                            texture: Some(resources.explosion.clone()),
+                            ..Game::particle_explosion()
+                        }), vec2(pos.x + 32.0, pos.y)));
+                    }
+                    play_sound_once(&resources.sound_explosion);
+                    play_sound_once(&resources.sound_die);
+                }
             }
         }
 
@@ -518,6 +602,10 @@ impl Scene for Game {
         self.draw_collectibles(&tiled_map);
         self.draw_door(&tiled_map);
         self.draw_animated_objects(&tiled_map);
+        
+        if let Some(g) = &self.gun {
+            self.draw_gun(&tiled_map, g, &resources);
+        }
 
         if self.score_board.game_won {
             draw_texture_ex(

@@ -13,7 +13,6 @@ use macroquad_tiled::Map;
 use crate::Resources;
 
 const GRAVITY: f32 = 500.0;
-//const JUMP_VELOCITY: f32 = -260.0;
 const JUMP_VELOCITY: f32 = -280.0;
 
 pub struct Player {
@@ -25,6 +24,7 @@ pub struct Player {
     pub simulate_left: bool,
     pub simulate_right: bool,
     pub is_dead: bool,
+    pub has_gun: bool
 }
 
 impl Player {
@@ -38,6 +38,7 @@ impl Player {
             simulate_left: false,
             simulate_right: false,
             is_dead: false,
+            has_gun: false
         }
     }
 
@@ -117,6 +118,10 @@ impl Player {
         if is_key_pressed(KeyCode::Up) && on_ground {
             play_sound_once(&resources.sound_jump);
             self.speed.y = JUMP_VELOCITY;
+        }
+
+        if is_key_pressed(KeyCode::LeftControl) && self.has_gun {
+            
         }
 
         world.move_h(self.collider, self.speed.x * delta);
