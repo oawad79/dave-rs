@@ -8,6 +8,7 @@ pub struct MainMenu {
     animated_banner: AnimatedSprite,
     fires: Vec<Object>,
     banner: Vec<Object>,
+    collects: Vec<Object>
 }
 
 impl MainMenu {
@@ -20,7 +21,8 @@ impl MainMenu {
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("dangerousdave1-sheet.png", resources.banner.clone()),
                 ("king.png", resources.king.clone()),
-                ("mytileset.png", resources.tileset.clone())
+                ("mytileset.png", resources.tileset.clone()),
+                ("collectibles.png", resources.collectibles.clone()),
                 
             ],
             &[],
@@ -29,6 +31,9 @@ impl MainMenu {
         
         let fire_layer = tiled_map.layers.get("fire").unwrap();
         let fires = fire_layer.objects.clone();
+
+        let collect_layer = tiled_map.layers.get("collectibles").unwrap();
+        let collects = collect_layer.objects.clone();
 
         let banner_layer = tiled_map.layers.get("banner").unwrap();
         let banner = banner_layer.objects.clone();
@@ -45,7 +50,8 @@ impl MainMenu {
             animated_fire,
             animated_banner,
             fires,
-            banner       
+            banner,
+            collects       
         }
     }
 }
@@ -90,6 +96,14 @@ impl Scene for MainMenu {
                 32.0,
             ),
         );
+
+        for collect in &self.collects {
+            tiled_map.spr_ex(
+                "collectibles",
+                Rect::new(192.0, 0.0, 32.0, 32.0),
+                Rect::new(collect.world_x + shift_by, collect.world_y - 32.0, 32.0, 32.0),
+            );
+        }
 
         tiled_map.spr_ex(
             "dangerousdave1-sheet",

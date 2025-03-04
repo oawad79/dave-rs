@@ -8,9 +8,9 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             9, 0, 9, 9, 9, 9, 0, 9, 0, 9,
-            9, 0, 9, 1025, 0, 0, 0, 0, 0, 9,
+            9, 0, 9, 0, 0, 0, 0, 0, 0, 9,
             9, 0, 9, 0, 0, 9, 9, 9, 0, 9,
-            9, 0, 9, 0, 0, 0, 0, 0, 1025, 9,
+            9, 0, 9, 0, 0, 0, 0, 0, 0, 9,
             9, 0, 9, 0, 9, 9, 9, 0, 0, 9,
             9, 0, 0, 0, 0, 0, 0, 0, 0, 9,
             9, 9, 9, 9, 9, 9, 9, 9, 0, 9,
@@ -31,7 +31,7 @@
          "name":"fire",
          "objects":[
                 {
-                 "gid":1026,
+                 "gid":1025,
                  "height":32,
                  "id":1,
                  "name":"fire",
@@ -43,7 +43,7 @@
                  "y":288
                 }, 
                 {
-                 "gid":1026,
+                 "gid":1025,
                  "height":32,
                  "id":2,
                  "name":"fire",
@@ -66,7 +66,7 @@
          "name":"banner",
          "objects":[
                 {
-                 "gid":1029,
+                 "gid":1028,
                  "height":96,
                  "id":4,
                  "name":"banner",
@@ -82,9 +82,44 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"collectibles",
+         "objects":[
+                {
+                 "gid":1038,
+                 "height":32,
+                 "id":5,
+                 "name":"king",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":96,
+                 "y":192
+                }, 
+                {
+                 "gid":1038,
+                 "height":32,
+                 "id":6,
+                 "name":"king",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":256,
+                 "y":256
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":5,
+ "nextlayerid":5,
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -104,21 +139,8 @@
          "tilewidth":32
         }, 
         {
-         "columns":1,
-         "firstgid":1025,
-         "image":"king.png",
-         "imageheight":32,
-         "imagewidth":32,
-         "margin":0,
-         "name":"king",
-         "spacing":0,
-         "tilecount":1,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
          "columns":3,
-         "firstgid":1026,
+         "firstgid":1025,
          "image":"fire1-sheet.png",
          "imageheight":33,
          "imagewidth":105,
@@ -148,7 +170,7 @@
         }, 
         {
          "columns":4,
-         "firstgid":1029,
+         "firstgid":1028,
          "image":"dangerousdave1-sheet.png",
          "imageheight":96,
          "imagewidth":1024,
@@ -158,6 +180,19 @@
          "tilecount":4,
          "tileheight":96,
          "tilewidth":256
+        }, 
+        {
+         "columns":7,
+         "firstgid":1032,
+         "image":"collectibles.png",
+         "imageheight":32,
+         "imagewidth":224,
+         "margin":0,
+         "name":"collectibles",
+         "spacing":0,
+         "tilecount":7,
+         "tileheight":32,
+         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",

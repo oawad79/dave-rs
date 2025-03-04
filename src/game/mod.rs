@@ -104,16 +104,6 @@ impl Game {
     
         let player = Player::new(actor);
 
-        if tiled_map.layers.contains_key("monster") {
-            let monster_layer = tiled_map.layers.get("monster").unwrap();
-            for object in &monster_layer.objects {
-                if object.name == "another" {
-                    println!("{:?}", object);
-                }
-            }
-        }
-
-
         let score_board = 
                         if level == 1 && !retry { 
                             ScoreBoard::new()
@@ -266,7 +256,8 @@ impl Game {
                 "red" => 64.0,
                 "loli" => 96.0,
                 "cup" => 128.0,
-                _ => 160.0
+                "yussuk" => 160.0,
+                _ => 192.0
             };
 
             tiled_map.spr_ex(
