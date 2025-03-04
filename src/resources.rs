@@ -20,7 +20,6 @@ pub struct Resources {
     pub sound_die: Sound,
     pub fire1: Texture2D,
     pub banner: Texture2D,
-    pub king: Texture2D,
     pub font: Font,
     pub quit_texture: Texture2D,
     pub score_texture: Texture2D,
@@ -35,9 +34,7 @@ pub struct Resources {
     pub sound_explosion: Sound,
     pub sound_gameover: Sound,
     pub gun: Texture2D,
-    pub lolipop: Texture2D,
     pub go_thru: Texture2D,
-    pub yussuk: Texture2D,
     pub monster1: Texture2D
 
 }
@@ -77,20 +74,11 @@ impl Resources {
         let water_texture = load_texture("water1-sheet.png").await.unwrap();
         water_texture.set_filter(FilterMode::Nearest);
 
-        let king = load_texture("king.png").await.unwrap();
-        king.set_filter(FilterMode::Nearest);
-
         let explosion = load_texture("explosion.png").await.unwrap();
         explosion.set_filter(FilterMode::Nearest);
 
         let gun = load_texture("gun_icon.png").await.unwrap();
         gun.set_filter(FilterMode::Nearest);
-
-        let lolipop = load_texture("lolipop.png").await.unwrap();
-        lolipop.set_filter(FilterMode::Nearest);
-
-        let yussuk = load_texture("yussuk.png").await.unwrap();
-        yussuk.set_filter(FilterMode::Nearest);
 
         let monster1 = load_texture("monster1.png").await.unwrap();
         monster1.set_filter(FilterMode::Nearest);
@@ -157,7 +145,6 @@ impl Resources {
             sound_die,
             fire1,
             banner,
-            king,
             font,
             quit_texture,
             score_texture,
@@ -172,9 +159,7 @@ impl Resources {
             sound_explosion,
             sound_gameover,
             gun, 
-            lolipop,
             go_thru,
-            yussuk,
             monster1
         })
     }
