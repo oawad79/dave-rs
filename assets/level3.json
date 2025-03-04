@@ -555,7 +555,7 @@
          "name":"message",
          "objects":[
                 {
-                 "gid":1046,
+                 "gid":1045,
                  "height":24,
                  "id":90,
                  "name":"",
@@ -1173,19 +1173,6 @@
         {
          "columns":1,
          "firstgid":1045,
-         "image":"lolipop.png",
-         "imageheight":32,
-         "imagewidth":32,
-         "margin":0,
-         "name":"lolipop",
-         "spacing":0,
-         "tilecount":1,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
-         "columns":1,
-         "firstgid":1046,
          "image":"door_enable_banner.png",
          "imageheight":28,
          "imagewidth":344,
