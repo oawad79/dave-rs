@@ -1,18 +1,18 @@
 mod player;
 mod resources;
 mod game;
-mod main_menu;
+mod entry_screen;
 mod separator;
 mod score_board;
 
 use game::Game;
-use main_menu::MainMenu;
+use entry_screen::EntryScreen;
 use separator::Separator;
 use resources::Resources;
 use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
-    MainMenu,
+    EntryScreen,
     Game{level: i32, retry: bool},
     Separator
 }
@@ -45,7 +45,7 @@ async fn main() {
     
     let main_camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
     
-    let mut scene: Box<dyn Scene> = Box::new(MainMenu::new());
+    let mut scene: Box<dyn Scene> = Box::new(EntryScreen::new());
     
     let resources = storage::get::<Resources>();
 
@@ -59,7 +59,7 @@ async fn main() {
         let change = scene.update();
         if let Some(change) = change {
             scene = match change {
-                SceneChange::MainMenu => Box::new(MainMenu::new()),
+                SceneChange::EntryScreen => Box::new(EntryScreen::new()),
                 SceneChange::Game{level, retry} => Box::new(Game::new(level, retry)),
                 SceneChange::Separator => Box::new(Separator::new())
             };

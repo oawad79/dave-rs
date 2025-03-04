@@ -3,7 +3,7 @@ use macroquad_tiled::{load_map, Map, Object};
 
 use crate::{resources::Resources, Scene, SceneChange};
 
-pub struct MainMenu {
+pub struct EntryScreen {
     animated_fire: AnimatedSprite,
     animated_banner: AnimatedSprite,
     fires: Vec<Object>,
@@ -11,8 +11,8 @@ pub struct MainMenu {
     collects: Vec<Object>
 }
 
-impl MainMenu {
-    pub fn new() -> MainMenu {
+impl EntryScreen {
+    pub fn new() -> EntryScreen {
         let resources = storage::get::<Resources>();
 
         let tiled_map = load_map(
@@ -45,7 +45,7 @@ impl MainMenu {
         let mut animated_banner = animated_banner();
         animated_banner.set_animation(0);
 
-        MainMenu {  
+        EntryScreen {  
             animated_fire,
             animated_banner,
             fires,
@@ -55,7 +55,7 @@ impl MainMenu {
     }
 }
 
-impl Scene for MainMenu {
+impl Scene for EntryScreen {
     fn update(&mut self) -> Option<SceneChange> {
         
         if is_key_down(KeyCode::Space) {
