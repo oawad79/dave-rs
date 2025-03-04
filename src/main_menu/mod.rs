@@ -20,7 +20,6 @@ impl MainMenu {
             &[
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("dangerousdave1-sheet.png", resources.banner.clone()),
-                ("king.png", resources.king.clone()),
                 ("mytileset.png", resources.tileset.clone()),
                 ("collectibles.png", resources.collectibles.clone()),
                 

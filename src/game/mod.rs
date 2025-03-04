@@ -70,7 +70,6 @@ impl Game {
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("water1-sheet.png", resources.water_texture.clone()),
                 ("gun_icon.png", resources.gun.clone()),
-                ("king.png", resources.king.clone()),
                 ("lolipop.png", resources.lolipop.clone()),
                 ("door_enable_banner.png", resources.go_thru.clone()),
                 ("yussuk.png", resources.yussuk.clone())
