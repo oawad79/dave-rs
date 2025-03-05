@@ -568,7 +568,7 @@ impl Scene for Game {
 
                 if self.player.overlaps(pos, &Rect::new(
                     monster.location.x + point.x,
-                    monster.location.y + point.y - 32.0,
+                    monster.location.y + point.y,
                     32.0,
                     32.0,
                 )) {
@@ -582,8 +582,14 @@ impl Scene for Game {
                             amount: 40,
                             texture: Some(resources.explosion.clone()),
                             ..Game::particle_explosion()
-                        }), vec2(pos.x + 32.0, pos.y)));
+                        }), vec2(pos.x, pos.y)));
+                        self.explosions.push((Emitter::new(EmitterConfig {
+                            amount: 40,
+                            texture: Some(resources.explosion.clone()),
+                            ..Game::particle_explosion()
+                        }), vec2(point.x, point.y)));
                     }
+
                     play_sound_once(&resources.sound_explosion);
                     play_sound_once(&resources.sound_die);
                 }
