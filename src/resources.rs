@@ -19,6 +19,7 @@ pub struct Resources {
     pub sound_win: Sound,
     pub sound_die: Sound,
     pub sound_gun: Sound,
+    pub sound_shoot: Sound,
     pub fire1: Texture2D,
     pub banner: Texture2D,
     pub font: Font,
@@ -106,6 +107,7 @@ impl Resources {
         let sound_explosion = load_sound("explosion.wav").await?;
         let sound_gameover = load_sound("gameoverman.wav").await?;
         let sound_gun = load_sound("gotspecial.wav").await?;
+        let sound_shoot = load_sound("shoot.wav").await?;
 
 
         let mut levels: Vec<String> = Vec::new();
@@ -159,6 +161,7 @@ impl Resources {
             sound_win,
             sound_die,
             sound_gun,
+            sound_shoot,
             fire1,
             banner,
             font,

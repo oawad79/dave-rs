@@ -15,6 +15,13 @@ use crate::Resources;
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -280.0;
 
+pub struct Bullet {
+    pub x: f32,
+    pub y: f32,
+    speed: f32,
+    pub collided: bool
+}
+
 pub struct Player {
     pub collider: Actor,
     pub speed: Vec2,
@@ -24,7 +31,8 @@ pub struct Player {
     pub simulate_left: bool,
     pub simulate_right: bool,
     pub is_dead: bool,
-    pub has_gun: bool
+    pub has_gun: bool,
+    pub bullets: Vec<Bullet>
 }
 
 impl Player {
@@ -38,7 +46,8 @@ impl Player {
             simulate_left: false,
             simulate_right: false,
             is_dead: false,
-            has_gun: false
+            has_gun: false,
+            bullets: vec![]
         }
     }
 
@@ -120,8 +129,38 @@ impl Player {
             self.speed.y = JUMP_VELOCITY;
         }
 
-        if is_key_pressed(KeyCode::LeftControl) && self.has_gun {
-            
+        if is_key_pressed(KeyCode::LeftControl) && self.has_gun  {
+            self.bullets.push(Bullet {
+                x: pos.x + 10.0,
+                y: pos.y,
+                speed: 250.0,
+                collided: false 
+            });
+            play_sound_once(&resources.sound_shoot);
+        }
+
+        for bullet in &mut self.bullets {
+            bullet.x += bullet.speed * delta;
+        }
+
+        // self.bullets.retain(|bullet| {
+        //     println!("collided: {} bullet.x: {} screen_width: {}", bullet.collided, bullet.x, screen_width());
+        //     bullet.x < screen_width() && !bullet.collided
+        // });
+
+        
+
+        for bullet in &self.bullets {
+            draw_texture_ex(
+                &resources.bullet,
+                bullet.x,
+                bullet.y,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(resources.bullet.width(), resources.bullet.height())),
+                    ..Default::default()
+                },
+            );
         }
 
         world.move_h(self.collider, self.speed.x * delta);

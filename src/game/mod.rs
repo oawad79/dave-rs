@@ -593,8 +593,43 @@ impl Scene for Game {
                     play_sound_once(&resources.sound_explosion);
                     play_sound_once(&resources.sound_die);
                 }
+
+                for bullet in &mut self.player.bullets {
+                    let bullet_rect = Rect {
+                        x: bullet.x,
+                        y: bullet.y,
+                        w: resources.bullet.width(),
+                        h: resources.bullet.height()
+                    };
+
+                    if bullet_rect.overlaps(&Rect::new(
+                        monster.location.x + point.x,
+                        monster.location.y + point.y,
+                        32.0,
+                        32.0,
+                    )) {
+                        bullet.collided = true;
+                        monster.alive = false;
+                        if self.explosions.is_empty() {
+                            self.explosions.push((Emitter::new(EmitterConfig {
+                                amount: 40,
+                                texture: Some(resources.explosion.clone()),
+                                ..Game::particle_explosion()
+                            }), vec2(monster.location.x + point.x, monster.location.y + point.y)));
+                        }
+
+                        play_sound_once(&resources.sound_explosion);
+                    }
+                }
             }
         }
+
+        let screen_left = self.camera.target.x - screen_width() / 2.0;
+        let screen_right = self.camera.target.x + screen_width() / 2.0;
+        
+        self.player.bullets.retain(|bullet| {
+            bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
+        });
 
         None
     }
