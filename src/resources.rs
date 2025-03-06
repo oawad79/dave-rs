@@ -40,7 +40,9 @@ pub struct Resources {
     pub go_thru: Texture2D,
     pub monster1: Texture2D,
     pub bullet: Texture2D,
-    pub monster_bullet: Texture2D
+    pub monster_bullet: Texture2D,
+    pub jetpack2: Texture2D,
+    pub jetpack_text: Texture2D
 
 }
 
@@ -96,6 +98,12 @@ impl Resources {
 
         let monster_bullet = load_texture("monster_bullet.png").await.unwrap();
         monster_bullet.set_filter(FilterMode::Nearest);
+
+        let jetpack2 = load_texture("jetpack2.png").await.unwrap();
+        jetpack2.set_filter(FilterMode::Nearest);
+
+        let jetpack_text = load_texture("jetpack.png").await.unwrap();
+        jetpack_text.set_filter(FilterMode::Nearest);
 
         let sound_collect = load_sound("getitem.wav").await?;
         let sound_jump = load_sound("jump.wav").await?;
@@ -182,7 +190,9 @@ impl Resources {
             go_thru,
             monster1,
             bullet,
-            monster_bullet
+            monster_bullet,
+            jetpack2,
+            jetpack_text
         })
     }
 

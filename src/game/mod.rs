@@ -6,8 +6,6 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
-
-
 use crate::score_board::GameObject;
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
@@ -21,11 +19,20 @@ struct PolyPoint {
 }
 
 #[derive(Debug)]
+pub struct Bullet {
+    pub x: f32,
+    pub y: f32,
+    pub speed: f32,
+    pub collided: bool
+}
+
+#[derive(Debug)]
 struct Monster {
     location: PolyPoint,
     waypoints: Vec<Vec2>,
     current_waypoint: usize,
-    alive: bool
+    alive: bool,
+    bullets: Vec<Bullet>
 }
 
 pub struct Game {
@@ -49,8 +56,9 @@ pub struct Game {
     deadly_objects: Vec<Object>,
     message_coord: (f32, f32),
     monsters: Vec<Monster>,
-    timer: f32,
-    gun: Option<GameObject>
+    monster_move_timer: f32,
+    gun: Option<GameObject>,
+    monster_bullet_timer: f32
 }
 
 impl Game {
@@ -73,6 +81,7 @@ impl Game {
                 ("door_enable_banner.png", resources.go_thru.clone()),
                 ("gun_icon.png", resources.gun_icon.clone()),
                 ("gun.png", resources.gun_text.clone()),
+                ("jetpack2.png", resources.jetpack2.clone()),
             ],
             &[],
         )
@@ -182,7 +191,8 @@ impl Game {
                             },
                             current_waypoint: 0, 
                             alive: true,
-                            waypoints: Vec::new()
+                            waypoints: Vec::new(),
+                            bullets: vec![]
                         };
 
                         let polygon_pts = monster_obj.polygon.as_ref().unwrap();
@@ -225,8 +235,9 @@ impl Game {
             deadly_objects,
             message_coord,
             monsters,
-            timer: 0.1,
-            gun
+            monster_move_timer: 0.1,
+            gun,
+            monster_bullet_timer: 6.0
         }
     }
 
@@ -538,6 +549,9 @@ impl Scene for Game {
             self.animated_grass.as_mut().unwrap().update();
         }
         
+        let screen_left = self.camera.target.x - screen_width() / 2.0;
+        let screen_right = self.camera.target.x + screen_width() / 2.0;
+
         for monster in &mut self.monsters {
             if monster.alive {
                 let point = &monster.waypoints[monster.current_waypoint];
@@ -553,8 +567,8 @@ impl Scene for Game {
                     },
                 );
 
-                if self.timer > 0.0 {
-                    self.timer -= MONSTER_SPEED * get_frame_time();
+                if self.monster_move_timer > 0.0 {
+                    self.monster_move_timer -= MONSTER_SPEED * get_frame_time();
                 }
                 else {
                     if monster.current_waypoint < monster.waypoints.len() - 1 {
@@ -563,7 +577,7 @@ impl Scene for Game {
                     else {
                         monster.current_waypoint = 0;
                     }
-                    self.timer = 0.1;
+                    self.monster_move_timer = 0.1;
                 }
 
                 if self.player.overlaps(pos, &Rect::new(
@@ -621,15 +635,61 @@ impl Scene for Game {
                         play_sound_once(&resources.sound_explosion);
                     }
                 }
+
+                if self.monster_bullet_timer > 0.0 {
+                    self.monster_bullet_timer -= get_frame_time();
+                }
+                else {
+                    println!("value = {}, met = {}", monster.location.x + point.x - pos.x, monster.location.x + point.x - pos.x < screen_width() * 0.8);
+                    //only allow monster to shoot if he is close to the player
+                    if monster.location.x + point.x - pos.x < screen_width() * 0.8 {
+                        //shoot a bullet
+                        monster.bullets.push(Bullet {
+                            x: monster.location.x + point.x + 10.0,
+                            y: monster.location.y + point.y,
+                            speed: 250.0,
+                            collided: false 
+                        });
+                    }
+
+                    self.monster_bullet_timer = 6.0;
+                }
+
+                for monster_bullet in &mut monster.bullets {
+                    monster_bullet.x -= monster_bullet.speed * get_frame_time();
+                }
+
+                for monster_bullet in &monster.bullets {
+                    draw_texture_ex(
+                        &resources.monster_bullet,
+                        monster_bullet.x,
+                        monster_bullet.y,
+                        WHITE,
+                        DrawTextureParams {
+                            dest_size: Some(vec2(resources.monster_bullet.width(), resources.monster_bullet.height())),
+                            ..Default::default()
+                        },
+                    );
+                }
+
+                println!("screen_right = {}", screen_right);
+                monster.bullets.retain(|bullet| {
+                    println!("bullet.x {}", bullet.x);
+                    !bullet.collided && bullet.x > screen_right
+                });
+
+                //println!("bullets.len() = {}", monster.bullets.len());
+
             }
         }
 
-        let screen_left = self.camera.target.x - screen_width() / 2.0;
-        let screen_right = self.camera.target.x + screen_width() / 2.0;
+        
         
         self.player.bullets.retain(|bullet| {
             bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
         });
+
+        
 
         None
     }

@@ -20,6 +20,9 @@
 		},
 		{
 			"path": "../../CLionProjects/opengl-training"
+		},
+		{
+			"path": "../egui-miniquad"
 		}
 	],
 	"settings": {

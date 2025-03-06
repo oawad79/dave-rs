@@ -37,6 +37,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    
     macroquad::logging::info!("started program..!!!");
 
     set_pc_assets_folder("assets");
@@ -73,8 +74,10 @@ async fn main() {
 
         next_frame().await
     }
-}
 
+   
+
+}
 
 fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
     if is_key_down(KeyCode::Escape) || *show_quit {
@@ -99,6 +102,3 @@ fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
 
     false
 }
-
-
-

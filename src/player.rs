@@ -10,17 +10,10 @@ use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::Resources;
+use crate::{game::Bullet, Resources};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -280.0;
-
-pub struct Bullet {
-    pub x: f32,
-    pub y: f32,
-    speed: f32,
-    pub collided: bool
-}
 
 pub struct Player {
     pub collider: Actor,
@@ -142,13 +135,6 @@ impl Player {
         for bullet in &mut self.bullets {
             bullet.x += bullet.speed * delta;
         }
-
-        // self.bullets.retain(|bullet| {
-        //     println!("collided: {} bullet.x: {} screen_width: {}", bullet.collided, bullet.x, screen_width());
-        //     bullet.x < screen_width() && !bullet.collided
-        // });
-
-        
 
         for bullet in &self.bullets {
             draw_texture_ex(

@@ -50,6 +50,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":8,
+         "name":"jetpack",
+         "objects":[
+                {
+                 "gid":1049,
+                 "height":32,
+                 "id":83,
+                 "name":"jetpack",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":2272,
+                 "y":192
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":4,
          "name":"water",
          "objects":[
@@ -955,8 +978,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":83,
+ "nextlayerid":9,
+ "nextobjectid":84,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1089,6 +1112,19 @@
          "name":"dave_walk",
          "spacing":0,
          "tilecount":2,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1049,
+         "image":"jetpack2.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"jetpack2",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

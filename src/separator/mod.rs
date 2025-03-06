@@ -68,7 +68,7 @@ impl Scene for Separator {
         if !self.sound_playing {
             play_sound(&resources.sound_walk, PlaySoundParams {
                 looped: true, 
-                ..Default::default()
+                volume: 1.0
             });
             self.sound_playing = true;
         }
