@@ -38,12 +38,12 @@ pub struct Resources {
     pub gun_icon: Texture2D,
     pub gun_text: Texture2D,
     pub go_thru: Texture2D,
-    pub monster1: Texture2D,
+    pub monsters: Vec<Texture2D>,
     pub bullet: Texture2D,
     pub monster_bullet: Texture2D,
     pub jetpack2: Texture2D,
-    pub jetpack_text: Texture2D
-
+    pub jetpack_text: Texture2D,
+    pub tuple_r: Texture2D
 }
 
 impl Resources {
@@ -69,6 +69,9 @@ impl Resources {
         let tuple = load_texture("tuple.png").await.unwrap();
         tuple.set_filter(FilterMode::Nearest);
 
+        let tuple_r = load_texture("tuple_r.png").await.unwrap();
+        tuple_r.set_filter(FilterMode::Nearest);
+
         let go_thru = load_texture("door_enable_banner.png").await.unwrap();
         go_thru.set_filter(FilterMode::Nearest);
 
@@ -90,8 +93,12 @@ impl Resources {
         let gun_text = load_texture("gun.png").await.unwrap();
         gun_text.set_filter(FilterMode::Nearest);
 
+
         let monster1 = load_texture("monster1.png").await.unwrap();
         monster1.set_filter(FilterMode::Nearest);
+
+        let monster2 = load_texture("monster2.png").await.unwrap();
+        monster2.set_filter(FilterMode::Nearest);
 
         let bullet = load_texture("bullet.png").await.unwrap();
         bullet.set_filter(FilterMode::Nearest);
@@ -119,7 +126,7 @@ impl Resources {
 
 
         let mut levels: Vec<String> = Vec::new();
-        for i in 1..=3 {
+        for i in 1..=4 {
             let level = load_string(&format!("level{}.json", i)).await.unwrap();
             levels.push(level);
         }
@@ -146,6 +153,11 @@ impl Resources {
         let mut numbers: Vec<Texture2D> = Vec::new();
         for i in 0..=9 {
             numbers.push(load_texture(&format!("num{}.png", i)).await.unwrap());
+        }
+
+        let mut monsters: Vec<Texture2D> = Vec::new();
+        for i in 1..=2 {
+            monsters.push(load_texture(&format!("monster{}.png", i)).await.unwrap());
         }
         
         //build_textures_atlas();
@@ -188,11 +200,12 @@ impl Resources {
             gun_icon, 
             gun_text,
             go_thru,
-            monster1,
+            monsters,
             bullet,
             monster_bullet,
             jetpack2,
-            jetpack_text
+            jetpack_text,
+            tuple_r
         })
     }
 

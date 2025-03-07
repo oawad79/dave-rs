@@ -32,7 +32,8 @@ struct Monster {
     waypoints: Vec<Vec2>,
     current_waypoint: usize,
     alive: bool,
-    bullets: Vec<Bullet>
+    bullets: Vec<Bullet>,
+    name: String
 }
 
 pub struct Game {
@@ -64,7 +65,6 @@ pub struct Game {
 
 impl Game {
     pub fn new(level: i32, retry: bool, cheat: bool) -> Game {
-        
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
@@ -76,7 +76,8 @@ impl Game {
                 ("dave_jump.png", resources.player_jump.clone()),
                 ("collectibles.png", resources.collectibles.clone()),
                 ("door.png", resources.door.clone()),
-                ("tuple.png", resources.tuple.clone()),   
+                ("tuple.png", resources.tuple.clone()),
+                ("tuple_r.png", resources.tuple_r.clone()),   
                 ("deadly.png", resources.deadly_grass_texture.clone()),     
                 ("fire1-sheet.png", resources.fire1.clone()),
                 ("water1-sheet.png", resources.water_texture.clone()),
@@ -197,7 +198,8 @@ impl Game {
                             current_waypoint: 0, 
                             alive: true,
                             waypoints: Vec::new(),
-                            bullets: vec![]
+                            bullets: vec![],
+                            name: monster_obj.name.clone()
                         };
 
                         let polygon_pts = monster_obj.polygon.as_ref().unwrap();
@@ -561,14 +563,15 @@ impl Scene for Game {
         for monster in &mut self.monsters {
             if monster.alive {
                 let point = &monster.waypoints[monster.current_waypoint];
-                
+                let m = &resources.monsters[monster.name.parse::<usize>().unwrap() - 1];
+
                 draw_texture_ex(
-                    &resources.monster1,
+                    m,
                     monster.location.x + point.x,
                     monster.location.y + point.y,
                     WHITE,
                     DrawTextureParams {
-                        dest_size: Some(vec2(resources.monster1.width() , resources.monster1.height() )), 
+                        dest_size: Some(vec2(m.width() , m.height() )), 
                         ..Default::default()
                     },
                 );
@@ -646,9 +649,8 @@ impl Scene for Game {
                     self.monster_bullet_timer -= get_frame_time();
                 }
                 else {
-                    println!("value = {}, met = {}", monster.location.x + point.x - pos.x, monster.location.x + point.x - pos.x < screen_width() * 0.8);
                     //only allow monster to shoot if he is close to the player
-                    if monster.location.x + point.x - pos.x < screen_width() * 0.8 {
+                    if monster.location.x + point.x - pos.x < screen_width() * 0.7 {
                         //shoot a bullet
                         monster.bullets.push(Bullet {
                             x: monster.location.x + point.x + 10.0,
@@ -678,13 +680,33 @@ impl Scene for Game {
                     );
                 }
 
-                println!("screen_right = {}", screen_right);
+                for bullet in &mut monster.bullets {
+                    let bullet_rect = Rect {
+                        x: bullet.x,
+                        y: bullet.y,
+                        w: resources.monster_bullet.width(),
+                        h: resources.monster_bullet.height()
+                    };
+
+                    if self.player.overlaps(pos, &bullet_rect) {
+                        bullet.collided = true;
+                        self.player.is_dead = true;
+                        if self.explosions.is_empty() {
+                            self.explosions.push((Emitter::new(EmitterConfig {
+                                amount: 40,
+                                texture: Some(resources.explosion.clone()),
+                                ..Game::particle_explosion()
+                            }), vec2(pos.x, pos.y)));
+                        }
+
+                        play_sound_once(&resources.sound_explosion);
+                    }
+                }
+
                 monster.bullets.retain(|bullet| {
-                    println!("bullet.x {}", bullet.x);
-                    !bullet.collided && bullet.x > screen_right
+                    !bullet.collided && bullet.x > pos.x - 100.0 
                 });
 
-                //println!("bullets.len() = {}", monster.bullets.len());
 
             }
         }

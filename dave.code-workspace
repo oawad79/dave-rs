@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "../egui-miniquad"
+		},
+		{
+			"path": "../iced-test"
 		}
 	],
 	"settings": {
