@@ -703,8 +703,17 @@ impl Scene for Game {
                     }
                 }
 
+                
                 monster.bullets.retain(|bullet| {
-                    !bullet.collided && bullet.x > pos.x - 100.0 
+                    if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
+                        return false
+                    }
+                    
+                    if !bullet.collided && bullet.x > pos.x - 100.0 {
+                        return true;
+                    }
+                    
+                    false
                 });
 
 
