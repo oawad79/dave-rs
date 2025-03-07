@@ -6,7 +6,7 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
-use crate::score_board::GameObject;
+use crate::score_board::{self, GameObject};
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
@@ -58,11 +58,13 @@ pub struct Game {
     monsters: Vec<Monster>,
     monster_move_timer: f32,
     gun: Option<GameObject>,
-    monster_bullet_timer: f32
+    monster_bullet_timer: f32,
+    cheat: bool
 }
 
 impl Game {
-    pub fn new(level: i32, retry: bool) -> Game {
+    pub fn new(level: i32, retry: bool, cheat: bool) -> Game {
+        
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
@@ -112,13 +114,16 @@ impl Game {
     
         let player = Player::new(actor);
 
-        let score_board = 
-                        if level == 1 && !retry { 
+        let mut score_board = 
+                        if (cheat || level == 1) && !retry {
                             ScoreBoard::new()
-                        } 
-                        else { 
+                        } else { 
                             storage::get::<ScoreBoard>().clone() 
                         };
+
+        if cheat {
+            score_board.level = level;
+        }
 
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
         let collectibles = 
@@ -237,7 +242,8 @@ impl Game {
             monsters,
             monster_move_timer: 0.1,
             gun,
-            monster_bullet_timer: 6.0
+            monster_bullet_timer: 6.0,
+            cheat
         }
     }
 
@@ -519,7 +525,7 @@ impl Scene for Game {
                 self.score_board.lives -= 1;
                 self.score_board.collectibles = self.collectibles.clone();
                 storage::store(self.score_board.clone());
-                return Some(SceneChange::Game{level: self.score_board.level, retry: true});
+                return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
             }
         }
 

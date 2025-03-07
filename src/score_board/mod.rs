@@ -10,7 +10,7 @@ use macroquad::{
 
 use crate::{resources::Resources, Scene, SceneChange};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GameObject {
     pub world_x: f32,
     pub world_y: f32,

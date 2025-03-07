@@ -13,7 +13,7 @@ use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     EntryScreen,
-    Game{level: i32, retry: bool},
+    Game{level: i32, retry: bool, cheat: bool},
     Separator
 }
 pub trait Scene {
@@ -61,7 +61,7 @@ async fn main() {
         if let Some(change) = change {
             scene = match change {
                 SceneChange::EntryScreen => Box::new(EntryScreen::new()),
-                SceneChange::Game{level, retry} => Box::new(Game::new(level, retry)),
+                SceneChange::Game{level, retry, cheat} => Box::new(Game::new(level, retry, cheat)),
                 SceneChange::Separator => Box::new(Separator::new())
             };
         }
@@ -70,6 +70,21 @@ async fn main() {
 
         if handle_quit_menu(&resources, &mut show_quit) {
             break;
+        }
+
+        if is_key_down(KeyCode::LeftControl) {
+            // Check if any number key (0-9) is pressed
+            for (i, key) in [
+                KeyCode::Key0, KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4,
+                KeyCode::Key5, KeyCode::Key6, KeyCode::Key7, KeyCode::Key8, KeyCode::Key9,
+            ]
+            .iter()
+            .enumerate()
+            {
+                if is_key_down(*key) {
+                    scene = Box::new(Game::new(i as i32, false, true));
+                }
+            }
         }
 
         next_frame().await
