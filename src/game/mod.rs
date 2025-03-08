@@ -6,17 +6,17 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::*;
 
-use crate::score_board::{self, GameObject};
-use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
+use crate::score_board::GameObject;
+use crate::{player::Player, monster::Monster, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
-const MONSTER_SPEED: f32 = 10.0;
+// const MONSTER_SPEED: f32 = 10.0;
 
-#[derive(Debug, Clone)]
-struct PolyPoint {
-    x: f32,
-    y: f32
-}
+// #[derive(Debug, Clone)]
+// struct PolyPoint {
+//     x: f32,
+//     y: f32
+// }
 
 #[derive(Debug)]
 pub struct Bullet {
@@ -26,15 +26,15 @@ pub struct Bullet {
     pub collided: bool
 }
 
-#[derive(Debug)]
-struct Monster {
-    location: PolyPoint,
-    waypoints: Vec<Vec2>,
-    current_waypoint: usize,
-    alive: bool,
-    bullets: Vec<Bullet>,
-    name: String
-}
+// #[derive(Debug)]
+// struct Monster {
+//     location: PolyPoint,
+//     waypoints: Vec<Vec2>,
+//     current_waypoint: usize,
+//     alive: bool,
+//     bullets: Vec<Bullet>,
+//     name: String
+// }
 
 pub struct Game {
     world: World,
@@ -56,11 +56,12 @@ pub struct Game {
     explosion_timer: f32,
     deadly_objects: Vec<Object>,
     message_coord: (f32, f32),
-    monsters: Vec<Monster>,
-    monster_move_timer: f32,
+    //monsters: Vec<Monster>,
+    // monster_move_timer: f32,
     gun: Option<GameObject>,
-    monster_bullet_timer: f32,
-    cheat: bool
+    // monster_bullet_timer: f32,
+    cheat: bool,
+    monsters: Vec<Monster>
 }
 
 impl Game {
@@ -187,38 +188,7 @@ impl Game {
         let mut monsters: Vec<Monster>  = Vec::new();
         
         if tiled_map.contains_layer("monsters") {
-            for layer in &tiled_map.raw_tiled_map.layers {
-                if layer.name == "monsters" {
-                    for monster_obj in &layer.objects {
-                        let mut monster: Monster = Monster {
-                            location: PolyPoint {
-                                x: monster_obj.x,
-                                y: monster_obj.y
-                            },
-                            current_waypoint: 0, 
-                            alive: true,
-                            waypoints: Vec::new(),
-                            bullets: vec![],
-                            name: monster_obj.name.clone()
-                        };
-
-                        let polygon_pts = monster_obj.polygon.as_ref().unwrap();
-                        let mapped_points = polygon_pts
-                                                .iter()
-                                                .map(|p| Vec2::new(p.x, p.y))
-                                                .collect::<Vec<Vec2>>();
-                        
-                        let pairs = Game::generate_pairs(&mapped_points);    
-                        
-                        for (p1, p2) in pairs {
-                            let points_between = Game::get_line_points_lerp(p1, p2, 10);
-                            monster.waypoints.extend(points_between.iter());
-                        }
-                        
-                        monsters.push(monster);
-                    }
-                }
-            }
+            monsters = Monster::load_monsters(&tiled_map);
         }
 
         Game {
@@ -241,15 +211,16 @@ impl Game {
             explosion_timer: 2.0,
             deadly_objects,
             message_coord,
-            monsters,
-            monster_move_timer: 0.1,
+            //monsters,
+            // monster_move_timer: 0.1,
             gun,
-            monster_bullet_timer: 6.0,
-            cheat
+            // monster_bullet_timer: 6.0,
+            cheat,
+            monsters
         }
     }
 
-    fn particle_explosion() -> EmitterConfig {
+    pub fn particle_explosion() -> EmitterConfig {
         EmitterConfig {
             local_coords: false,
             one_shot: true,
@@ -381,35 +352,6 @@ impl Game {
         );
 
     }
-
-    fn get_line_points_lerp(p1: Vec2, p2: Vec2, steps: usize) -> Vec<Vec2> {
-        let mut points = Vec::new();
-    
-        for i in 0..=steps {
-            let t = i as f32 / steps as f32;  // Interpolation factor (0.0 to 1.0)
-            let interpolated = p1.lerp(p2, t); // Using glam's built-in lerp()
-            points.push(interpolated);
-        }
-    
-        points
-    }
-
-    fn generate_pairs(points: &[Vec2]) -> Vec<(Vec2, Vec2)> {
-        let mut pairs = Vec::new();
-        
-        if points.len() < 2 {
-            return pairs; // Not enough points to form pairs
-        }
-    
-        for i in 0..points.len() {
-            let next_index = (i + 1) % points.len(); // Wrap around to form a closed loop
-            pairs.push((points[i], points[next_index]));
-        }
-    
-        pairs
-    }
-
-    
 }
 
 impl Scene for Game {
@@ -562,39 +504,9 @@ impl Scene for Game {
 
         for monster in &mut self.monsters {
             if monster.alive {
-                let point = &monster.waypoints[monster.current_waypoint];
-                let m = &resources.monsters[monster.name.parse::<usize>().unwrap() - 1];
+                monster.update(&pos);
 
-                draw_texture_ex(
-                    m,
-                    monster.location.x + point.x,
-                    monster.location.y + point.y,
-                    WHITE,
-                    DrawTextureParams {
-                        dest_size: Some(vec2(m.width() , m.height() )), 
-                        ..Default::default()
-                    },
-                );
-
-                if self.monster_move_timer > 0.0 {
-                    self.monster_move_timer -= MONSTER_SPEED * get_frame_time();
-                }
-                else {
-                    if monster.current_waypoint < monster.waypoints.len() - 1 {
-                        monster.current_waypoint += 1;
-                    }    
-                    else {
-                        monster.current_waypoint = 0;
-                    }
-                    self.monster_move_timer = 0.1;
-                }
-
-                if self.player.overlaps(pos, &Rect::new(
-                    monster.location.x + point.x,
-                    monster.location.y + point.y,
-                    32.0,
-                    32.0,
-                )) {
+                if self.player.overlaps(pos, &monster.monster_rectangle()) {
                     self.player.is_dead = true;
                     monster.alive = false;
                     self.explosion_active = true;
@@ -610,7 +522,7 @@ impl Scene for Game {
                             amount: 40,
                             texture: Some(resources.explosion.clone()),
                             ..Game::particle_explosion()
-                        }), vec2(point.x, point.y)));
+                        }), vec2(monster.location.x + monster.current_waypoint().x, monster.location.y + monster.current_waypoint().y)));
                     }
 
                     play_sound_once(&resources.sound_explosion);
@@ -624,13 +536,8 @@ impl Scene for Game {
                         w: resources.bullet.width(),
                         h: resources.bullet.height()
                     };
-
-                    if bullet_rect.overlaps(&Rect::new(
-                        monster.location.x + point.x,
-                        monster.location.y + point.y,
-                        32.0,
-                        32.0,
-                    )) {
+        
+                    if bullet_rect.overlaps(&monster.monster_rectangle()) {
                         bullet.collided = true;
                         monster.alive = false;
                         if self.explosions.is_empty() {
@@ -638,46 +545,11 @@ impl Scene for Game {
                                 amount: 40,
                                 texture: Some(resources.explosion.clone()),
                                 ..Game::particle_explosion()
-                            }), vec2(monster.location.x + point.x, monster.location.y + point.y)));
+                            }), vec2(monster.location.x + monster.current_waypoint().x, monster.location.y + monster.current_waypoint().y)));
                         }
-
+        
                         play_sound_once(&resources.sound_explosion);
                     }
-                }
-
-                if self.monster_bullet_timer > 0.0 {
-                    self.monster_bullet_timer -= get_frame_time();
-                }
-                else {
-                    //only allow monster to shoot if he is close to the player
-                    if monster.location.x + point.x - pos.x < screen_width() * 0.7 {
-                        //shoot a bullet
-                        monster.bullets.push(Bullet {
-                            x: monster.location.x + point.x + 10.0,
-                            y: monster.location.y + point.y,
-                            speed: 250.0,
-                            collided: false 
-                        });
-                    }
-
-                    self.monster_bullet_timer = 6.0;
-                }
-
-                for monster_bullet in &mut monster.bullets {
-                    monster_bullet.x -= monster_bullet.speed * get_frame_time();
-                }
-
-                for monster_bullet in &monster.bullets {
-                    draw_texture_ex(
-                        &resources.monster_bullet,
-                        monster_bullet.x,
-                        monster_bullet.y,
-                        WHITE,
-                        DrawTextureParams {
-                            dest_size: Some(vec2(resources.monster_bullet.width(), resources.monster_bullet.height())),
-                            ..Default::default()
-                        },
-                    );
                 }
 
                 for bullet in &mut monster.bullets {
@@ -687,7 +559,7 @@ impl Scene for Game {
                         w: resources.monster_bullet.width(),
                         h: resources.monster_bullet.height()
                     };
-
+        
                     if self.player.overlaps(pos, &bullet_rect) {
                         bullet.collided = true;
                         self.player.is_dead = true;
@@ -698,12 +570,11 @@ impl Scene for Game {
                                 ..Game::particle_explosion()
                             }), vec2(pos.x, pos.y)));
                         }
-
+        
                         play_sound_once(&resources.sound_explosion);
                     }
                 }
 
-                
                 monster.bullets.retain(|bullet| {
                     if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
                         return false
@@ -715,11 +586,10 @@ impl Scene for Game {
                     
                     false
                 });
-
-
             }
         }
 
+        
         
         
         self.player.bullets.retain(|bullet| {

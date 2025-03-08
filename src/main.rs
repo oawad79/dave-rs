@@ -4,6 +4,7 @@ mod game;
 mod entry_screen;
 mod separator;
 mod score_board;
+mod monster;
 
 use game::Game;
 use entry_screen::EntryScreen;
