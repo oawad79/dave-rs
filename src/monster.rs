@@ -3,7 +3,7 @@ use std::vec;
 use macroquad::{math::Vec2, prelude::{collections::storage, *}};
 use macroquad_tiled::Map;
 
-use crate::{game::Bullet, resources::Resources};
+use crate::{bullet::Bullet, resources::Resources};
 
 const MONSTER_SPEED: f32 = 10.0;
 

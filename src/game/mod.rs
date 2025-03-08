@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::vec;
 
 use macroquad::prelude::{*, animation::*, collections::storage};
@@ -10,31 +11,7 @@ use crate::score_board::GameObject;
 use crate::{player::Player, monster::Monster, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
 
 const EXPLOSION_DURATION: f32 = 2.0;
-// const MONSTER_SPEED: f32 = 10.0;
 
-// #[derive(Debug, Clone)]
-// struct PolyPoint {
-//     x: f32,
-//     y: f32
-// }
-
-#[derive(Debug)]
-pub struct Bullet {
-    pub x: f32,
-    pub y: f32,
-    pub speed: f32,
-    pub collided: bool
-}
-
-// #[derive(Debug)]
-// struct Monster {
-//     location: PolyPoint,
-//     waypoints: Vec<Vec2>,
-//     current_waypoint: usize,
-//     alive: bool,
-//     bullets: Vec<Bullet>,
-//     name: String
-// }
 
 pub struct Game {
     world: World,
@@ -56,10 +33,7 @@ pub struct Game {
     explosion_timer: f32,
     deadly_objects: Vec<Object>,
     message_coord: (f32, f32),
-    //monsters: Vec<Monster>,
-    // monster_move_timer: f32,
     gun: Option<GameObject>,
-    // monster_bullet_timer: f32,
     cheat: bool,
     monsters: Vec<Monster>
 }
@@ -211,10 +185,7 @@ impl Game {
             explosion_timer: 2.0,
             deadly_objects,
             message_coord,
-            //monsters,
-            // monster_move_timer: 0.1,
             gun,
-            // monster_bullet_timer: 6.0,
             cheat,
             monsters
         }
@@ -352,6 +323,147 @@ impl Game {
         );
 
     }
+    
+    fn handle_collecting_valuables(&mut self, resources: &Resources, pos: Vec2) {
+        // Check for collision between player and Jewellery
+        for jewellery in self.collectibles.iter_mut() {
+            let jewellery_rect = Rect::new(
+                jewellery.world_x,
+                jewellery.world_y - 32.0,
+                32.0,
+                32.0,
+            );
+    
+            if self.player.overlaps(pos, &jewellery_rect) {
+                if !self.score_board.game_won && jewellery.name == "cup" {
+                    self.score_board.score += 100;
+                    self.score_board.game_won = true;
+                    play_sound_once(&resources.sound_cup);
+                }
+                else {
+                    self.score_board.score += 10;
+                    jewellery.collected = Option::Some(true);
+                    play_sound_once(&resources.sound_collect);
+                }
+            }
+        }
+    }
+    
+    fn handle_collision_with_deadly(&mut self, resources: &impl Deref<Target = Resources>, pos: Vec2) {
+        self.deadly_objects.iter().for_each(|deadly_object| {
+            let deadly_rect = Rect::new(
+                deadly_object.world_x,
+                deadly_object.world_y - 32.0,
+                10.0,
+                10.0,
+            );
+    
+            if self.player.overlaps(pos, &deadly_rect) && !self.player.is_dead {
+                self.player.is_dead = true;    
+                self.explosion_active = true;
+                self.explosion_timer = EXPLOSION_DURATION;
+    
+                if self.explosions.is_empty() {
+                    self.explosions.push((Emitter::new(EmitterConfig {
+                        amount: 40,
+                        texture: Some(resources.explosion.clone()),
+                        ..Game::particle_explosion()
+                    }), vec2(pos.x + 32.0, pos.y)));
+                }
+                play_sound_once(&resources.sound_explosion);
+                play_sound_once(&resources.sound_die);
+            }
+        });
+    }
+    
+    fn monster_mechanics(&mut self, resources: &Resources, pos: Vec2) {
+        self.monsters.iter_mut().for_each(|monster| {
+            if monster.alive {
+                monster.update(&pos);
+    
+                if self.player.overlaps(pos, &monster.monster_rectangle()) {
+                    self.player.is_dead = true;
+                    monster.alive = false;
+                    self.explosion_active = true;
+                    self.explosion_timer = EXPLOSION_DURATION;
+    
+                    if self.explosions.is_empty() {
+                        self.explosions.push((Emitter::new(EmitterConfig {
+                            amount: 40,
+                            texture: Some(resources.explosion.clone()),
+                            ..Game::particle_explosion()
+                        }), vec2(pos.x, pos.y)));
+                        self.explosions.push((Emitter::new(EmitterConfig {
+                            amount: 40,
+                            texture: Some(resources.explosion.clone()),
+                            ..Game::particle_explosion()
+                        }), monster.current_location()));
+                    }
+    
+                    play_sound_once(&resources.sound_explosion);
+                    play_sound_once(&resources.sound_die);
+                }
+    
+                for bullet in &mut self.player.bullets {
+                    let bullet_rect = Rect {
+                        x: bullet.x,
+                        y: bullet.y,
+                        w: resources.bullet.width(),
+                        h: resources.bullet.height()
+                    };
+    
+                    if bullet_rect.overlaps(&monster.monster_rectangle()) {
+                        bullet.collided = true;
+                        monster.alive = false;
+                        if self.explosions.is_empty() {
+                            self.explosions.push((Emitter::new(EmitterConfig {
+                                amount: 40,
+                                texture: Some(resources.explosion.clone()),
+                                ..Game::particle_explosion()
+                            }), monster.current_location()));
+                        }
+    
+                        play_sound_once(&resources.sound_explosion);
+                    }
+                }
+    
+                for bullet in &mut monster.bullets {
+                    let bullet_rect = Rect {
+                        x: bullet.x,
+                        y: bullet.y,
+                        w: resources.monster_bullet.width(),
+                        h: resources.monster_bullet.height()
+                    };
+    
+                    if self.player.overlaps(pos, &bullet_rect) {
+                        bullet.collided = true;
+                        self.player.is_dead = true;
+                        if self.explosions.is_empty() {
+                            self.explosions.push((Emitter::new(EmitterConfig {
+                                amount: 40,
+                                texture: Some(resources.explosion.clone()),
+                                ..Game::particle_explosion()
+                            }), vec2(pos.x, pos.y)));
+                        }
+    
+                        play_sound_once(&resources.sound_explosion);
+                    }
+                }
+    
+                monster.bullets.retain(|bullet| {
+                    if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
+                        return false
+                    }
+            
+                    if !bullet.collided && bullet.x > pos.x - 100.0 {
+                        return true;
+                    }
+            
+                    false
+                });
+            }
+        });
+    }
 }
 
 impl Scene for Game {
@@ -382,28 +494,7 @@ impl Scene for Game {
             self.score_board.position = (self.camera.target.x - 300.0, pos.y);
         }
 
-        // Check for collision between player and Jewellery
-        for jewellery in self.collectibles.iter_mut() {
-            let jewellery_rect = Rect::new(
-                jewellery.world_x,
-                jewellery.world_y - 32.0,
-                32.0,
-                32.0,
-            );
-
-            if self.player.overlaps(pos, &jewellery_rect) {
-                if !self.score_board.game_won && jewellery.name == "cup" {
-                    self.score_board.score += 100;
-                    self.score_board.game_won = true;
-                    play_sound_once(&resources.sound_cup);
-                }
-                else {
-                    self.score_board.score += 10;
-                    jewellery.collected = Option::Some(true);
-                    play_sound_once(&resources.sound_collect);
-                }
-            }
-        }
+        self.handle_collecting_valuables(&resources, pos);
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
@@ -436,30 +527,7 @@ impl Scene for Game {
         
         self.explosions.retain(|(explosion, _)| explosion.config.emitting);
 
-        for deadly_object in &self.deadly_objects {
-            let deadly_rect = Rect::new(
-                deadly_object.world_x,
-                deadly_object.world_y - 32.0,
-                10.0,
-                10.0,
-            );
-
-            if self.player.overlaps(pos, &deadly_rect) && !self.player.is_dead {
-                self.player.is_dead = true;    
-                self.explosion_active = true;
-                self.explosion_timer = EXPLOSION_DURATION;
-
-                if self.explosions.is_empty() {
-                    self.explosions.push((Emitter::new(EmitterConfig {
-                        amount: 40,
-                        texture: Some(resources.explosion.clone()),
-                        ..Game::particle_explosion()
-                    }), vec2(pos.x + 32.0, pos.y)));
-                }
-                play_sound_once(&resources.sound_explosion);
-                play_sound_once(&resources.sound_die);
-            }
-        }
+        self.handle_collision_with_deadly(&resources, pos);
 
         if !self.explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
@@ -502,101 +570,11 @@ impl Scene for Game {
         let screen_left = self.camera.target.x - screen_width() / 2.0;
         let screen_right = self.camera.target.x + screen_width() / 2.0;
 
-        for monster in &mut self.monsters {
-            if monster.alive {
-                monster.update(&pos);
+        self.monster_mechanics(&resources, pos);
 
-                if self.player.overlaps(pos, &monster.monster_rectangle()) {
-                    self.player.is_dead = true;
-                    monster.alive = false;
-                    self.explosion_active = true;
-                    self.explosion_timer = EXPLOSION_DURATION;
-
-                    if self.explosions.is_empty() {
-                        self.explosions.push((Emitter::new(EmitterConfig {
-                            amount: 40,
-                            texture: Some(resources.explosion.clone()),
-                            ..Game::particle_explosion()
-                        }), vec2(pos.x, pos.y)));
-                        self.explosions.push((Emitter::new(EmitterConfig {
-                            amount: 40,
-                            texture: Some(resources.explosion.clone()),
-                            ..Game::particle_explosion()
-                        }), monster.current_location()));
-                    }
-
-                    play_sound_once(&resources.sound_explosion);
-                    play_sound_once(&resources.sound_die);
-                }
-
-                for bullet in &mut self.player.bullets {
-                    let bullet_rect = Rect {
-                        x: bullet.x,
-                        y: bullet.y,
-                        w: resources.bullet.width(),
-                        h: resources.bullet.height()
-                    };
-        
-                    if bullet_rect.overlaps(&monster.monster_rectangle()) {
-                        bullet.collided = true;
-                        monster.alive = false;
-                        if self.explosions.is_empty() {
-                            self.explosions.push((Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.explosion.clone()),
-                                ..Game::particle_explosion()
-                            }), monster.current_location()));
-                        }
-        
-                        play_sound_once(&resources.sound_explosion);
-                    }
-                }
-
-                for bullet in &mut monster.bullets {
-                    let bullet_rect = Rect {
-                        x: bullet.x,
-                        y: bullet.y,
-                        w: resources.monster_bullet.width(),
-                        h: resources.monster_bullet.height()
-                    };
-        
-                    if self.player.overlaps(pos, &bullet_rect) {
-                        bullet.collided = true;
-                        self.player.is_dead = true;
-                        if self.explosions.is_empty() {
-                            self.explosions.push((Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.explosion.clone()),
-                                ..Game::particle_explosion()
-                            }), vec2(pos.x, pos.y)));
-                        }
-        
-                        play_sound_once(&resources.sound_explosion);
-                    }
-                }
-
-                monster.bullets.retain(|bullet| {
-                    if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
-                        return false
-                    }
-                    
-                    if !bullet.collided && bullet.x > pos.x - 100.0 {
-                        return true;
-                    }
-                    
-                    false
-                });
-            }
-        }
-
-        
-        
-        
         self.player.bullets.retain(|bullet| {
             bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
         });
-
-        
 
         None
     }
@@ -627,10 +605,6 @@ impl Scene for Game {
                 },
             );
         }
-
-
-        
-
     }
 }
 

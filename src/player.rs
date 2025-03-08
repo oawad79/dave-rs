@@ -10,7 +10,7 @@ use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::{game::Bullet, Resources};
+use crate::{bullet::Bullet, Resources};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -280.0;
