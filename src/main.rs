@@ -100,12 +100,15 @@ fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
     if is_key_down(KeyCode::Escape) || *show_quit {
         *show_quit = true;
         draw_texture_ex(
-            &resources.quit_texture,
+            resources.get_texture("quit").unwrap(),
             220.0,
             150.0,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(vec2(resources.quit_texture.width() * 0.7, resources.quit_texture.height() * 0.7)), 
+                dest_size: Some(vec2(
+                    resources.get_texture("quit").unwrap().width() * 0.7, 
+                    resources.get_texture("quit").unwrap().height() * 0.7)
+                ), 
                 ..Default::default()
             },
         );

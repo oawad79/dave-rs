@@ -138,12 +138,15 @@ impl Player {
 
         for bullet in &self.bullets {
             draw_texture_ex(
-                &resources.bullet,
+                resources.get_texture("bullet").unwrap(),
                 bullet.x,
                 bullet.y,
                 WHITE,
                 DrawTextureParams {
-                    dest_size: Some(vec2(resources.bullet.width(), resources.bullet.height())),
+                    dest_size: Some(vec2(
+                        resources.get_texture("bullet").unwrap().width(), 
+                        resources.get_texture("bullet").unwrap().height()
+                    )),
                     ..Default::default()
                 },
             );
