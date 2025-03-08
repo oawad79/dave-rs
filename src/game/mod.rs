@@ -522,7 +522,7 @@ impl Scene for Game {
                             amount: 40,
                             texture: Some(resources.explosion.clone()),
                             ..Game::particle_explosion()
-                        }), vec2(monster.location.x + monster.current_waypoint().x, monster.location.y + monster.current_waypoint().y)));
+                        }), monster.current_location()));
                     }
 
                     play_sound_once(&resources.sound_explosion);
@@ -545,7 +545,7 @@ impl Scene for Game {
                                 amount: 40,
                                 texture: Some(resources.explosion.clone()),
                                 ..Game::particle_explosion()
-                            }), vec2(monster.location.x + monster.current_waypoint().x, monster.location.y + monster.current_waypoint().y)));
+                            }), monster.current_location()));
                         }
         
                         play_sound_once(&resources.sound_explosion);

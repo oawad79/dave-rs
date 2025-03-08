@@ -101,6 +101,10 @@ impl Monster {
         )
     }
 
+    pub fn current_location(&self) -> Vec2 {
+        Vec2::new(self.location.x + self.current_waypoint().x, self.location.y + self.current_waypoint().y)
+    }
+
     pub fn current_waypoint(&self) -> &Vec2  {
         &self.waypoints[self.current_waypoint]
     }
