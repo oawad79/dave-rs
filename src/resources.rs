@@ -1,4 +1,12 @@
+use std::collections::HashMap;
+
 use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
+use slotmap::{new_key_type, SlotMap};
+use glob::glob;
+
+new_key_type! {
+    pub struct SoundKey;
+}
 
 pub struct Resources {
     pub tileset: Texture2D,
@@ -11,15 +19,6 @@ pub struct Resources {
     pub collectibles: Texture2D,
     pub tuple: Texture2D,
     pub door: Texture2D,
-    pub sound_collect: Sound,
-    pub sound_jump: Sound,
-    pub sound_walk: Sound,
-    pub sound_falling: Sound,
-    pub sound_cup: Sound,
-    pub sound_win: Sound,
-    pub sound_die: Sound,
-    pub sound_gun: Sound,
-    pub sound_shoot: Sound,
     pub fire1: Texture2D,
     pub banner: Texture2D,
     pub font: Font,
@@ -33,8 +32,6 @@ pub struct Resources {
     pub deadly_grass_texture: Texture2D,
     pub water_texture: Texture2D,
     pub explosion: Texture2D,
-    pub sound_explosion: Sound,
-    pub sound_gameover: Sound,
     pub gun_icon: Texture2D,
     pub gun_text: Texture2D,
     pub go_thru: Texture2D,
@@ -43,11 +40,33 @@ pub struct Resources {
     pub monster_bullet: Texture2D,
     pub jetpack2: Texture2D,
     pub jetpack_text: Texture2D,
-    pub tuple_r: Texture2D
+    pub tuple_r: Texture2D,
+    sounds: SlotMap<SoundKey, Sound>,
+    pub sounds_keys: HashMap<String, SoundKey>
+
 }
 
 impl Resources {
     async fn new() -> Result<Resources, macroquad::Error> {
+        let mut sounds = SlotMap::with_key();
+        let mut sounds_keys = HashMap::new();
+
+        // Load sounds
+        for entry in glob("assets/sounds/*.wav").expect("Failed to read glob pattern") {
+            match entry {
+                Ok(path) => {
+                    let sound = load_sound(
+                            format!("sounds/{}", path.file_name().unwrap().to_str().unwrap()).as_str()
+                        ).await?;
+                    sounds_keys.insert(
+                        path.file_stem().unwrap().to_os_string().into_string().unwrap(), 
+                        sounds.insert(sound)
+                    );
+                }
+                Err(e) => panic!("{:?}", e),
+            }
+        }
+        
         let tileset = load_texture("mytileset.png").await.unwrap();
         tileset.set_filter(FilterMode::Nearest);
 
@@ -112,19 +131,6 @@ impl Resources {
         let jetpack_text = load_texture("jetpack.png").await.unwrap();
         jetpack_text.set_filter(FilterMode::Nearest);
 
-        let sound_collect = load_sound("getitem.wav").await?;
-        let sound_jump = load_sound("jump.wav").await?;
-        let sound_walk = load_sound("hd-walk.wav").await?;
-        let sound_falling = load_sound("fall.wav").await?;
-        let sound_cup = load_sound("trophy.wav").await?;
-        let sound_win = load_sound("win.wav").await?;
-        let sound_die = load_sound("hd-die-dave-7.wav").await?;
-        let sound_explosion = load_sound("explosion.wav").await?;
-        let sound_gameover = load_sound("gameoverman.wav").await?;
-        let sound_gun = load_sound("gotspecial.wav").await?;
-        let sound_shoot = load_sound("shoot.wav").await?;
-
-
         let mut levels: Vec<String> = Vec::new();
         for i in 1..=4 {
             let level = load_string(&format!("level{}.json", i)).await.unwrap();
@@ -173,15 +179,6 @@ impl Resources {
             collectibles,
             tuple,
             door,
-            sound_collect, 
-            sound_jump, 
-            sound_walk, 
-            sound_falling, 
-            sound_cup, 
-            sound_win,
-            sound_die,
-            sound_gun,
-            sound_shoot,
             fire1,
             banner,
             font,
@@ -195,8 +192,6 @@ impl Resources {
             deadly_grass_texture,
             water_texture,
             explosion,
-            sound_explosion,
-            sound_gameover,
             gun_icon, 
             gun_text,
             go_thru,
@@ -205,8 +200,15 @@ impl Resources {
             monster_bullet,
             jetpack2,
             jetpack_text,
-            tuple_r
+            tuple_r,
+            sounds,
+            sounds_keys
         })
+    }
+
+    pub fn get_sound(&self, sound_key: &str) -> Option<&Sound> {
+        let x = self.sounds_keys.get(sound_key).unwrap();
+        self.sounds.get(*x)
     }
 
     pub async fn load() -> Result<(), macroquad::Error> {

@@ -66,7 +66,7 @@ impl Scene for Separator {
         let resources = storage::get::<Resources>();
 
         if !self.sound_playing {
-            play_sound(&resources.sound_walk, PlaySoundParams {
+            play_sound(resources.get_sound("hd-walk").unwrap(), PlaySoundParams {
                 looped: true, 
                 volume: 1.0
             });
@@ -77,7 +77,7 @@ impl Scene for Separator {
         self.player.update(&mut self.world);
 
         if pos.x > 608.0 {
-            stop_sound(&resources.sound_walk);
+            stop_sound(resources.get_sound("hd-walk").unwrap());
             storage::store(self.score_board.clone());
             return Some(SceneChange::Game { level: self.score_board.level, retry: false, cheat: false });
         }

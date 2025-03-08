@@ -118,7 +118,7 @@ impl Player {
         }
 
         if is_key_pressed(KeyCode::Up) && on_ground {
-            play_sound_once(&resources.sound_jump);
+            play_sound_once(resources.get_sound("jump").unwrap());
             self.speed.y = JUMP_VELOCITY;
         }
 
@@ -129,7 +129,7 @@ impl Player {
                 speed: 250.0,
                 collided: false 
             });
-            play_sound_once(&resources.sound_shoot);
+            play_sound_once(resources.get_sound("shoot").unwrap());
         }
 
         for bullet in &mut self.bullets {

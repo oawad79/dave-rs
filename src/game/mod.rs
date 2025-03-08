@@ -338,12 +338,12 @@ impl Game {
                 if !self.score_board.game_won && jewellery.name == "cup" {
                     self.score_board.score += 100;
                     self.score_board.game_won = true;
-                    play_sound_once(&resources.sound_cup);
+                    play_sound_once(resources.get_sound("trophy").unwrap());
                 }
                 else {
                     self.score_board.score += 10;
                     jewellery.collected = Option::Some(true);
-                    play_sound_once(&resources.sound_collect);
+                    play_sound_once(resources.get_sound("getitem").unwrap());
                 }
             }
         }
@@ -370,8 +370,8 @@ impl Game {
                         ..Game::particle_explosion()
                     }), vec2(pos.x + 32.0, pos.y)));
                 }
-                play_sound_once(&resources.sound_explosion);
-                play_sound_once(&resources.sound_die);
+                play_sound_once(resources.get_sound("explosion").unwrap());
+                play_sound_once(resources.get_sound("hd-die-dave-7").unwrap());
             }
         });
     }
@@ -400,8 +400,8 @@ impl Game {
                         }), monster.current_location()));
                     }
     
-                    play_sound_once(&resources.sound_explosion);
-                    play_sound_once(&resources.sound_die);
+                    play_sound_once(resources.get_sound("explosion").unwrap());
+                    play_sound_once(resources.get_sound("hd-die-dave-7").unwrap());
                 }
     
                 for bullet in &mut self.player.bullets {
@@ -423,7 +423,7 @@ impl Game {
                             }), monster.current_location()));
                         }
     
-                        play_sound_once(&resources.sound_explosion);
+                        play_sound_once(resources.get_sound("explosion").unwrap());
                     }
                 }
     
@@ -446,7 +446,7 @@ impl Game {
                             }), vec2(pos.x, pos.y)));
                         }
     
-                        play_sound_once(&resources.sound_explosion);
+                        play_sound_once(resources.get_sound("explosion").unwrap());
                     }
                 }
     
@@ -506,7 +506,7 @@ impl Scene for Game {
                 32.0,
                 32.0,
             )) {
-                play_sound_once(&resources.sound_gun);
+                play_sound_once(resources.get_sound("gotspecial").unwrap());
                 self.player.has_gun = true;
             }
         }
@@ -519,7 +519,7 @@ impl Scene for Game {
             32.0,
         )) {
             self.score_board.game_won = false;
-            play_sound_once(&resources.sound_win);
+            play_sound_once(resources.get_sound("win").unwrap());
             self.score_board.level += 1;
             storage::store(self.score_board.clone());
             return Some(SceneChange::Separator);
@@ -531,7 +531,7 @@ impl Scene for Game {
 
         if !self.explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
-                play_sound_once(&resources.sound_gameover);
+                play_sound_once(resources.get_sound("gameoverman").unwrap());
                 return Some(SceneChange::EntryScreen);
             } else {
                 self.score_board.lives -= 1;
