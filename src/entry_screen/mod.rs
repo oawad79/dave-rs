@@ -18,10 +18,10 @@ impl EntryScreen {
         let tiled_map = load_map(
             &resources.intro_map_json,
             &[
-                ("fire1-sheet.png", resources.get_texture("fire1-sheet").clone()),
-                ("dangerousdave1-sheet.png", resources.get_texture("dangerousdave1-sheet").clone()),
-                ("mytileset.png", resources.get_texture("mytileset").clone()),
-                ("collectibles.png", resources.get_texture("collectibles").clone()),
+                ("images/fire1-sheet.png", resources.get_texture("fire1-sheet").clone()),
+                ("images/dangerousdave1-sheet.png", resources.get_texture("dangerousdave1-sheet").clone()),
+                ("images/mytileset.png", resources.get_texture("mytileset").clone()),
+                ("images/collectibles.png", resources.get_texture("collectibles").clone()),
                 
             ],
             &[],

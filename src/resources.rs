@@ -36,11 +36,11 @@ impl Resources {
         }
 
         // Load textures
-        for entry in glob("assets/*.png").expect("Failed to read glob pattern") {
+        for entry in glob("assets/images/*.png").expect("Failed to read glob pattern") {
             match entry {
                 Ok(path) => {
                     let texture = load_texture(
-                            format!("{}", path.file_name().unwrap().to_str().unwrap()).as_str()
+                            format!("images/{}", path.file_name().unwrap().to_str().unwrap()).as_str()
                         ).await?;
                     textures_keys.insert(
                         path.file_stem().unwrap().to_os_string().into_string().unwrap(), 
@@ -64,12 +64,12 @@ impl Resources {
         
         let mut numbers: Vec<Texture2D> = Vec::new();
         for i in 0..=9 {
-            numbers.push(load_texture(&format!("num{}.png", i)).await.unwrap());
+            numbers.push(load_texture(&format!("images/num{}.png", i)).await.unwrap());
         }
 
         let mut monsters: Vec<Texture2D> = Vec::new();
         for i in 1..=2 {
-            monsters.push(load_texture(&format!("monster{}.png", i)).await.unwrap());
+            monsters.push(load_texture(&format!("images/monster{}.png", i)).await.unwrap());
         }
         
         //build_textures_atlas();

@@ -18,12 +18,12 @@ impl Separator {
         let tiled_map = load_map(
             &resources.separator_map_json,
             &[
-                ("mytileset.png", resources.get_texture("mytileset").clone()),
-                ("dave_walk.png", resources.get_texture("dave_walk").clone()),
-                ("dave_idle.png", resources.get_texture("dave_idle").clone()),
-                ("dave_jump.png", resources.get_texture("dave_jump").clone()),
-                ("collectibles.png", resources.get_texture("collectibles").clone()),
-                ("door.png", resources.get_texture("door").clone()),
+                ("images/mytileset.png", resources.get_texture("mytileset").clone()),
+                ("images/dave_walk.png", resources.get_texture("dave_walk").clone()),
+                ("images/dave_idle.png", resources.get_texture("dave_idle").clone()),
+                ("images/dave_jump.png", resources.get_texture("dave_jump").clone()),
+                ("images/collectibles.png", resources.get_texture("collectibles").clone()),
+                ("images/door.png", resources.get_texture("door").clone()),
             ],
             &[],
         )

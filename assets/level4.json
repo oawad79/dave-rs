@@ -1138,7 +1138,7 @@
         {
          "columns":7,
          "firstgid":1,
-         "image":"collectibles.png",
+         "image":"images\/collectibles.png",
          "imageheight":32,
          "imagewidth":224,
          "margin":0,
@@ -1151,7 +1151,7 @@
         {
          "columns":3,
          "firstgid":8,
-         "image":"deadly.png",
+         "image":"images\/deadly.png",
          "imageheight":34,
          "imagewidth":124,
          "margin":0,
@@ -1164,7 +1164,7 @@
         {
          "columns":5,
          "firstgid":11,
-         "image":"water1-sheet.png",
+         "image":"images\/water1-sheet.png",
          "imageheight":32,
          "imagewidth":160,
          "margin":0,
@@ -1177,7 +1177,7 @@
         {
          "columns":32,
          "firstgid":16,
-         "image":"mytileset.png",
+         "image":"images\/mytileset.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -1190,7 +1190,7 @@
         {
          "columns":1,
          "firstgid":1040,
-         "image":"tuple.png",
+         "image":"images\/tuple.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -1203,7 +1203,7 @@
         {
          "columns":3,
          "firstgid":1041,
-         "image":"fire1-sheet.png",
+         "image":"images\/fire1-sheet.png",
          "imageheight":33,
          "imagewidth":105,
          "margin":0,
@@ -1216,7 +1216,7 @@
         {
          "columns":1,
          "firstgid":1044,
-         "image":"door.png",
+         "image":"images\/door.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -1229,7 +1229,7 @@
         {
          "columns":1,
          "firstgid":1045,
-         "image":"dave_idle.png",
+         "image":"images\/dave_idle.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -1242,7 +1242,7 @@
         {
          "columns":1,
          "firstgid":1046,
-         "image":"dave_jump.png",
+         "image":"images\/dave_jump.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -1255,7 +1255,7 @@
         {
          "columns":2,
          "firstgid":1047,
-         "image":"dave_walk.png",
+         "image":"images\/dave_walk.png",
          "imageheight":32,
          "imagewidth":64,
          "margin":0,
@@ -1268,7 +1268,7 @@
         {
          "columns":1,
          "firstgid":1049,
-         "image":"jetpack2.png",
+         "image":"images\/jetpack2.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -1281,7 +1281,7 @@
         {
          "columns":1,
          "firstgid":1050,
-         "image":"door_enable_banner.png",
+         "image":"images\/door_enable_banner.png",
          "imageheight":28,
          "imagewidth":344,
          "margin":0,
@@ -1294,7 +1294,7 @@
         {
          "columns":1,
          "firstgid":1051,
-         "image":"tuple_r.png",
+         "image":"images\/tuple_r.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,

@@ -34,7 +34,7 @@
         {
          "columns":32,
          "firstgid":1,
-         "image":"mytileset.png",
+         "image":"images\/mytileset.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -47,7 +47,7 @@
         {
          "columns":1,
          "firstgid":1025,
-         "image":"door.png",
+         "image":"images\/door.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -60,7 +60,7 @@
         {
          "columns":2,
          "firstgid":1026,
-         "image":"dave_walk.png",
+         "image":"images\/dave_walk.png",
          "imageheight":32,
          "imagewidth":64,
          "margin":0,
@@ -73,7 +73,7 @@
         {
          "columns":1,
          "firstgid":1028,
-         "image":"dave_idle.png",
+         "image":"images\/dave_idle.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -86,7 +86,7 @@
         {
          "columns":1,
          "firstgid":1029,
-         "image":"dave_jump.png",
+         "image":"images\/dave_jump.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
