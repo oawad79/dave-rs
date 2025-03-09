@@ -44,6 +44,8 @@ async fn main() {
 
     set_pc_assets_folder("assets");
 
+    let mut is_full_screen: bool = false;
+
     let _ = Resources::load().await;
     
     let main_camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
@@ -86,6 +88,18 @@ async fn main() {
                 if is_key_down(*key) {
                     scene = Box::new(Game::new(i as i32, false, true));
                 }
+            }
+        }
+
+        if is_key_pressed(KeyCode::A) && is_key_down(KeyCode::LeftControl) {
+            is_full_screen = !is_full_screen;
+
+            if is_full_screen {
+                set_fullscreen(is_full_screen);
+            }
+            else {
+                set_fullscreen(is_full_screen);
+                request_new_screen_size(1000.0, 650.0);
             }
         }
 
