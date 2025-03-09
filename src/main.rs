@@ -112,6 +112,7 @@ async fn main() {
 
 fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
     if is_key_down(KeyCode::Escape) || *show_quit {
+        //This helps when we scroll, the quit dialog will scroll with the screen
         set_default_camera();
         *show_quit = true;
         draw_texture_ex(

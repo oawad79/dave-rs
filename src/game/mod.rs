@@ -444,6 +444,10 @@ impl Game {
                     if self.player.overlaps(pos, &bullet_rect) {
                         bullet.collided = true;
                         self.player.is_dead = true;
+
+                        self.explosion_active = true;
+                        self.explosion_timer = EXPLOSION_DURATION;
+                        
                         if self.explosions.is_empty() {
                             self.explosions.push((Emitter::new(EmitterConfig {
                                 amount: 40,
