@@ -112,11 +112,12 @@ async fn main() {
 
 fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
     if is_key_down(KeyCode::Escape) || *show_quit {
+        set_default_camera();
         *show_quit = true;
         draw_texture_ex(
             resources.get_texture("quit"),
-            220.0,
-            150.0,
+            screen_width() / 2.0 - 120.0,
+            screen_height() / 2.0 - 20.0,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(

@@ -72,7 +72,7 @@ impl Resources {
             monsters.push(load_texture(&format!("images/monster{}.png", i)).await.unwrap());
         }
         
-        //build_textures_atlas();
+        build_textures_atlas();
 
         Ok(Resources { 
             levels,
