@@ -29,8 +29,10 @@ pub struct Game {
     animated_grass: Option<AnimatedSprite>,
     grasses: Vec<Object>,
     explosions: Vec<(Emitter, Vec2)>,
-    explosion_active: bool,
-    explosion_timer: f32,
+    monster_explosion_active: bool,
+    monster_explosion_timer: f32,
+    player_explosion_active: bool,
+    player_explosion_timer: f32,
     deadly_objects: Vec<Object>,
     message_coord: (f32, f32),
     gun: Option<GameObject>,
@@ -181,8 +183,10 @@ impl Game {
             animated_grass,
             grasses,
             explosions: vec![],
-            explosion_active: false,
-            explosion_timer: 2.0,
+            monster_explosion_active: false,
+            monster_explosion_timer: 2.0,
+            player_explosion_active: false,
+            player_explosion_timer: 2.0,
             deadly_objects,
             message_coord,
             gun,
@@ -366,8 +370,8 @@ impl Game {
     
             if self.player.overlaps(pos, &deadly_rect) && !self.player.is_dead {
                 self.player.is_dead = true;    
-                self.explosion_active = true;
-                self.explosion_timer = EXPLOSION_DURATION;
+                self.player_explosion_active = true;
+                self.player_explosion_timer = EXPLOSION_DURATION;
     
                 if self.explosions.is_empty() {
                     self.explosions.push((Emitter::new(EmitterConfig {
@@ -390,8 +394,8 @@ impl Game {
                 if self.player.overlaps(pos, &monster.monster_rectangle()) {
                     self.player.is_dead = true;
                     monster.alive = false;
-                    self.explosion_active = true;
-                    self.explosion_timer = EXPLOSION_DURATION;
+                    self.monster_explosion_active = true;
+                    self.monster_explosion_timer = EXPLOSION_DURATION;
     
                     if self.explosions.is_empty() {
                         self.explosions.push((Emitter::new(EmitterConfig {
@@ -445,8 +449,8 @@ impl Game {
                         bullet.collided = true;
                         self.player.is_dead = true;
 
-                        self.explosion_active = true;
-                        self.explosion_timer = EXPLOSION_DURATION;
+                        self.player_explosion_active = true;
+                        self.player_explosion_timer = EXPLOSION_DURATION;
 
                         if self.explosions.is_empty() {
                             self.explosions.push((Emitter::new(EmitterConfig {
@@ -540,7 +544,7 @@ impl Scene for Game {
 
         self.handle_collision_with_deadly(&resources, pos);
 
-        if !self.explosion_active && self.player.is_dead {
+        if !self.player_explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
                 play_sound_once(resources.get_sound("gameoverman"));
                 return Some(SceneChange::EntryScreen);
@@ -557,10 +561,17 @@ impl Scene for Game {
             explosion.draw(vec2(coords.x, coords.y));
         }
 
-        if self.explosion_active {
-            self.explosion_timer -= get_frame_time();
-            if self.explosion_timer <= 0.0 {
-                self.explosion_active = false;
+        if self.monster_explosion_active {
+            self.monster_explosion_timer -= get_frame_time();
+            if self.monster_explosion_timer <= 0.0 {
+                self.monster_explosion_active = false;
+            }
+        }
+
+        if self.player_explosion_active {
+            self.player_explosion_timer -= get_frame_time();
+            if self.player_explosion_timer <= 0.0 {
+                self.player_explosion_active = false;
             }
         }
         
