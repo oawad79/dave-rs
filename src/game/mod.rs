@@ -161,11 +161,15 @@ impl Game {
             tiled_map.layers.get("message").unwrap().objects[0].world_y
         );
 
-        let mut monsters: Vec<Monster>  = Vec::new();
-        
-        if tiled_map.contains_layer("monsters") {
-            monsters = Monster::load_monsters(&tiled_map);
-        }
+        let monsters: Vec<Monster>  = if retry {
+            score_board.monsters.clone()
+        } 
+        else if tiled_map.contains_layer("monsters") {
+            Monster::load_monsters(&tiled_map)
+        } 
+        else {
+            vec![]
+        };
 
         Game {
             world,
@@ -394,8 +398,11 @@ impl Game {
                 if self.player.overlaps(pos, &monster.monster_rectangle()) {
                     self.player.is_dead = true;
                     monster.alive = false;
+                    
                     self.monster_explosion_active = true;
                     self.monster_explosion_timer = EXPLOSION_DURATION;
+                    self.player_explosion_active = true;
+                    self.player_explosion_timer = EXPLOSION_DURATION;
     
                     if self.explosions.is_empty() {
                         self.explosions.push((Emitter::new(EmitterConfig {
@@ -551,6 +558,7 @@ impl Scene for Game {
             } else {
                 self.score_board.lives -= 1;
                 self.score_board.collectibles = self.collectibles.clone();
+                self.score_board.monsters = self.monsters.clone();
                 storage::store(self.score_board.clone());
                 return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
             }

@@ -13,6 +13,7 @@ pub struct PolyPoint {
     pub y: f32
 }
 
+#[derive(Clone)]
 pub struct Monster {
     pub location: PolyPoint,
     waypoints: Vec<Vec2>,

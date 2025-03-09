@@ -8,7 +8,7 @@ use macroquad::{
     }
 };
 
-use crate::{resources::Resources, Scene, SceneChange};
+use crate::{monster::Monster, resources::Resources, Scene, SceneChange};
 
 #[derive(Clone, Debug)]
 pub struct GameObject {
@@ -26,7 +26,8 @@ pub struct ScoreBoard {
     pub position: (f32, f32),
     pub collectibles: Vec<GameObject>,
     pub game_won: bool,
-    pub gun_captured: bool
+    pub gun_captured: bool,
+    pub monsters: Vec<Monster>
 }
 
 impl ScoreBoard {
@@ -38,7 +39,8 @@ impl ScoreBoard {
             position: (5.0, 5.0),
             collectibles: Vec::new(),
             game_won: false,
-            gun_captured: false
+            gun_captured: false,
+            monsters: vec![]
         }
     }
 
