@@ -57,14 +57,14 @@ impl Scene for ScoreBoard {
         let resources = storage::get::<Resources>();
 
         draw_texture_ex(
-            resources.get_texture("score").unwrap(),
+            resources.get_texture("score"),
             self.position.0,
             5.0,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("score").unwrap().width() , 
-                    resources.get_texture("score").unwrap().height() 
+                    resources.get_texture("score").width() , 
+                    resources.get_texture("score").height() 
                 )), 
                 ..Default::default()
             },
@@ -85,14 +85,14 @@ impl Scene for ScoreBoard {
         }
 
         draw_texture_ex(
-            resources.get_texture("level").unwrap(),
+            resources.get_texture("level"),
             self.position.0 + 220.0,
             5.0,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("level").unwrap().width(), 
-                    resources.get_texture("level").unwrap().height()
+                    resources.get_texture("level").width(), 
+                    resources.get_texture("level").height()
                 )), 
                 ..Default::default()
             },
@@ -104,20 +104,23 @@ impl Scene for ScoreBoard {
             7.0,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(vec2(resources.numbers[self.level as usize].width(), resources.numbers[self.level as usize].height())), 
+                dest_size: Some(vec2(
+                    resources.numbers[self.level as usize].width(), 
+                    resources.numbers[self.level as usize].height()
+                )), 
                 ..Default::default()
             },
         );
 
         draw_texture_ex(
-            resources.get_texture("daves").unwrap(),
+            resources.get_texture("daves"),
             self.position.0 + 400.0,
             5.0,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("daves").unwrap().width(), 
-                    resources.get_texture("daves").unwrap().height()
+                    resources.get_texture("daves").width(), 
+                    resources.get_texture("daves").height()
                 )), 
                 ..Default::default()
             },
@@ -125,14 +128,14 @@ impl Scene for ScoreBoard {
 
         for i in 0..self.lives {
             draw_texture_ex(
-                resources.get_texture("DaveFace").unwrap(),
+                resources.get_texture("DaveFace"),
                 self.position.0 + 510.0 + (i as f32 * 30.0),
                 2.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("DaveFace").unwrap().width(), 
-                        resources.get_texture("DaveFace").unwrap().height()
+                        resources.get_texture("DaveFace").width(), 
+                        resources.get_texture("DaveFace").height()
                     )), 
                     ..Default::default()
                 },
@@ -140,14 +143,14 @@ impl Scene for ScoreBoard {
         }
 
         draw_texture_ex(
-            resources.get_texture("thin").unwrap(),
+            resources.get_texture("thin"),
             self.position.0,
             30.0,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("thin").unwrap().width() , 
-                    resources.get_texture("thin").unwrap().height() * 0.5)
+                    resources.get_texture("thin").width() , 
+                    resources.get_texture("thin").height() * 0.5)
                 ), 
                 ..Default::default()
             },

@@ -108,7 +108,6 @@ dependencies = [
  "macroquad-platformer",
  "macroquad-tiled",
  "macroquad_macro",
- "slotmap",
 ]
 
 [[package]]

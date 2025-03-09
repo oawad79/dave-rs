@@ -163,14 +163,14 @@ impl Monster {
 
         for monster_bullet in &self.bullets {
             draw_texture_ex(
-                resources.get_texture("monster_bullet").unwrap(),
+                resources.get_texture("monster_bullet"),
                 monster_bullet.x,
                 monster_bullet.y,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("monster_bullet").unwrap().width(), 
-                        resources.get_texture("monster_bullet").unwrap().height()
+                        resources.get_texture("monster_bullet").width(), 
+                        resources.get_texture("monster_bullet").height()
                     )),
                     ..Default::default()
                 },

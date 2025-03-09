@@ -18,12 +18,12 @@ impl Separator {
         let tiled_map = load_map(
             &resources.separator_map_json,
             &[
-                ("mytileset.png", resources.get_texture("mytileset").unwrap().clone()),
-                ("dave_walk.png", resources.get_texture("dave_walk").unwrap().clone()),
-                ("dave_idle.png", resources.get_texture("dave_idle").unwrap().clone()),
-                ("dave_jump.png", resources.get_texture("dave_jump").unwrap().clone()),
-                ("collectibles.png", resources.get_texture("collectibles").unwrap().clone()),
-                ("door.png", resources.get_texture("door").unwrap().clone()),
+                ("mytileset.png", resources.get_texture("mytileset").clone()),
+                ("dave_walk.png", resources.get_texture("dave_walk").clone()),
+                ("dave_idle.png", resources.get_texture("dave_idle").clone()),
+                ("dave_jump.png", resources.get_texture("dave_jump").clone()),
+                ("collectibles.png", resources.get_texture("collectibles").clone()),
+                ("door.png", resources.get_texture("door").clone()),
             ],
             &[],
         )
@@ -66,7 +66,7 @@ impl Scene for Separator {
         let resources = storage::get::<Resources>();
 
         if !self.sound_playing {
-            play_sound(resources.get_sound("hd-walk").unwrap(), PlaySoundParams {
+            play_sound(resources.get_sound("hd-walk"), PlaySoundParams {
                 looped: true, 
                 volume: 1.0
             });
@@ -77,7 +77,7 @@ impl Scene for Separator {
         self.player.update(&mut self.world);
 
         if pos.x > 608.0 {
-            stop_sound(resources.get_sound("hd-walk").unwrap());
+            stop_sound(resources.get_sound("hd-walk"));
             storage::store(self.score_board.clone());
             return Some(SceneChange::Game { level: self.score_board.level, retry: false, cheat: false });
         }

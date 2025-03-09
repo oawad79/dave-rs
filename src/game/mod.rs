@@ -45,21 +45,21 @@ impl Game {
         let tiled_map = load_map(
             &resources.levels[(level - 1) as usize],
             &[
-                ("mytileset.png", resources.get_texture("mytileset").unwrap().clone()),
-                ("dave_walk.png", resources.get_texture("dave_walk").unwrap().clone()),
-                ("dave_idle.png", resources.get_texture("dave_idle").unwrap().clone()),
-                ("dave_jump.png", resources.get_texture("dave_jump").unwrap().clone()),
-                ("collectibles.png", resources.get_texture("collectibles").unwrap().clone()),
-                ("door.png", resources.get_texture("door").unwrap().clone()),
-                ("tuple.png", resources.get_texture("tuple").unwrap().clone()),
-                ("tuple_r.png", resources.get_texture("tuple_r").unwrap().clone()),   
-                ("deadly.png", resources.get_texture("deadly").unwrap().clone()),     
-                ("fire1-sheet.png", resources.get_texture("fire1-sheet").unwrap().clone()),
-                ("water1-sheet.png", resources.get_texture("water1-sheet").unwrap().clone()),
-                ("door_enable_banner.png", resources.get_texture("door_enable_banner").unwrap().clone()),
-                ("gun_icon.png", resources.get_texture("gun_icon").unwrap().clone()),
-                ("gun.png", resources.get_texture("gun").unwrap().clone()),
-                ("jetpack2.png", resources.get_texture("jetpack2").unwrap().clone()),
+                ("mytileset.png", resources.get_texture("mytileset").clone()),
+                ("dave_walk.png", resources.get_texture("dave_walk").clone()),
+                ("dave_idle.png", resources.get_texture("dave_idle").clone()),
+                ("dave_jump.png", resources.get_texture("dave_jump").clone()),
+                ("collectibles.png", resources.get_texture("collectibles").clone()),
+                ("door.png", resources.get_texture("door").clone()),
+                ("tuple.png", resources.get_texture("tuple").clone()),
+                ("tuple_r.png", resources.get_texture("tuple_r").clone()),   
+                ("deadly.png", resources.get_texture("deadly").clone()),     
+                ("fire1-sheet.png", resources.get_texture("fire1-sheet").clone()),
+                ("water1-sheet.png", resources.get_texture("water1-sheet").clone()),
+                ("door_enable_banner.png", resources.get_texture("door_enable_banner").clone()),
+                ("gun_icon.png", resources.get_texture("gun_icon").clone()),
+                ("gun.png", resources.get_texture("gun").clone()),
+                ("jetpack2.png", resources.get_texture("jetpack2").clone()),
             ],
             &[],
         )
@@ -260,28 +260,28 @@ impl Game {
         }
         else {
             draw_texture_ex(
-                resources.get_texture("gun").unwrap(),
+                resources.get_texture("gun"),
                 self.message_coord.0 + self.camera.target.x - 20.0,
                 self.message_coord.1 - 32.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("gun").unwrap().width() , 
-                        resources.get_texture("gun").unwrap().height() 
+                        resources.get_texture("gun").width() , 
+                        resources.get_texture("gun").height() 
                     )), 
                     ..Default::default()
                 },
             );
 
             draw_texture_ex(
-                resources.get_texture("gun_icon").unwrap(),
+                resources.get_texture("gun_icon"),
                 self.message_coord.0 + self.camera.target.x + 60.0,
                 self.message_coord.1 - 32.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("gun_icon").unwrap().width() , 
-                        resources.get_texture("gun_icon").unwrap().height() 
+                        resources.get_texture("gun_icon").width() , 
+                        resources.get_texture("gun_icon").height() 
                     )), 
                     ..Default::default()
                 },
@@ -344,12 +344,12 @@ impl Game {
                 if !self.score_board.game_won && jewellery.name == "cup" {
                     self.score_board.score += 100;
                     self.score_board.game_won = true;
-                    play_sound_once(resources.get_sound("trophy").unwrap());
+                    play_sound_once(resources.get_sound("trophy"));
                 }
                 else {
                     self.score_board.score += 10;
                     jewellery.collected = Option::Some(true);
-                    play_sound_once(resources.get_sound("getitem").unwrap());
+                    play_sound_once(resources.get_sound("getitem"));
                 }
             }
         }
@@ -372,12 +372,12 @@ impl Game {
                 if self.explosions.is_empty() {
                     self.explosions.push((Emitter::new(EmitterConfig {
                         amount: 40,
-                        texture: Some(resources.get_texture("explosion").unwrap().clone()),
+                        texture: Some(resources.get_texture("explosion").clone()),
                         ..Game::particle_explosion()
                     }), vec2(pos.x + 32.0, pos.y)));
                 }
-                play_sound_once(resources.get_sound("explosion").unwrap());
-                play_sound_once(resources.get_sound("hd-die-dave-7").unwrap());
+                play_sound_once(resources.get_sound("explosion"));
+                play_sound_once(resources.get_sound("hd-die-dave-7"));
             }
         });
     }
@@ -396,26 +396,26 @@ impl Game {
                     if self.explosions.is_empty() {
                         self.explosions.push((Emitter::new(EmitterConfig {
                             amount: 40,
-                            texture: Some(resources.get_texture("explosion").unwrap().clone()),
+                            texture: Some(resources.get_texture("explosion").clone()),
                             ..Game::particle_explosion()
                         }), vec2(pos.x, pos.y)));
                         self.explosions.push((Emitter::new(EmitterConfig {
                             amount: 40,
-                            texture: Some(resources.get_texture("explosion").unwrap().clone()),
+                            texture: Some(resources.get_texture("explosion").clone()),
                             ..Game::particle_explosion()
                         }), monster.current_location()));
                     }
     
-                    play_sound_once(resources.get_sound("explosion").unwrap());
-                    play_sound_once(resources.get_sound("hd-die-dave-7").unwrap());
+                    play_sound_once(resources.get_sound("explosion"));
+                    play_sound_once(resources.get_sound("hd-die-dave-7"));
                 }
     
                 for bullet in &mut self.player.bullets {
                     let bullet_rect = Rect {
                         x: bullet.x,
                         y: bullet.y,
-                        w: resources.get_texture("bullet").unwrap().width(),
-                        h: resources.get_texture("bullet").unwrap().height()
+                        w: resources.get_texture("bullet").width(),
+                        h: resources.get_texture("bullet").height()
                     };
     
                     if bullet_rect.overlaps(&monster.monster_rectangle()) {
@@ -424,12 +424,12 @@ impl Game {
                         if self.explosions.is_empty() {
                             self.explosions.push((Emitter::new(EmitterConfig {
                                 amount: 40,
-                                texture: Some(resources.get_texture("explosion").unwrap().clone()),
+                                texture: Some(resources.get_texture("explosion").clone()),
                                 ..Game::particle_explosion()
                             }), monster.current_location()));
                         }
     
-                        play_sound_once(resources.get_sound("explosion").unwrap());
+                        play_sound_once(resources.get_sound("explosion"));
                     }
                 }
     
@@ -437,8 +437,8 @@ impl Game {
                     let bullet_rect = Rect {
                         x: bullet.x,
                         y: bullet.y,
-                        w: resources.get_texture("monster_bullet").unwrap().width(),
-                        h: resources.get_texture("monster_bullet").unwrap().height()
+                        w: resources.get_texture("monster_bullet").width(),
+                        h: resources.get_texture("monster_bullet").height()
                     };
     
                     if self.player.overlaps(pos, &bullet_rect) {
@@ -447,12 +447,12 @@ impl Game {
                         if self.explosions.is_empty() {
                             self.explosions.push((Emitter::new(EmitterConfig {
                                 amount: 40,
-                                texture: Some(resources.get_texture("explosion").unwrap().clone()),
+                                texture: Some(resources.get_texture("explosion").clone()),
                                 ..Game::particle_explosion()
                             }), vec2(pos.x, pos.y)));
                         }
     
-                        play_sound_once(resources.get_sound("explosion").unwrap());
+                        play_sound_once(resources.get_sound("explosion"));
                     }
                 }
     
@@ -512,7 +512,7 @@ impl Scene for Game {
                 32.0,
                 32.0,
             )) {
-                play_sound_once(resources.get_sound("gotspecial").unwrap());
+                play_sound_once(resources.get_sound("gotspecial"));
                 self.player.has_gun = true;
             }
         }
@@ -525,7 +525,7 @@ impl Scene for Game {
             32.0,
         )) {
             self.score_board.game_won = false;
-            play_sound_once(resources.get_sound("win").unwrap());
+            play_sound_once(resources.get_sound("win"));
             self.score_board.level += 1;
             storage::store(self.score_board.clone());
             return Some(SceneChange::Separator);
@@ -537,7 +537,7 @@ impl Scene for Game {
 
         if !self.explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
-                play_sound_once(resources.get_sound("gameoverman").unwrap());
+                play_sound_once(resources.get_sound("gameoverman"));
                 return Some(SceneChange::EntryScreen);
             } else {
                 self.score_board.lives -= 1;
@@ -601,14 +601,14 @@ impl Scene for Game {
 
         if self.score_board.game_won {
             draw_texture_ex(
-                resources.get_texture("door_enable_banner").unwrap(),
+                resources.get_texture("door_enable_banner"),
                 self.message_coord.0 + self.camera.target.x - 300.0,
                 self.message_coord.1 - 32.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("door_enable_banner").unwrap().width() , 
-                        resources.get_texture("door_enable_banner").unwrap().height() 
+                        resources.get_texture("door_enable_banner").width() , 
+                        resources.get_texture("door_enable_banner").height() 
                     )), 
                     ..Default::default()
                 },

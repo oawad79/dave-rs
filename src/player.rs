@@ -118,7 +118,7 @@ impl Player {
         }
 
         if is_key_pressed(KeyCode::Up) && on_ground {
-            play_sound_once(resources.get_sound("jump").unwrap());
+            play_sound_once(resources.get_sound("jump"));
             self.speed.y = JUMP_VELOCITY;
         }
 
@@ -129,7 +129,7 @@ impl Player {
                 speed: 250.0,
                 collided: false 
             });
-            play_sound_once(resources.get_sound("shoot").unwrap());
+            play_sound_once(resources.get_sound("shoot"));
         }
 
         for bullet in &mut self.bullets {
@@ -138,14 +138,14 @@ impl Player {
 
         for bullet in &self.bullets {
             draw_texture_ex(
-                resources.get_texture("bullet").unwrap(),
+                resources.get_texture("bullet"),
                 bullet.x,
                 bullet.y,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("bullet").unwrap().width(), 
-                        resources.get_texture("bullet").unwrap().height()
+                        resources.get_texture("bullet").width(), 
+                        resources.get_texture("bullet").height()
                     )),
                     ..Default::default()
                 },

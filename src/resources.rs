@@ -1,13 +1,7 @@
 use std::collections::HashMap;
 
 use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
-use slotmap::{new_key_type, SlotMap};
 use glob::glob;
-
-new_key_type! {
-    pub struct SoundKey;
-    pub struct TextureKey;
-}
 
 pub struct Resources {
     pub levels: Vec<String>,
@@ -16,19 +10,13 @@ pub struct Resources {
     pub font: Font,
     pub numbers: Vec<Texture2D>,
     pub monsters: Vec<Texture2D>,
-    sounds: SlotMap<SoundKey, Sound>,
-    pub sounds_keys: HashMap<String, SoundKey>,
-    textures: SlotMap<TextureKey, Texture2D>,
-    pub textures_keys: HashMap<String, TextureKey>,
-
+    pub sounds_keys: HashMap<String, Sound>,
+    pub textures_keys: HashMap<String, Texture2D>,
 }
 
 impl Resources {
     async fn new() -> Result<Resources, macroquad::Error> {
-        let mut sounds = SlotMap::with_key();
         let mut sounds_keys = HashMap::new();
-
-        let mut textures = SlotMap::with_key();
         let mut textures_keys = HashMap::new();
 
         // Load sounds
@@ -40,7 +28,7 @@ impl Resources {
                         ).await?;
                     sounds_keys.insert(
                         path.file_stem().unwrap().to_os_string().into_string().unwrap(), 
-                        sounds.insert(sound)
+                        sound
                     );
                 }
                 Err(e) => panic!("{:?}", e),
@@ -56,7 +44,7 @@ impl Resources {
                         ).await?;
                     textures_keys.insert(
                         path.file_stem().unwrap().to_os_string().into_string().unwrap(), 
-                        textures.insert(texture)
+                        texture
                     );
                 }
                 Err(e) => panic!("{:?}", e),
@@ -93,21 +81,17 @@ impl Resources {
             font,
             numbers,
             monsters,
-            sounds,
             sounds_keys,
-            textures,
             textures_keys
         })
     }
 
-    pub fn get_sound(&self, sound_key: &str) -> Option<&Sound> {
-        let x = self.sounds_keys.get(sound_key).unwrap();
-        self.sounds.get(*x)
+    pub fn get_sound(&self, sound_key: &str) -> &Sound {
+        self.sounds_keys.get(sound_key).unwrap()
     }
 
-    pub fn get_texture(&self, texture_key: &str) -> Option<&Texture2D> {
-        let x = self.textures_keys.get(texture_key).unwrap();
-        self.textures.get(*x)
+    pub fn get_texture(&self, texture_key: &str) -> &Texture2D {
+        self.textures_keys.get(texture_key).unwrap()
     }
 
     pub async fn load() -> Result<(), macroquad::Error> {
