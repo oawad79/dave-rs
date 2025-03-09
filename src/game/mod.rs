@@ -88,8 +88,6 @@ impl Game {
 
         let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
     
-        let player = Player::new(actor);
-
         let mut score_board = 
                         if (cheat || level == 1) && !retry {
                             ScoreBoard::new()
@@ -100,6 +98,8 @@ impl Game {
         if cheat {
             score_board.level = level;
         }
+
+        let player = Player::new(actor, score_board.gun_captured);
 
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
         let collectibles = 
@@ -447,7 +447,7 @@ impl Game {
 
                         self.explosion_active = true;
                         self.explosion_timer = EXPLOSION_DURATION;
-                        
+
                         if self.explosions.is_empty() {
                             self.explosions.push((Emitter::new(EmitterConfig {
                                 amount: 40,
@@ -518,6 +518,7 @@ impl Scene for Game {
             )) {
                 play_sound_once(resources.get_sound("gotspecial"));
                 self.player.has_gun = true;
+                self.score_board.gun_captured = true;
             }
         }
 

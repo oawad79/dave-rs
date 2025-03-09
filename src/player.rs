@@ -29,7 +29,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(collider: Actor) -> Self {
+    pub fn new(collider: Actor, has_gun: bool) -> Self {
         Player {
             collider,
             speed: vec2(0., 0.),
@@ -39,7 +39,7 @@ impl Player {
             simulate_left: false,
             simulate_right: false,
             is_dead: false,
-            has_gun: false,
+            has_gun,
             bullets: vec![]
         }
     }

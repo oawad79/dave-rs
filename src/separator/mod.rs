@@ -47,9 +47,9 @@ impl Separator {
     
         let actor = world.add_actor(vec2(50.0, 192.0), 32, 32);
     
-        let player = Player::new(actor);
-
         let score_board = storage::get::<ScoreBoard>().clone();
+
+        let player = Player::new(actor, score_board.gun_captured);
 
         Separator {
             player,
