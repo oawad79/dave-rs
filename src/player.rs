@@ -46,7 +46,7 @@ impl Player {
         }
     }
 
-    pub fn overlaps(&self, pos: Vec2, game_object: &Rect) -> bool {
+    pub fn overlaps(pos: Vec2, game_object: &Rect) -> bool {
         let player_rect = Rect::new(
             pos.x,
             pos.y,
@@ -197,12 +197,12 @@ pub enum AnimationState {
 }
 
 impl AnimationState {
-    pub fn as_str(&self) -> &str {
+    pub const fn as_str(&self) -> &str {
         match self {
-            AnimationState::Walk => "walk",
-            AnimationState::Idle => "idle",
-            AnimationState::Jump => "jump",
-            AnimationState::Fly => "fly"
+            Self::Walk => "walk",
+            Self::Idle => "idle",
+            Self::Jump => "jump",
+            Self::Fly => "fly"
         }
     }
 }

@@ -390,7 +390,7 @@ impl Game {
                 32.0,
             );
     
-            if self.player.overlaps(pos, &jewellery_rect) {
+            if Player::overlaps(pos, &jewellery_rect) {
                 if !self.score_board.game_won && jewellery.name == "cup" {
                     self.score_board.score += 100;
                     self.score_board.game_won = true;
@@ -414,7 +414,7 @@ impl Game {
                 10.0,
             );
     
-            if self.player.overlaps(pos, &deadly_rect) && !self.player.is_dead {
+            if Player::overlaps(pos, &deadly_rect) && !self.player.is_dead {
                 self.player.is_dead = true;    
                 self.player_explosion_active = true;
                 self.player_explosion_timer = EXPLOSION_DURATION;
@@ -435,9 +435,9 @@ impl Game {
     fn monster_mechanics(&mut self, resources: &Resources, pos: Vec2) {
         self.monsters.iter_mut().for_each(|monster| {
             if monster.alive {
-                monster.update(&pos);
+                monster.update(pos);
     
-                if self.player.overlaps(pos, &monster.monster_rectangle()) {
+                if Player::overlaps(pos, &monster.monster_rectangle()) {
                     self.player.is_dead = true;
                     monster.alive = false;
                     
@@ -494,7 +494,7 @@ impl Game {
                         h: resources.get_texture("monster_bullet").height()
                     };
     
-                    if self.player.overlaps(pos, &bullet_rect) {
+                    if Player::overlaps(pos, &bullet_rect) {
                         bullet.collided = true;
                         self.player.is_dead = true;
 
@@ -563,7 +563,7 @@ impl Scene for Game {
 
         // Check for collision between player and jetpack
         if let Some(j) = &self.jetpack { 
-            if !self.player.has_jetpack && self.player.overlaps(pos, &Rect::new(
+            if !self.player.has_jetpack && Player::overlaps(pos, &Rect::new(
                 j.world_x,
                 j.world_y - 32.0,
                 32.0,
@@ -577,7 +577,7 @@ impl Scene for Game {
 
         // Check for collision between player and gun
         if let Some(g) = &self.gun { 
-            if !self.player.has_gun && self.player.overlaps(pos, &Rect::new(
+            if !self.player.has_gun && Player::overlaps(pos, &Rect::new(
                 g.world_x,
                 g.world_y - 32.0,
                 32.0,
@@ -590,7 +590,7 @@ impl Scene for Game {
         }
 
         // Check for collision between player and door
-        if self.score_board.game_won && self.player.overlaps(pos, &Rect::new(
+        if self.score_board.game_won && Player::overlaps(pos, &Rect::new(
             self.door.world_x,
             self.door.world_y - 32.0,
             32.0,

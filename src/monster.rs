@@ -81,7 +81,7 @@ impl Monster {
                     let pairs = Self::generate_pairs(&mapped_points);    
                     
                     for (p1, p2) in pairs {
-                        let points_between = Monster::get_line_points_lerp(p1, p2, 10);
+                        let points_between = Self::get_line_points_lerp(p1, p2, 10);
                         monster.waypoints.extend(points_between.iter());
                     }
                     
@@ -110,7 +110,7 @@ impl Monster {
         &self.waypoints[self.current_waypoint]
     }
 
-    pub fn update(&mut self, player_pos: &Vec2) {
+    pub fn update(&mut self, player_pos: Vec2) {
         let resources = storage::get::<Resources>();
 
         let point = self.waypoints[self.current_waypoint];
