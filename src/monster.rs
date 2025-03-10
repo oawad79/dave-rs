@@ -21,8 +21,8 @@ pub struct Monster {
     pub alive: bool,
     pub bullets: Vec<Bullet>,
     name: String,
-    monster_move_timer: f32,
-    monster_bullet_timer: f32
+    move_timer: f32,
+    bullet_timer: f32
 }
 
 impl Monster {
@@ -53,12 +53,12 @@ impl Monster {
         pairs
     }
 
-    pub fn load_monsters(tiled_map: &Map) -> Vec<Monster> {
-        let mut monsters: Vec<Monster> = vec![];
+    pub fn load_monsters(tiled_map: &Map) -> Vec<Self> {
+        let mut monsters: Vec<Self> = vec![];
         for layer in &tiled_map.raw_tiled_map.layers {
             if layer.name == "monsters" {
                 for monster_obj in &layer.objects {
-                    let mut monster: Monster = Monster {
+                    let mut monster: Self = Self {
                         location: PolyPoint {
                             x: monster_obj.x,
                             y: monster_obj.y
@@ -68,8 +68,8 @@ impl Monster {
                         waypoints: Vec::new(),
                         bullets: vec![],
                         name: monster_obj.name.clone(),
-                        monster_move_timer: 0.1,
-                        monster_bullet_timer: 6.0
+                        move_timer: 0.1,
+                        bullet_timer: 6.0
                     };
 
                     let polygon_pts = monster_obj.polygon.as_ref().unwrap();
@@ -78,7 +78,7 @@ impl Monster {
                                             .map(|p| Vec2::new(p.x, p.y))
                                             .collect::<Vec<Vec2>>();
                     
-                    let pairs = Monster::generate_pairs(&mapped_points);    
+                    let pairs = Self::generate_pairs(&mapped_points);    
                     
                     for (p1, p2) in pairs {
                         let points_between = Monster::get_line_points_lerp(p1, p2, 10);
@@ -127,8 +127,8 @@ impl Monster {
             },
         );
 
-        if self.monster_move_timer > 0.0 {
-            self.monster_move_timer -= MONSTER_SPEED * get_frame_time();
+        if self.move_timer > 0.0 {
+            self.move_timer -= MONSTER_SPEED * get_frame_time();
         }
         else {
             if self.current_waypoint < self.waypoints.len() - 1 {
@@ -137,11 +137,11 @@ impl Monster {
             else {
                 self.current_waypoint = 0;
             }
-            self.monster_move_timer = 0.1;
+            self.move_timer = 0.1;
         }
 
-        if self.monster_bullet_timer > 0.0 {
-            self.monster_bullet_timer -= get_frame_time();
+        if self.bullet_timer > 0.0 {
+            self.bullet_timer -= get_frame_time();
         }
         else {
             //only allow monster to shoot if he is close to the player
@@ -155,7 +155,7 @@ impl Monster {
                 });
             }
 
-            self.monster_bullet_timer = 6.0;
+            self.bullet_timer = 6.0;
         }
 
         for monster_bullet in &mut self.bullets {

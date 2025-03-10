@@ -1,5 +1,5 @@
 use macroquad::{
-    audio::play_sound_once, 
+    audio::{play_sound, play_sound_once, stop_sound, PlaySoundParams}, 
     math::{vec2, Rect, Vec2}, 
     prelude::{
         animation::{AnimatedSprite, Animation}, 
@@ -20,27 +20,29 @@ pub struct Player {
     pub speed: Vec2,
     pub facing_left: bool,
     animated_player: AnimatedSprite,
-    simulate_jump: bool,
     pub simulate_left: bool,
     pub simulate_right: bool,
     pub is_dead: bool,
     pub has_gun: bool,
-    pub bullets: Vec<Bullet>
+    pub bullets: Vec<Bullet>,
+    pub has_jetpack: bool,
+    pub jet_sound_playing: bool
 }
 
 impl Player {
-    pub fn new(collider: Actor, has_gun: bool) -> Self {
+    pub fn new(collider: Actor, has_gun: bool, has_jetpack: bool) -> Self {
         Player {
             collider,
             speed: vec2(0., 0.),
             facing_left: false,
             animated_player: animated_player(),
-            simulate_jump: false,
             simulate_left: false,
             simulate_right: false,
             is_dead: false,
             has_gun,
-            bullets: vec![]
+            bullets: vec![],
+            has_jetpack,
+            jet_sound_playing: false
         }
     }
 
@@ -64,7 +66,7 @@ impl Player {
         
         let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
 
-        let state: &str;
+        let mut state: &str;
         let flip: f32;
 
         if self.speed.x != 0.0 {
@@ -88,6 +90,31 @@ impl Player {
             self.animated_player.set_animation(1); // idle
             flip = if self.facing_left { -32.0 } else { 32.0 };
         }
+
+        if is_key_pressed(KeyCode::LeftAlt) && self.has_jetpack {
+            if !self.jet_sound_playing {
+                play_sound(resources.get_sound("jetPackActivated"), PlaySoundParams {
+                    looped: true, 
+                    volume: 1.0
+                });
+                self.jet_sound_playing = true;
+                state = "player_jetpack";
+                self.animated_player.set_animation(3);
+            }
+            else {
+                state = "dave_idle";
+                self.jet_sound_playing = false;
+                self.animated_player.set_animation(1);
+                stop_sound(resources.get_sound("jetPackActivated"));
+
+            }
+        }
+
+        // if self.has_jetpack && self.jet_sound_playing {
+        //     self.animated_player.set_animation(3);
+        // }
+        
+        //println!("{}", state);
 
         if !self.is_dead {
             tiled_map.spr_ex(
@@ -132,6 +159,9 @@ impl Player {
             play_sound_once(resources.get_sound("shoot"));
         }
 
+        
+        
+
         for bullet in &mut self.bullets {
             bullet.x += bullet.speed * delta;
         }
@@ -163,6 +193,7 @@ pub enum AnimationState {
     Walk,
     Idle,
     Jump,
+    Fly
 }
 
 impl AnimationState {
@@ -171,6 +202,7 @@ impl AnimationState {
             AnimationState::Walk => "walk",
             AnimationState::Idle => "idle",
             AnimationState::Jump => "jump",
+            AnimationState::Fly => "fly"
         }
     }
 }
@@ -194,6 +226,12 @@ pub fn animated_player() -> AnimatedSprite {
             },
             Animation {
                 name: AnimationState::Jump.as_str().to_string(),
+                row: 0,
+                frames: 1,
+                fps: 1,
+            },
+            Animation {
+                name: AnimationState::Fly.as_str().to_string(),
                 row: 0,
                 frames: 1,
                 fps: 1,

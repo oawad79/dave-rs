@@ -37,7 +37,8 @@ pub struct Game {
     message_coord: (f32, f32),
     gun: Option<GameObject>,
     cheat: bool,
-    monsters: Vec<Monster>
+    monsters: Vec<Monster>,
+    jetpack: Option<GameObject>
 }
 
 impl Game {
@@ -62,6 +63,7 @@ impl Game {
                 ("images/gun_icon.png", resources.get_texture("gun_icon").clone()),
                 ("images/gun.png", resources.get_texture("gun").clone()),
                 ("images/jetpack2.png", resources.get_texture("jetpack2").clone()),
+                ("images/player_jetpack.png", resources.get_texture("player_jetpack").clone()),
             ],
             &[],
         )
@@ -101,7 +103,8 @@ impl Game {
             score_board.level = level;
         }
 
-        let player = Player::new(actor, score_board.gun_captured);
+        let player = Player::new(actor, 
+            score_board.gun_captured, score_board.jetpack_captured);
 
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
         let collectibles = 
@@ -124,6 +127,19 @@ impl Game {
                 world_x: gun_object.world_x,
                 world_y: gun_object.world_y,
                 name: gun_object.name.clone(),
+                collected: None,
+            })
+        }
+        else {
+            None
+        };
+
+        let jetpack = if tiled_map.contains_layer("jetpack") {
+            let jetpack_object = tiled_map.layers.get("jetpack").unwrap().objects.first().unwrap();    
+            Some(GameObject {
+                world_x: jetpack_object.world_x,
+                world_y: jetpack_object.world_y,
+                name: jetpack_object.name.clone(),
                 collected: None,
             })
         }
@@ -195,7 +211,8 @@ impl Game {
             message_coord,
             gun,
             cheat,
-            monsters
+            monsters,
+            jetpack
         }
     }
 
@@ -269,13 +286,13 @@ impl Game {
         else {
             draw_texture_ex(
                 resources.get_texture("gun"),
-                self.message_coord.0 + self.camera.target.x - 20.0,
+                self.message_coord.0 + self.camera.target.x + 50.0,
                 self.message_coord.1 - 32.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("gun").width() , 
-                        resources.get_texture("gun").height() 
+                        resources.get_texture("gun").width() * 0.7 , 
+                        resources.get_texture("gun").height() * 0.7
                     )), 
                     ..Default::default()
                 },
@@ -283,13 +300,38 @@ impl Game {
 
             draw_texture_ex(
                 resources.get_texture("gun_icon"),
-                self.message_coord.0 + self.camera.target.x + 60.0,
+                self.message_coord.0 + self.camera.target.x + 110.0,
                 self.message_coord.1 - 32.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
                         resources.get_texture("gun_icon").width() , 
                         resources.get_texture("gun_icon").height() 
+                    )), 
+                    ..Default::default()
+                },
+            );
+        }
+    }
+
+    fn draw_jetpack(&self, tiled_map: &Map, jetpack: &GameObject, resources: &Resources) {
+        if !self.player.has_jetpack {
+            tiled_map.spr_ex(
+                "jetpack2",
+                Rect::new(0.0, 0.0, 32.0, 32.0),
+                Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
+            );
+        }
+        else {
+            draw_texture_ex(
+                resources.get_texture("jetpack"),
+                self.message_coord.0 + self.camera.target.x - 410.0,
+                self.message_coord.1 - 32.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(
+                        resources.get_texture("jetpack").width() * 0.7, 
+                        resources.get_texture("jetpack").height() * 0.7
                     )), 
                     ..Default::default()
                 },
@@ -519,6 +561,20 @@ impl Scene for Game {
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
+        // Check for collision between player and jetpack
+        if let Some(j) = &self.jetpack { 
+            if !self.player.has_jetpack && self.player.overlaps(pos, &Rect::new(
+                j.world_x,
+                j.world_y - 32.0,
+                32.0,
+                32.0,
+            )) {
+                play_sound_once(resources.get_sound("jetPackActivated"));
+                self.player.has_jetpack = true;
+                self.score_board.jetpack_captured = true;
+            }
+        }
+
         // Check for collision between player and gun
         if let Some(g) = &self.gun { 
             if !self.player.has_gun && self.player.overlaps(pos, &Rect::new(
@@ -622,6 +678,11 @@ impl Scene for Game {
         if let Some(g) = &self.gun {
             self.draw_gun(&tiled_map, g, &resources);
         }
+
+        if let Some(j) = &self.jetpack {
+            self.draw_jetpack(&tiled_map, j, &resources);
+        }
+
 
         if self.score_board.game_won {
             draw_texture_ex(

@@ -1,7 +1,12 @@
 [package]
 name = "dave"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+description = "Rewrite of Dangerous Dave using Rust"
+license = "MIT"
+repository = "https://github.com/yourusername/dave"
+keywords = ["game", "macroquad"]
+categories = ["game-development", "graphics"]
 
 [workspace]
 

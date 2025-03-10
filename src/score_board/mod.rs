@@ -27,7 +27,8 @@ pub struct ScoreBoard {
     pub collectibles: Vec<GameObject>,
     pub game_won: bool,
     pub gun_captured: bool,
-    pub monsters: Vec<Monster>
+    pub monsters: Vec<Monster>,
+    pub jetpack_captured: bool
 }
 
 impl ScoreBoard {
@@ -40,7 +41,8 @@ impl ScoreBoard {
             collectibles: Vec::new(),
             game_won: false,
             gun_captured: false,
-            monsters: vec![]
+            monsters: vec![],
+            jetpack_captured: false
         }
     }
 
