@@ -2,13 +2,19 @@ use std::ops::Deref;
 use std::vec;
 
 use macroquad::prelude::{*, animation::*, collections::storage};
-use macroquad::audio::*;
+use macroquad::audio::play_sound_once;
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
-use macroquad_particles::*;
+use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
 
 use crate::score_board::GameObject;
-use crate::{player::Player, monster::Monster, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
+use crate::{
+    player::Player, 
+    monster::Monster, 
+    resources::Resources, 
+    score_board::ScoreBoard, 
+    Scene, SceneChange
+};
 
 const EXPLOSION_DURATION: f32 = 2.0;
 
@@ -42,7 +48,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(level: i32, retry: bool, cheat: bool) -> Game {
+    pub fn new(level: u32, retry: bool, cheat: bool) -> Self {
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
@@ -187,7 +193,7 @@ impl Game {
             vec![]
         };
 
-        Game {
+        Self {
             world,
             player,
             collectibles,
@@ -234,14 +240,14 @@ impl Game {
         }
     }
     
-    fn load_animation(tiled_map: &Map, name: &str, frames: i32) -> (Option<AnimatedSprite>, Vec<Object>) {
+    fn load_animation(tiled_map: &Map, name: &str, frames: u32) -> (Option<AnimatedSprite>, Vec<Object>) {
         let mut objects = vec![];
         let mut animated_object: Option<AnimatedSprite> = None;
         if tiled_map.layers.contains_key(name) {
             animated_object = Some(create_animation(name, frames));
             
             let object_layer = tiled_map.layers.get(name).unwrap();
-            objects = object_layer.objects.clone();
+            objects.extend(object_layer.objects.iter().cloned());
         }
 
         (animated_object, objects)
@@ -315,14 +321,7 @@ impl Game {
     }
 
     fn draw_jetpack(&self, tiled_map: &Map, jetpack: &GameObject, resources: &Resources) {
-        if !self.player.has_jetpack {
-            tiled_map.spr_ex(
-                "jetpack2",
-                Rect::new(0.0, 0.0, 32.0, 32.0),
-                Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
-            );
-        }
-        else {
+        if self.player.has_jetpack {
             draw_texture_ex(
                 resources.get_texture("jetpack"),
                 self.message_coord.0 + self.camera.target.x - 410.0,
@@ -335,6 +334,13 @@ impl Game {
                     )), 
                     ..Default::default()
                 },
+            );
+        }
+        else {
+            tiled_map.spr_ex(
+                "jetpack2",
+                Rect::new(0.0, 0.0, 32.0, 32.0),
+                Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
             );
         }
     }
@@ -382,7 +388,7 @@ impl Game {
     
     fn handle_collecting_valuables(&mut self, resources: &Resources, pos: Vec2) {
         // Check for collision between player and Jewellery
-        for jewellery in self.collectibles.iter_mut() {
+        for jewellery in & mut self.collectibles {
             let jewellery_rect = Rect::new(
                 jewellery.world_x,
                 jewellery.world_y - 32.0,
@@ -423,7 +429,7 @@ impl Game {
                     self.explosions.push((Emitter::new(EmitterConfig {
                         amount: 40,
                         texture: Some(resources.get_texture("explosion").clone()),
-                        ..Game::particle_explosion()
+                        ..Self::particle_explosion()
                     }), vec2(pos.x + 32.0, pos.y)));
                 }
                 play_sound_once(resources.get_sound("explosion"));
@@ -450,12 +456,12 @@ impl Game {
                         self.explosions.push((Emitter::new(EmitterConfig {
                             amount: 40,
                             texture: Some(resources.get_texture("explosion").clone()),
-                            ..Game::particle_explosion()
+                            ..Self::particle_explosion()
                         }), vec2(pos.x, pos.y)));
                         self.explosions.push((Emitter::new(EmitterConfig {
                             amount: 40,
                             texture: Some(resources.get_texture("explosion").clone()),
-                            ..Game::particle_explosion()
+                            ..Self::particle_explosion()
                         }), monster.current_location()));
                     }
     
@@ -478,7 +484,7 @@ impl Game {
                             self.explosions.push((Emitter::new(EmitterConfig {
                                 amount: 40,
                                 texture: Some(resources.get_texture("explosion").clone()),
-                                ..Game::particle_explosion()
+                                ..Self::particle_explosion()
                             }), monster.current_location()));
                         }
     
@@ -505,7 +511,7 @@ impl Game {
                             self.explosions.push((Emitter::new(EmitterConfig {
                                 amount: 40,
                                 texture: Some(resources.get_texture("explosion").clone()),
-                                ..Game::particle_explosion()
+                                ..Self::particle_explosion()
                             }), vec2(pos.x, pos.y)));
                         }
     
@@ -611,13 +617,14 @@ impl Scene for Game {
             if self.score_board.lives == 0 {
                 play_sound_once(resources.get_sound("gameoverman"));
                 return Some(SceneChange::EntryScreen);
-            } else {
-                self.score_board.lives -= 1;
-                self.score_board.collectibles = self.collectibles.clone();
-                self.score_board.monsters = self.monsters.clone();
-                storage::store(self.score_board.clone());
-                return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
-            }
+            } 
+            
+            self.score_board.lives -= 1;
+            self.score_board.collectibles = self.collectibles.clone();
+            self.score_board.monsters = self.monsters.clone();
+            storage::store(self.score_board.clone());
+            return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
+            
         }
 
 
@@ -702,7 +709,7 @@ impl Scene for Game {
     }
 }
 
-fn create_animation(name: &str, frames: i32) -> AnimatedSprite {
+fn create_animation(name: &str, frames: u32) -> AnimatedSprite {
     let mut ani = AnimatedSprite::new(
         32,
         32,
@@ -710,7 +717,7 @@ fn create_animation(name: &str, frames: i32) -> AnimatedSprite {
             Animation {
                 name: name.to_string(),
                 row: 0,
-                frames: frames as u32,
+                frames,
                 fps: 4,
             }
         ],

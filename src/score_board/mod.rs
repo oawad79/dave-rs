@@ -20,9 +20,9 @@ pub struct GameObject {
 
 #[derive(Clone)]
 pub struct ScoreBoard {
-    pub score: i32,
+    pub score: u32,
     pub lives: i32,
-    pub level: i32,
+    pub level: u32,
     pub position: (f32, f32),
     pub collectibles: Vec<GameObject>,
     pub game_won: bool,
@@ -32,8 +32,8 @@ pub struct ScoreBoard {
 }
 
 impl ScoreBoard {
-    pub fn new() -> ScoreBoard {
-        ScoreBoard {
+    pub const fn new() -> Self {
+        Self {
             score: 0,
             lives: 3,
             level: 1,
@@ -76,7 +76,7 @@ impl Scene for ScoreBoard {
             },
         );
 
-        let score = ScoreBoard::number_to_vec(self.score as u32);
+        let score = Self::number_to_vec(self.score);
         for (i, n) in score.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],

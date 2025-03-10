@@ -23,7 +23,7 @@ use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     EntryScreen,
-    Game{level: i32, retry: bool, cheat: bool},
+    Game{level: u32, retry: bool, cheat: bool},
     Separator
 }
 pub trait Scene {
@@ -94,7 +94,7 @@ async fn main() {
             .enumerate()
             {
                 if is_key_down(*key) {
-                    if let Ok(level) = i32::try_from(i) {
+                    if let Ok(level) = u32::try_from(i) {
                         scene = Box::new(Game::new(level, false, true));
                     }
                 }

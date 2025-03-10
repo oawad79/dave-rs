@@ -15,7 +15,7 @@ pub struct Resources {
 }
 
 impl Resources {
-    async fn new() -> Result<Resources, macroquad::Error> {
+    async fn new() -> Result<Self, macroquad::Error> {
         let mut sounds_keys = HashMap::new();
         let mut textures_keys = HashMap::new();
 
@@ -31,7 +31,7 @@ impl Resources {
                         sound
                     );
                 }
-                Err(e) => panic!("{:?}", e),
+                Err(e) => panic!("{e:?}"),
             }
         }
 
@@ -47,13 +47,13 @@ impl Resources {
                         texture
                     );
                 }
-                Err(e) => panic!("{:?}", e),
+                Err(e) => panic!("{e:?}"),
             }
         }
         
         let mut levels: Vec<String> = Vec::new();
         for i in 1..=4 {
-            let level = load_string(&format!("level{}.json", i)).await.unwrap();
+            let level = load_string(&format!("level{i}.json")).await.unwrap();
             levels.push(level);
         }
 
@@ -64,17 +64,17 @@ impl Resources {
         
         let mut numbers: Vec<Texture2D> = Vec::new();
         for i in 0..=9 {
-            numbers.push(load_texture(&format!("images/num{}.png", i)).await.unwrap());
+            numbers.push(load_texture(&format!("images/num{i}.png")).await.unwrap());
         }
 
         let mut monsters: Vec<Texture2D> = Vec::new();
         for i in 1..=2 {
-            monsters.push(load_texture(&format!("images/monster{}.png", i)).await.unwrap());
+            monsters.push(load_texture(&format!("images/monster{i}.png")).await.unwrap());
         }
         
         build_textures_atlas();
 
-        Ok(Resources { 
+        Ok(Self { 
             levels,
             intro_map_json,
             separator_map_json,
@@ -94,14 +94,16 @@ impl Resources {
         self.textures_keys.get(texture_key).unwrap()
     }
 
+   
     pub async fn load() -> Result<(), macroquad::Error> {
         let resources_loading = start_coroutine(async {
-            let resources = Resources::new().await.unwrap();
+            let resources = Self::new().await.unwrap();
             storage::store(resources);
         });
         
         while !resources_loading.is_done() {
             clear_background(BLACK);
+            
             draw_text(
                 &format!(
                     "Loading resources {}",

@@ -12,7 +12,7 @@ pub struct Separator {
 }
 
 impl Separator {
-    pub fn new() -> Separator {
+    pub fn new() -> Self {
         let resources = storage::get::<Resources>();
 
         let tiled_map = load_map(
@@ -52,7 +52,7 @@ impl Separator {
         let player = Player::new(actor, 
             score_board.gun_captured, score_board.jetpack_captured);
 
-        Separator {
+        Self {
             player,
             score_board,
             world,

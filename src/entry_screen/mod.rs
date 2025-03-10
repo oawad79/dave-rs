@@ -12,7 +12,7 @@ pub struct EntryScreen {
 }
 
 impl EntryScreen {
-    pub fn new() -> EntryScreen {
+    pub fn new() -> Self {
         let resources = storage::get::<Resources>();
 
         let tiled_map = load_map(
@@ -45,7 +45,7 @@ impl EntryScreen {
         let mut animated_banner = animated_banner();
         animated_banner.set_animation(0);
 
-        EntryScreen {  
+        Self {  
             animated_fire,
             animated_banner,
             fires,

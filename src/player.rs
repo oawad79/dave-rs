@@ -31,7 +31,7 @@ pub struct Player {
 
 impl Player {
     pub fn new(collider: Actor, has_gun: bool, has_jetpack: bool) -> Self {
-        Player {
+        Self {
             collider,
             speed: vec2(0., 0.),
             facing_left: false,
