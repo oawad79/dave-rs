@@ -14,6 +14,8 @@ use crate::{monster::Monster, resources::Resources, Scene, SceneChange};
 pub struct GameObject {
     pub world_x: f32,
     pub world_y: f32,
+    pub width: f32,
+    pub height: f32,
     pub name: String,
     pub collected: Option<bool>,
 }

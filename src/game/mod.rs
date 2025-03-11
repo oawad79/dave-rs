@@ -44,7 +44,8 @@ pub struct Game {
     gun: Option<GameObject>,
     cheat: bool,
     monsters: Vec<Monster>,
-    jetpack: Option<GameObject>
+    jetpack: Option<GameObject>,
+    trees: Vec<GameObject>
 }
 
 impl Game {
@@ -124,16 +125,40 @@ impl Game {
                     GameObject {
                         world_x: entry.world_x,
                         world_y: entry.world_y,
+                        width: entry.world_w,
+                        height: entry.world_h,
                         name: entry.name.clone(),
                         collected: None,
                     }
             ).collect::<Vec<GameObject>>()};
+
+        let trees = if tiled_map.contains_layer("tree") {    
+            let trees_layer = tiled_map.layers.get("tree").unwrap();
+            trees_layer.objects
+                    .iter()
+                    .map(|entry| 
+                        GameObject {
+                            world_x: entry.world_x,
+                            world_y: entry.world_y,
+                            width: entry.world_w,
+                            height: entry.world_h,
+                            name: entry.name.clone(),
+                            collected: None,
+                        }
+                ).collect::<Vec<GameObject>>()
+        }
+        else {
+            Vec::new()
+        };
+    
 
         let gun = if tiled_map.contains_layer("gun") {     
             let gun_object = tiled_map.layers.get("gun").unwrap().objects.first().unwrap();    
             Some(GameObject {
                 world_x: gun_object.world_x,
                 world_y: gun_object.world_y,
+                width: gun_object.world_w,
+                height: gun_object.world_h,
                 name: gun_object.name.clone(),
                 collected: None,
             })
@@ -147,6 +172,8 @@ impl Game {
             Some(GameObject {
                 world_x: jetpack_object.world_x,
                 world_y: jetpack_object.world_y,
+                width: jetpack_object.world_w,
+                height: jetpack_object.world_h,
                 name: jetpack_object.name.clone(),
                 collected: None,
             })
@@ -160,6 +187,8 @@ impl Game {
         let door = GameObject {
             world_x: door.world_x,
             world_y: door.world_y,
+            width: door.world_w,
+            height: door.world_h,
             name: door.name.clone(),
             collected: None,
         };
@@ -220,7 +249,8 @@ impl Game {
             gun,
             cheat,
             monsters,
-            jetpack
+            jetpack,
+            trees
         }
     }
 
@@ -271,6 +301,24 @@ impl Game {
                 "collectibles",
                 Rect::new(x, 0.0, 32.0, 32.0),
                 Rect::new(diamond.world_x, diamond.world_y - 32.0, 32.0, 32.0),
+            );
+        }
+    }
+
+    fn draw_trees(&self, resources: &Resources) {
+        for tree in &self.trees {
+            draw_texture_ex(
+                resources.get_texture("tree"),
+                tree.world_x,
+                tree.world_y - tree.height,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(
+                        tree.width, 
+                        tree.height
+                    )), 
+                    ..Default::default()
+                },
             );
         }
     }
@@ -542,9 +590,18 @@ impl Game {
 impl Scene for Game {
     fn update(&mut self) -> Option<SceneChange> {
         let resources = storage::get::<Resources>();
+        let tiled_map = storage::get::<Map>();
 
         // Set the camera to follow the player
         set_camera(&self.camera);
+
+        if tiled_map.contains_layer("tree") {
+            tiled_map.draw_tiles(
+                "night",
+                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+                None,
+            );
+        }
 
         let pos = self.world.actor_pos(self.player.collider);
 
@@ -552,7 +609,7 @@ impl Scene for Game {
         if self.score_board.level > 1 {
             let screen_width = screen_width();
             let target_x = if (pos.x > screen_width / 2.0) && 
-                              (pos.x < (self.width_tiles * 32) as f32 - screen_width / 3.0) {
+                              (pos.x < (self.width_tiles * 32) as f32 - screen_width / 3.4) {
                 pos.x
             } else if pos.x > 200.0 && pos.x < (self.width_tiles * 32) as f32 - 
                               (if screen_width > 1000.0 {screen_width / 5.0} else {screen_width / 3.0}) {
@@ -670,6 +727,10 @@ impl Scene for Game {
         self.monster_mechanics(&resources, pos);
 
         self.player.bullets.retain(|bullet| {
+            if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
+                return false
+            }
+
             bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
         });
 
@@ -709,6 +770,10 @@ impl Scene for Game {
                     ..Default::default()
                 },
             );
+        }
+
+        if !self.trees.is_empty() {
+            self.draw_trees(&resources);
         }
     }
 }
