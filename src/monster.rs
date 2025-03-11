@@ -3,7 +3,7 @@ use std::vec;
 use macroquad::{math::Vec2, prelude::{collections::storage, *}};
 use macroquad_tiled::Map;
 
-use crate::{bullet::Bullet, resources::Resources};
+use crate::{bullet::{Bullet, BulletDirection}, player, resources::Resources};
 
 const MONSTER_SPEED: f32 = 10.0;
 
@@ -151,7 +151,8 @@ impl Monster {
                     x: self.location.x + point.x + 10.0,
                     y: self.location.y + point.y,
                     speed: 250.0,
-                    collided: false 
+                    collided: false,
+                    direction: BulletDirection::Left 
                 });
             }
 

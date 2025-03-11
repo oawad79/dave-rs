@@ -1,8 +1,16 @@
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum BulletDirection {
+    Left,
+    Right,
+    Still
+}
 #[derive(Debug, Clone)]
 pub struct Bullet {
     pub x: f32,
     pub y: f32,
     pub speed: f32,
-    pub collided: bool
+    pub collided: bool,
+    pub direction: BulletDirection
 }
 

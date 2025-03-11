@@ -10,7 +10,7 @@ use macroquad_platformer::{Actor, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::{bullet::Bullet, Resources};
+use crate::{bullet::{Bullet, BulletDirection}, Resources};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -280.0;
@@ -157,16 +157,19 @@ impl Player {
                 x: pos.x + 10.0,
                 y: pos.y,
                 speed: 250.0,
-                collided: false 
+                collided: false,
+                direction: if self.facing_left {BulletDirection::Left} else {BulletDirection::Right} 
             });
             play_sound_once(resources.get_sound("shoot"));
         }
 
-        
-        
-
         for bullet in &mut self.bullets {
-            bullet.x += bullet.speed * delta;
+            if bullet.direction == BulletDirection::Left {
+                bullet.x -= bullet.speed * delta;
+            }
+            else {
+                bullet.x += bullet.speed * delta;
+            }
         }
 
         for bullet in &self.bullets {
