@@ -70,6 +70,8 @@ impl Game {
                 ("images/gun.png", resources.get_texture("gun").clone()),
                 ("images/jetpack2.png", resources.get_texture("jetpack2").clone()),
                 ("images/player_jetpack.png", resources.get_texture("player_jetpack").clone()),
+                ("images/stars-sheet.png", resources.get_texture("stars-sheet").clone()),
+                ("images/tree.png", resources.get_texture("tree").clone()),
             ],
             &[],
         )
@@ -383,6 +385,8 @@ impl Game {
             Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
             None,
         );
+
+        
 
     }
     

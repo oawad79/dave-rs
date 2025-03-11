@@ -52,9 +52,18 @@ impl Resources {
         }
         
         let mut levels: Vec<String> = Vec::new();
-        for i in 1..=4 {
-            let level = load_string(&format!("level{i}.json")).await.unwrap();
-            levels.push(level);
+        
+        let mut levels_files: Vec<_> = glob("assets/level*.json").expect("Failed to load levels").collect();
+        levels_files.sort_by(|a, b| a.iter().cmp(b));
+
+        for entry in levels_files {
+            match entry {
+                Ok(path) => {
+                    let level = load_string(path.file_name().unwrap().to_str().unwrap()).await.unwrap();
+                    levels.push(level);
+                },
+                Err(e) => panic!("{e:?}")
+            }     
         }
 
         let intro_map_json = load_string("intro.json").await.unwrap();
@@ -68,7 +77,7 @@ impl Resources {
         }
 
         let mut monsters: Vec<Texture2D> = Vec::new();
-        for i in 1..=2 {
+        for i in 1..=3 {
             monsters.push(load_texture(&format!("images/monster{i}.png")).await.unwrap());
         }
         
