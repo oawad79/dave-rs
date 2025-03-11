@@ -14,6 +14,7 @@ use crate::{bullet::Bullet, Resources};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -280.0;
+const JETPACK_VELOCITY: f32 = 100.0;
 
 pub struct Player {
     pub collider: Actor,
@@ -107,7 +108,7 @@ impl Player {
             state = "player_jetpack";
             self.animated_player.set_animation(3);
         }
-        
+
         if !self.is_dead {
             tiled_map.spr_ex(
                 state,
@@ -124,8 +125,23 @@ impl Player {
         self.animated_player.update();
 
         // player movement control
-        if !on_ground {
+        if !on_ground && !self.jetpack_active {
             self.speed.y += GRAVITY * delta;
+        } else if self.jetpack_active {
+            if is_key_down(KeyCode::Up) {
+                self.speed.y = -JETPACK_VELOCITY;
+            } 
+            else if is_key_down(KeyCode::Down) {
+                self.speed.y = JETPACK_VELOCITY;
+            }
+            else {
+                self.speed.y = 0.0;
+            }
+        }
+
+        if is_key_pressed(KeyCode::Up) && on_ground {
+            play_sound_once(resources.get_sound("jump"));
+            self.speed.y = JUMP_VELOCITY;
         }
 
         if self.simulate_right || is_key_down(KeyCode::Right) {
@@ -134,11 +150,6 @@ impl Player {
             self.speed.x = -100.0;
         } else {
             self.speed.x = 0.;
-        }
-
-        if is_key_pressed(KeyCode::Up) && on_ground {
-            play_sound_once(resources.get_sound("jump"));
-            self.speed.y = JUMP_VELOCITY;
         }
 
         if is_key_pressed(KeyCode::LeftControl) && self.has_gun  {
