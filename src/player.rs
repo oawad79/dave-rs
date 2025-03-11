@@ -26,7 +26,7 @@ pub struct Player {
     pub has_gun: bool,
     pub bullets: Vec<Bullet>,
     pub has_jetpack: bool,
-    pub jet_sound_playing: bool
+    pub jetpack_active: bool
 }
 
 impl Player {
@@ -42,7 +42,7 @@ impl Player {
             has_gun,
             bullets: vec![],
             has_jetpack,
-            jet_sound_playing: false
+            jetpack_active: false,
         }
     }
 
@@ -92,30 +92,22 @@ impl Player {
         }
 
         if is_key_pressed(KeyCode::LeftAlt) && self.has_jetpack {
-            if !self.jet_sound_playing {
+            self.jetpack_active = !self.jetpack_active;
+            if self.jetpack_active {
                 play_sound(resources.get_sound("jetPackActivated"), PlaySoundParams {
                     looped: true, 
                     volume: 1.0
                 });
-                self.jet_sound_playing = true;
-                state = "player_jetpack";
-                self.animated_player.set_animation(3);
-            }
-            else {
-                state = "dave_idle";
-                self.jet_sound_playing = false;
-                self.animated_player.set_animation(1);
+            } else {
                 stop_sound(resources.get_sound("jetPackActivated"));
-
             }
         }
 
-        // if self.has_jetpack && self.jet_sound_playing {
-        //     self.animated_player.set_animation(3);
-        // }
+        if self.jetpack_active {
+            state = "player_jetpack";
+            self.animated_player.set_animation(3);
+        }
         
-        //println!("{}", state);
-
         if !self.is_dead {
             tiled_map.spr_ex(
                 state,
