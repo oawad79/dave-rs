@@ -152,7 +152,7 @@ impl Monster {
                     y: self.location.y + point.y,
                     speed: 250.0,
                     collided: false,
-                    direction: BulletDirection::Left 
+                    direction: if player_pos.x < self.location.x + point.x {BulletDirection::Left} else {BulletDirection::Right}
                 });
             }
 
@@ -160,7 +160,12 @@ impl Monster {
         }
 
         for monster_bullet in &mut self.bullets {
-            monster_bullet.x -= monster_bullet.speed * get_frame_time();
+            if monster_bullet.direction == BulletDirection::Left {
+                monster_bullet.x -= monster_bullet.speed * get_frame_time();
+            }
+            else {
+                monster_bullet.x += monster_bullet.speed * get_frame_time();
+            }
         }
 
         for monster_bullet in &self.bullets {
@@ -174,6 +179,7 @@ impl Monster {
                         resources.get_texture("monster_bullet").width(), 
                         resources.get_texture("monster_bullet").height()
                     )),
+                    rotation: if monster_bullet.direction == BulletDirection::Right { std::f32::consts::PI } else { 0.0 },
                     ..Default::default()
                 },
             );

@@ -183,6 +183,7 @@ impl Player {
                         resources.get_texture("bullet").width(), 
                         resources.get_texture("bullet").height()
                     )),
+                    rotation: if bullet.direction == BulletDirection::Left { std::f32::consts::PI } else { 0.0 },
                     ..Default::default()
                 },
             );
