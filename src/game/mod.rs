@@ -2,7 +2,7 @@ use std::ops::Deref;
 use std::vec;
 
 use macroquad::prelude::{*, animation::*, collections::storage};
-use macroquad::audio::play_sound_once;
+use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
@@ -44,8 +44,8 @@ pub struct Game {
     gun: Option<GameObject>,
     cheat: bool,
     monsters: Vec<Monster>,
-    jetpack: Option<GameObject>,
-    trees: Vec<GameObject>
+    jetpack: Option<GameObject>
+    //tree_rects: Option<Vec<Rect>>
 }
 
 impl Game {
@@ -73,6 +73,7 @@ impl Game {
                 ("images/player_jetpack.png", resources.get_texture("player_jetpack").clone()),
                 ("images/stars-sheet.png", resources.get_texture("stars-sheet").clone()),
                 ("images/tree.png", resources.get_texture("tree").clone()),
+                ("images/climb-sheet.png", resources.get_texture("climb-sheet").clone()),
             ],
             &[],
         )
@@ -91,12 +92,27 @@ impl Game {
             });
         }
 
+        let mut tree_static_colliders = vec![];
+        if tiled_map.contains_layer("tree_collider") {
+            
+            for (_x, _y, tile) in tiled_map.tiles("tree_collider", None) {
+                tree_static_colliders.push(if tile.is_some() {
+                    Tile::JumpThrough
+                } else {
+                    Tile::Empty
+                });
+            }
+        }
+
+
+
         let height = tiled_map.layers.get("platform").unwrap().height;
         let width = tiled_map.layers.get("platform").unwrap().width;
         
         let mut world = World::new();
         world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
-        
+        world.add_static_tiled_layer(tree_static_colliders, 32., 32., width as usize, 2);
+
         let player_loc = tiled_map.layers.get("player").unwrap().objects.first().unwrap();
 
         let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
@@ -132,24 +148,24 @@ impl Game {
                     }
             ).collect::<Vec<GameObject>>()};
 
-        let trees = if tiled_map.contains_layer("tree") {    
-            let trees_layer = tiled_map.layers.get("tree").unwrap();
-            trees_layer.objects
-                    .iter()
-                    .map(|entry| 
-                        GameObject {
-                            world_x: entry.world_x,
-                            world_y: entry.world_y,
-                            width: entry.world_w,
-                            height: entry.world_h,
-                            name: entry.name.clone(),
-                            collected: None,
-                        }
-                ).collect::<Vec<GameObject>>()
-        }
-        else {
-            Vec::new()
-        };
+        // let trees = if tiled_map.contains_layer("tree") {    
+        //     let trees_layer = tiled_map.layers.get("tree").unwrap();
+        //     trees_layer.objects
+        //             .iter()
+        //             .map(|entry| 
+        //                 GameObject {
+        //                     world_x: entry.world_x,
+        //                     world_y: entry.world_y,
+        //                     width: entry.world_w,
+        //                     height: entry.world_h,
+        //                     name: entry.name.clone(),
+        //                     collected: None,
+        //                 }
+        //         ).collect::<Vec<GameObject>>()
+        // }
+        // else {
+        //     Vec::new()
+        // };
     
 
         let gun = if tiled_map.contains_layer("gun") {     
@@ -224,6 +240,13 @@ impl Game {
             vec![]
         };
 
+        // let tree_rects = if tiled_map.contains_layer("tree_marker") {
+        //     Some(Game::load_tree_coordinates(&tiled_map))
+        // }
+        // else {
+        //     None
+        // };
+
         Self {
             world,
             player,
@@ -249,8 +272,7 @@ impl Game {
             gun,
             cheat,
             monsters,
-            jetpack,
-            trees
+            jetpack
         }
     }
 
@@ -272,6 +294,26 @@ impl Game {
         }
     }
     
+    // fn load_tree_coordinates(tiled_map: &Map) -> Vec<Rect> {
+    //     let mut rectangles: Vec<Rect> = vec![];
+    //     for layer in &tiled_map.raw_tiled_map.layers {
+    //         if layer.name == "tree_marker" {
+    //             for rect_obj in &layer.objects {
+    //                 let rect: Rect = Rect {
+    //                     x: rect_obj.x,
+    //                     y: rect_obj.y,
+    //                     w: rect_obj.width,
+    //                     h: rect_obj.height,     
+    //                 };
+
+    //                 rectangles.push(rect);
+    //             }
+    //         }
+    //     }
+
+    //     rectangles
+    // }
+
     fn load_animation(tiled_map: &Map, name: &str, frames: u32) -> (Option<AnimatedSprite>, Vec<Object>) {
         let mut objects = vec![];
         let mut animated_object: Option<AnimatedSprite> = None;
@@ -305,23 +347,23 @@ impl Game {
         }
     }
 
-    fn draw_trees(&self, resources: &Resources) {
-        for tree in &self.trees {
-            draw_texture_ex(
-                resources.get_texture("tree"),
-                tree.world_x,
-                tree.world_y - tree.height,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        tree.width, 
-                        tree.height
-                    )), 
-                    ..Default::default()
-                },
-            );
-        }
-    }
+    // fn draw_trees(&self, resources: &Resources) {
+    //     for tree in &self.trees {
+    //         draw_texture_ex(
+    //             resources.get_texture("tree"),
+    //             tree.world_x,
+    //             tree.world_y - tree.height,
+    //             WHITE,
+    //             DrawTextureParams {
+    //                 dest_size: Some(vec2(
+    //                     tree.width, 
+    //                     tree.height
+    //                 )), 
+    //                 ..Default::default()
+    //             },
+    //         );
+    //     }
+    // }
 
     fn draw_door(&self, tiled_map: &Map) {
         tiled_map.spr_ex(
@@ -436,6 +478,8 @@ impl Game {
 
         
 
+        
+
     }
     
     fn handle_collecting_valuables(&mut self, resources: &Resources, pos: Vec2) {
@@ -466,7 +510,7 @@ impl Game {
     fn handle_collision_with_deadly(&mut self, resources: &impl Deref<Target = Resources>, pos: Vec2) {
         self.deadly_objects.iter().for_each(|deadly_object| {
             let deadly_rect = Rect::new(
-                deadly_object.world_x,
+                deadly_object.world_x + 10.0,
                 deadly_object.world_y - 32.0,
                 10.0,
                 10.0,
@@ -595,7 +639,7 @@ impl Scene for Game {
         // Set the camera to follow the player
         set_camera(&self.camera);
 
-        if tiled_map.contains_layer("tree") {
+        if tiled_map.contains_layer("night") {
             tiled_map.draw_tiles(
                 "night",
                 Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
@@ -667,6 +711,7 @@ impl Scene for Game {
             play_sound_once(resources.get_sound("win"));
             self.score_board.level += 1;
             storage::store(self.score_board.clone());
+            stop_sound(resources.get_sound("jetPackActivated"));
             return Some(SceneChange::Separator);
         }
         
@@ -687,8 +732,7 @@ impl Scene for Game {
             return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
             
         }
-
-
+        
         for (explosion, coords) in &mut self.explosions {
             explosion.draw(vec2(coords.x, coords.y));
         }
@@ -707,6 +751,14 @@ impl Scene for Game {
             }
         }
         
+        if tiled_map.contains_layer("tree_collider") {
+            tiled_map.draw_tiles(
+                "tree_collider",
+                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+                None,
+            );
+        }
+
         self.player.update(&mut self.world);
 
         if self.animated_fire.is_some() {
@@ -733,6 +785,9 @@ impl Scene for Game {
 
             bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
         });
+
+        
+        
 
         None
     }
@@ -772,9 +827,7 @@ impl Scene for Game {
             );
         }
 
-        if !self.trees.is_empty() {
-            self.draw_trees(&resources);
-        }
+        
     }
 }
 

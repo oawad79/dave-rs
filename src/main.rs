@@ -1,10 +1,10 @@
-#![warn(
-    clippy::all,
-    clippy::pedantic,
-    // clippy::restriction,
-    clippy::nursery,
-    clippy::cargo,
-)]
+// #![warn(
+//     clippy::all,
+//     clippy::pedantic,
+//     // clippy::restriction,
+//     clippy::nursery,
+//     clippy::cargo,
+// )]
 
 mod bullet;
 mod entry_screen;

@@ -6,11 +6,11 @@ use macroquad::{
         collections::storage
     }
 };
-use macroquad_platformer::{Actor, World};
+use macroquad_platformer::{Actor, Tile, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::{bullet::{Bullet, BulletDirection}, Resources};
+use crate::{bullet::{Bullet, BulletDirection}, score_board::{self, ScoreBoard}, Resources};
 
 const GRAVITY: f32 = 500.0;
 const JUMP_VELOCITY: f32 = -280.0;
@@ -27,7 +27,9 @@ pub struct Player {
     pub has_gun: bool,
     pub bullets: Vec<Bullet>,
     pub has_jetpack: bool,
-    pub jetpack_active: bool
+    pub jetpack_active: bool,
+    pub climbing: bool,
+    pub climbing_active: bool
 }
 
 impl Player {
@@ -44,6 +46,8 @@ impl Player {
             bullets: vec![],
             has_jetpack,
             jetpack_active: false,
+            climbing: false,
+            climbing_active: false
         }
     }
 
@@ -60,12 +64,16 @@ impl Player {
     pub fn update(&mut self, world: &mut World) {
         let resources = storage::get::<Resources>();
         let tiled_map = storage::get::<Map>();
-
+        
         let delta = get_frame_time();
 
         let pos = world.actor_pos(self.collider);
         
         let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
+
+        if self.is_dead {
+            stop_sound(resources.get_sound("jetPackActivated"));
+        }
 
         let mut state: &str;
         let flip: f32;
@@ -86,7 +94,8 @@ impl Player {
                 self.facing_left = false;
                 flip = 32.0;
             }
-        } else {
+        } 
+        else {
             state = "dave_idle";
             self.animated_player.set_animation(1); // idle
             flip = if self.facing_left { -32.0 } else { 32.0 };
@@ -104,11 +113,29 @@ impl Player {
             }
         }
 
+        //#[allow(clippy::collapsible_if)]
+        if tiled_map.contains_layer("tree_collider") && 
+                    (is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down)) && 
+                    world.collide_tag(2, pos, 32, 32) == Tile::JumpThrough {
+            self.climbing = true;
+            self.climbing_active = true;
+        }
+        else {
+            self.climbing = false;
+        }
+    
+
         if self.jetpack_active {
-            state = "player_jetpack";
             self.animated_player.set_animation(3);
+            state = "player_jetpack";
         }
 
+        if self.climbing {
+            state = "climb-sheet";
+            self.animated_player.set_animation(4);    
+        }
+        
+        //println!("{state}");
         if !self.is_dead {
             tiled_map.spr_ex(
                 state,
@@ -122,10 +149,14 @@ impl Player {
             );
         }
 
+        
+
+        //println!("cl = {}", self.climbing);
+
         self.animated_player.update();
 
         // player movement control
-        if !on_ground && !self.jetpack_active {
+        if !on_ground && !self.jetpack_active && !self.climbing {
             self.speed.y += GRAVITY * delta;
         } else if self.jetpack_active {
             if is_key_down(KeyCode::Up) {
@@ -137,13 +168,24 @@ impl Player {
             else {
                 self.speed.y = 0.0;
             }
+        } else if self.climbing {
+            if is_key_down(KeyCode::Up) {
+                self.speed.y = -JETPACK_VELOCITY;
+            } 
+            else if is_key_down(KeyCode::Down) {
+                self.speed.y = JETPACK_VELOCITY;
+            }
+            else {
+                self.speed.y = 0.0;
+            }
         }
 
-        if is_key_pressed(KeyCode::Up) && on_ground {
+        
+        if !self.climbing && is_key_pressed(KeyCode::Up) && on_ground {
             play_sound_once(resources.get_sound("jump"));
             self.speed.y = JUMP_VELOCITY;
         }
-
+        
         if self.simulate_right || is_key_down(KeyCode::Right) {
             self.speed.x = 100.0;
         } else if self.simulate_left || is_key_down(KeyCode::Left) {
@@ -200,7 +242,8 @@ pub enum AnimationState {
     Walk,
     Idle,
     Jump,
-    Fly
+    Fly,
+    Climb
 }
 
 impl AnimationState {
@@ -209,7 +252,8 @@ impl AnimationState {
             Self::Walk => "walk",
             Self::Idle => "idle",
             Self::Jump => "jump",
-            Self::Fly => "fly"
+            Self::Fly => "fly",
+            Self::Climb => "climb"
         }
     }
 }
@@ -242,6 +286,12 @@ pub fn animated_player() -> AnimatedSprite {
                 row: 0,
                 frames: 1,
                 fps: 1,
+            },
+            Animation {
+                name: AnimationState::Climb.as_str().to_string(),
+                row: 0,
+                frames: 3,
+                fps: 3,
             },
         ],
         true,
