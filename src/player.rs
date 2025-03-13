@@ -78,27 +78,34 @@ impl Player {
         let mut state: &str;
         let flip: f32;
 
-        if self.speed.x != 0.0 {
-            state = if !on_ground {
-                self.animated_player.set_animation(2); // jump
-                "dave_jump"
-            } else {
-                self.animated_player.set_animation(0); // walk
-                "dave_walk"
-            };
+        if !self.climbing_active {
+            if self.speed.x != 0.0 {
+                state = if !on_ground {
+                    self.animated_player.set_animation(2); // jump
+                    "dave_jump"
+                } else {
+                    self.animated_player.set_animation(0); // walk
+                    "dave_walk"
+                };
 
-            if self.speed.x < 0.0 {
-                self.facing_left = true;
-                flip = -32.0;
-            } else {
-                self.facing_left = false;
-                flip = 32.0;
+                if self.speed.x < 0.0 {
+                    self.facing_left = true;
+                    flip = -32.0;
+                } else {
+                    self.facing_left = false;
+                    flip = 32.0;
+                }
+            } 
+            else {
+                state = "dave_idle";
+                self.animated_player.set_animation(1); // idle
+                flip = if self.facing_left { -32.0 } else { 32.0 };
             }
-        } 
+        }
         else {
-            state = "dave_idle";
-            self.animated_player.set_animation(1); // idle
-            flip = if self.facing_left { -32.0 } else { 32.0 };
+            flip = 32.0;
+            state = "climb-sheet";
+            self.animated_player.set_animation(4);   
         }
 
         if is_key_pressed(KeyCode::LeftAlt) && self.has_jetpack {
@@ -114,7 +121,7 @@ impl Player {
         }
 
         if tiled_map.contains_layer("tree_collider") {
-            if world.collide_tag(2, pos, 32, 32) == Tile::JumpThrough {
+            if world.collide_tag(2, pos, 10, 32) == Tile::JumpThrough {
                 if is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down) {
                     self.climbing = true;
                     self.climbing_active = true;
@@ -155,7 +162,6 @@ impl Player {
 
         self.animated_player.update();
 
-        println!("climbing_active = {}", self.climbing_active);
         // player movement control
         if !on_ground && !self.jetpack_active && !self.climbing_active {
             self.speed.y += GRAVITY * delta;
