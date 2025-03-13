@@ -123,11 +123,22 @@ impl Player {
         if tiled_map.contains_layer("tree_collider") {
             if world.collide_tag(2, pos, 10, 32) == Tile::JumpThrough {
                 if is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down) {
+                    if !self.climbing {
+                        play_sound(resources.get_sound("climb"), PlaySoundParams {
+                            looped: true, 
+                            volume: 0.2
+                        });
+                    }
+
                     self.climbing = true;
                     self.climbing_active = true;
+
+                    
                 }   
                 else {
                     self.climbing = false;
+                    stop_sound(resources.get_sound("climb"));
+
                 }     
             }
             else {

@@ -45,7 +45,6 @@ pub struct Game {
     cheat: bool,
     monsters: Vec<Monster>,
     jetpack: Option<GameObject>
-    //tree_rects: Option<Vec<Rect>>
 }
 
 impl Game {
@@ -148,26 +147,6 @@ impl Game {
                     }
             ).collect::<Vec<GameObject>>()};
 
-        // let trees = if tiled_map.contains_layer("tree") {    
-        //     let trees_layer = tiled_map.layers.get("tree").unwrap();
-        //     trees_layer.objects
-        //             .iter()
-        //             .map(|entry| 
-        //                 GameObject {
-        //                     world_x: entry.world_x,
-        //                     world_y: entry.world_y,
-        //                     width: entry.world_w,
-        //                     height: entry.world_h,
-        //                     name: entry.name.clone(),
-        //                     collected: None,
-        //                 }
-        //         ).collect::<Vec<GameObject>>()
-        // }
-        // else {
-        //     Vec::new()
-        // };
-    
-
         let gun = if tiled_map.contains_layer("gun") {     
             let gun_object = tiled_map.layers.get("gun").unwrap().objects.first().unwrap();    
             Some(GameObject {
@@ -240,13 +219,6 @@ impl Game {
             vec![]
         };
 
-        // let tree_rects = if tiled_map.contains_layer("tree_marker") {
-        //     Some(Game::load_tree_coordinates(&tiled_map))
-        // }
-        // else {
-        //     None
-        // };
-
         Self {
             world,
             player,
@@ -294,26 +266,6 @@ impl Game {
         }
     }
     
-    // fn load_tree_coordinates(tiled_map: &Map) -> Vec<Rect> {
-    //     let mut rectangles: Vec<Rect> = vec![];
-    //     for layer in &tiled_map.raw_tiled_map.layers {
-    //         if layer.name == "tree_marker" {
-    //             for rect_obj in &layer.objects {
-    //                 let rect: Rect = Rect {
-    //                     x: rect_obj.x,
-    //                     y: rect_obj.y,
-    //                     w: rect_obj.width,
-    //                     h: rect_obj.height,     
-    //                 };
-
-    //                 rectangles.push(rect);
-    //             }
-    //         }
-    //     }
-
-    //     rectangles
-    // }
-
     fn load_animation(tiled_map: &Map, name: &str, frames: u32) -> (Option<AnimatedSprite>, Vec<Object>) {
         let mut objects = vec![];
         let mut animated_object: Option<AnimatedSprite> = None;
@@ -346,24 +298,6 @@ impl Game {
             );
         }
     }
-
-    // fn draw_trees(&self, resources: &Resources) {
-    //     for tree in &self.trees {
-    //         draw_texture_ex(
-    //             resources.get_texture("tree"),
-    //             tree.world_x,
-    //             tree.world_y - tree.height,
-    //             WHITE,
-    //             DrawTextureParams {
-    //                 dest_size: Some(vec2(
-    //                     tree.width, 
-    //                     tree.height
-    //                 )), 
-    //                 ..Default::default()
-    //             },
-    //         );
-    //     }
-    // }
 
     fn draw_door(&self, tiled_map: &Map) {
         tiled_map.spr_ex(
