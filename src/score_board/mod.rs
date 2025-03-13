@@ -106,19 +106,19 @@ impl Scene for ScoreBoard {
             },
         );
 
-        draw_texture_ex(
-            &resources.numbers[self.level as usize],
-            self.position.0 + 320.0,
-            7.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.numbers[self.level as usize].width(), 
-                    resources.numbers[self.level as usize].height()
-                )), 
-                ..Default::default()
-            },
-        );
+        let levels = Self::number_to_vec(self.level);
+        for (i, n) in levels.iter().enumerate() {
+            draw_texture_ex(
+                &resources.numbers[*n as usize],
+                self.position.0 + 320.0 + (i as f32 * 20.0),
+                7.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(resources.numbers[*n as usize].width() , resources.numbers[*n as usize].height() )), 
+                    ..Default::default()
+                },
+            );
+        }
 
         draw_texture_ex(
             resources.get_texture("daves"),
