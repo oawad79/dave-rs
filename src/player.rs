@@ -113,15 +113,20 @@ impl Player {
             }
         }
 
-        //#[allow(clippy::collapsible_if)]
-        if tiled_map.contains_layer("tree_collider") && 
-                    (is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down)) && 
-                    world.collide_tag(2, pos, 32, 32) == Tile::JumpThrough {
-            self.climbing = true;
-            self.climbing_active = true;
-        }
-        else {
-            self.climbing = false;
+        if tiled_map.contains_layer("tree_collider") {
+            if world.collide_tag(2, pos, 32, 32) == Tile::JumpThrough {
+                if is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down) {
+                    self.climbing = true;
+                    self.climbing_active = true;
+                }   
+                else {
+                    self.climbing = false;
+                }     
+            }
+            else {
+                self.climbing_active = false;
+                self.climbing = false;
+            }
         }
     
 
@@ -135,7 +140,6 @@ impl Player {
             self.animated_player.set_animation(4);    
         }
         
-        //println!("{state}");
         if !self.is_dead {
             tiled_map.spr_ex(
                 state,
@@ -149,16 +153,13 @@ impl Player {
             );
         }
 
-        
-
-        //println!("cl = {}", self.climbing);
-
         self.animated_player.update();
 
+        println!("climbing_active = {}", self.climbing_active);
         // player movement control
-        if !on_ground && !self.jetpack_active && !self.climbing {
+        if !on_ground && !self.jetpack_active && !self.climbing_active {
             self.speed.y += GRAVITY * delta;
-        } else if self.jetpack_active {
+        } else if self.jetpack_active || self.climbing_active {
             if is_key_down(KeyCode::Up) {
                 self.speed.y = -JETPACK_VELOCITY;
             } 
@@ -168,17 +169,7 @@ impl Player {
             else {
                 self.speed.y = 0.0;
             }
-        } else if self.climbing {
-            if is_key_down(KeyCode::Up) {
-                self.speed.y = -JETPACK_VELOCITY;
-            } 
-            else if is_key_down(KeyCode::Down) {
-                self.speed.y = JETPACK_VELOCITY;
-            }
-            else {
-                self.speed.y = 0.0;
-            }
-        }
+        } 
 
         
         if !self.climbing && is_key_pressed(KeyCode::Up) && on_ground {
