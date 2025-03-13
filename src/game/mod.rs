@@ -409,11 +409,6 @@ impl Game {
             Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
             None,
         );
-
-        
-
-        
-
     }
     
     fn handle_collecting_valuables(&mut self, resources: &Resources, pos: Vec2) {

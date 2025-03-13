@@ -73,6 +73,7 @@ impl Player {
 
         if self.is_dead {
             stop_sound(resources.get_sound("jetPackActivated"));
+            stop_sound(resources.get_sound("climb"));
         }
 
         let mut state: &str;
@@ -132,8 +133,6 @@ impl Player {
 
                     self.climbing = true;
                     self.climbing_active = true;
-
-                    
                 }   
                 else {
                     self.climbing = false;
@@ -144,6 +143,7 @@ impl Player {
             else {
                 self.climbing_active = false;
                 self.climbing = false;
+                stop_sound(resources.get_sound("climb"));
             }
         }
     

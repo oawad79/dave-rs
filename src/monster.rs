@@ -6,6 +6,7 @@ use macroquad_tiled::Map;
 use crate::{bullet::{Bullet, BulletDirection}, player, resources::Resources};
 
 const MONSTER_SPEED: f32 = 10.0;
+const MONSTER_ROTATION_TIMER: f32 = 6.0;
 
 #[derive(Debug, Clone)]
 pub struct PolyPoint {
@@ -22,7 +23,10 @@ pub struct Monster {
     pub bullets: Vec<Bullet>,
     name: String,
     move_timer: f32,
-    bullet_timer: f32
+    bullet_timer: f32,
+    pub rotate: bool,
+    rotation_degree: f32,
+    rotation_timer: f32
 }
 
 impl Monster {
@@ -69,7 +73,10 @@ impl Monster {
                         bullets: vec![],
                         name: monster_obj.name.clone(),
                         move_timer: 0.1,
-                        bullet_timer: 6.0
+                        bullet_timer: 6.0,
+                        rotate: monster_obj.properties.iter().any(|e| e.name == "rotate"),
+                        rotation_degree: 0.0,
+                        rotation_timer: MONSTER_ROTATION_TIMER
                     };
 
                     let polygon_pts = monster_obj.polygon.as_ref().unwrap();
@@ -116,6 +123,14 @@ impl Monster {
         let point = self.waypoints[self.current_waypoint];
         let m = &resources.monsters[self.name.parse::<usize>().unwrap() - 1];
 
+        if self.rotate {
+            self.rotation_timer -= 30.0 * get_frame_time();
+            if self.rotation_timer <= 0.0 {
+                self.rotation_degree += 0.5;
+                self.rotation_timer = MONSTER_ROTATION_TIMER;
+            }
+        }
+
         draw_texture_ex(
             m,
             self.location.x + point.x,
@@ -123,8 +138,10 @@ impl Monster {
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(m.width() , m.height() )), 
+                rotation: self.rotation_degree, 
                 ..Default::default()
             },
+            
         );
 
         if self.move_timer > 0.0 {
