@@ -5,7 +5,7 @@ use macroquad_tiled::Map;
 
 use crate::{bullet::{Bullet, BulletDirection}, player, resources::Resources};
 
-const MONSTER_SPEED: f32 = 10.0;
+const MONSTER_SPEED: f32 = 250.0;
 const MONSTER_ROTATION_TIMER: f32 = 6.0;
 
 #[derive(Debug, Clone)]
