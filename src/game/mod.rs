@@ -7,7 +7,7 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
 
-use crate::score_board::GameObject;
+use crate::score_board::{self, GameObject};
 use crate::{
     player::Player, 
     monster::Monster, 
@@ -52,7 +52,7 @@ impl Game {
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
-            &resources.levels[(level - 1) as usize],
+            &resources.levels[(if level == 0 {9} else {level - 1}) as usize],
             &[
                 ("images/mytileset.png", resources.get_texture("mytileset").clone()),
                 ("images/dave_walk.png", resources.get_texture("dave_walk").clone()),
@@ -579,7 +579,7 @@ impl Scene for Game {
         let pos = self.world.actor_pos(self.player.collider);
 
         //Update camera position to follow the player
-        if self.score_board.level > 1 {
+        if self.score_board.level > 1 || self.score_board.level == 0 {
             let screen_width = screen_width();
             let target_x = if (pos.x > screen_width / 2.0) && 
                               (pos.x < (self.width_tiles * 32) as f32 - screen_width / 3.4) {
@@ -595,6 +595,13 @@ impl Scene for Game {
 
             self.camera.target.x = self.camera.target.x + (target_x - self.camera.target.x) * 0.1;
             self.score_board.position = (self.camera.target.x - 300.0, pos.y);
+        }
+
+        //handle the player falling out of the game so we bring him from top
+        if pos.y > screen_height() {
+            let actor = self.world.add_actor(vec2(pos.x, 0.0), 32, 32);
+            self.player = Player::new(actor, 
+                self.score_board.gun_captured, self.score_board.jetpack_captured);
         }
 
         self.handle_collecting_valuables(&resources, pos);

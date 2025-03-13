@@ -54,7 +54,11 @@ impl Resources {
         let mut levels: Vec<String> = Vec::new();
         
         let mut levels_files: Vec<_> = glob("assets/level*.json").expect("Failed to load levels").collect();
-        levels_files.sort_by(|a, b| a.iter().cmp(b));
+        levels_files.sort_by(|a, b| {
+            let num_a: u32 = a.as_ref().unwrap().file_stem().unwrap().to_str().unwrap()[5..].parse().unwrap(); 
+            let num_b: u32 = b.as_ref().unwrap().file_stem().unwrap().to_str().unwrap()[5..].parse().unwrap(); 
+            num_a.cmp(&num_b)
+        });
 
         for entry in levels_files {
             match entry {
