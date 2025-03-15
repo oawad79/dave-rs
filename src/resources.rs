@@ -81,7 +81,7 @@ impl Resources {
         }
 
         let mut monsters: Vec<Texture2D> = Vec::new();
-        for i in 1..=7 {
+        for i in 1..=8 {
             monsters.push(load_texture(&format!("images/monster{i}.png")).await.unwrap());
         }
         

@@ -6,7 +6,7 @@ use macroquad_tiled::Map;
 use crate::{bullet::{Bullet, BulletDirection}, player, resources::Resources};
 
 const MONSTER_SPEED: f32 = 250.0;
-const MONSTER_ROTATION_TIMER: f32 = 6.0;
+const MONSTER_ROTATION_TIMER: f32 = 2.0;
 
 #[derive(Debug, Clone)]
 pub struct PolyPoint {
@@ -26,7 +26,8 @@ pub struct Monster {
     bullet_timer: f32,
     pub rotate: bool,
     rotation_degree: f32,
-    rotation_timer: f32
+    rotation_timer: f32,
+    rotate_y_axis: bool
 }
 
 impl Monster {
@@ -76,7 +77,8 @@ impl Monster {
                         bullet_timer: 6.0,
                         rotate: monster_obj.properties.iter().any(|e| e.name == "rotate"),
                         rotation_degree: 0.0,
-                        rotation_timer: MONSTER_ROTATION_TIMER
+                        rotation_timer: MONSTER_ROTATION_TIMER,
+                        rotate_y_axis: monster_obj.properties.iter().any(|e| e.name == "y-axis") 
                     };
 
                     let polygon_pts = monster_obj.polygon.as_ref().unwrap();
@@ -123,27 +125,65 @@ impl Monster {
         let point = self.waypoints[self.current_waypoint];
         let m = &resources.monsters[self.name.parse::<usize>().unwrap() - 1];
 
+        // Create the default draw parameters
+        let mut draw_params = DrawTextureParams {
+            dest_size: Some(vec2(m.width(), m.height())),
+            flip_y: true,
+            ..Default::default()
+        };
+
         if self.rotate {
-            self.rotation_timer -= 30.0 * get_frame_time();
+            self.rotation_timer -= 150.0 * get_frame_time();
             if self.rotation_timer <= 0.0 {
                 self.rotation_degree += 0.5;
                 self.rotation_timer = MONSTER_ROTATION_TIMER;
             }
+            
+            // If rotating around z-axis (normal rotation)
+            if !self.rotate_y_axis {
+                draw_params.rotation = self.rotation_degree;
+                draw_params.pivot = Some(Vec2::new(
+                    self.location.x + point.x + m.width()/2.0, 
+                    self.location.y + point.y + m.height()/2.0
+                ));
+            }
         }
 
-        draw_texture_ex(
-            m,
-            self.location.x + point.x,
-            self.location.y + point.y,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(m.width() , m.height() )), 
-                rotation: self.rotation_degree, 
-                ..Default::default()
-            },
+        // Handle y-axis rotation separately 
+        // Note: Cody AI helped me with this y-axis rotation
+        if self.rotate_y_axis {
+            // Calculate rotation based on time or existing rotation_degree
+            let angle = self.rotation_degree * std::f32::consts::PI / 180.0; // Convert to radians
             
-        );
-
+            // Calculate scale factor - width narrows as we rotate to the side
+            let scale_x = angle.cos().abs();
+            
+            // Calculate x position offset to keep the texture centered during rotation
+            let width = m.width();
+            let center_offset = (width - width * scale_x) / 2.0;
+            
+            // Update draw parameters for y-axis rotation
+            draw_params.dest_size = Some(vec2(width * scale_x, m.height()));
+            
+            // Draw with adjusted position to maintain center point
+            draw_texture_ex(
+                m,
+                self.location.x + point.x + center_offset,
+                self.location.y + point.y,
+                WHITE,
+                draw_params
+            );
+        } else {
+            // Draw with regular parameters (z-axis rotation or no rotation)
+            draw_texture_ex(
+                m,
+                self.location.x + point.x,
+                self.location.y + point.y,
+                WHITE,
+                draw_params
+            );
+        }
+    
         if self.move_timer > 0.0 {
             self.move_timer -= MONSTER_SPEED * get_frame_time();
         }
