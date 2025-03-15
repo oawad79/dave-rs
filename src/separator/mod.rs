@@ -80,6 +80,7 @@ impl Scene for Separator {
         if pos.x > 608.0 {
             stop_sound(resources.get_sound("hd-walk"));
             storage::store(self.score_board.clone());
+            
             if self.score_board.level == 10 {
                 return Some(SceneChange::Complete);
             }
@@ -100,11 +101,11 @@ impl Scene for Separator {
         
         self.score_board.draw();
 
-        let m = if 10 - self.score_board.level + 1 > 0 {
+        let m = if self.score_board.level < 10 {
             format!("GOOD WORK! ONLY {} MORE TO GO!", (10 - self.score_board.level + 1))
         }
         else {
-            "YES! YOU FINISHED THE GAME!".to_string()
+            "  YES! YOU FINISHED THE GAME!".to_string()
         };
         
         draw_text_ex(

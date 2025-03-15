@@ -634,7 +634,7 @@ impl Scene for Game {
                 self.score_board.gun_captured = true;
             }
         }
-
+        
         // Check for collision between player and door
         if self.score_board.game_won && Player::overlaps(pos, &Rect::new(
             self.door.world_x,
@@ -644,7 +644,12 @@ impl Scene for Game {
         )) {
             self.score_board.game_won = false;
             play_sound_once(resources.get_sound("win"));
-            self.score_board.level += 1;
+            if self.score_board.level == 0 {
+                self.score_board.level = 10;
+            }
+            else {
+                self.score_board.level += 1;
+            }
             storage::store(self.score_board.clone());
             stop_sound(resources.get_sound("jetPackActivated"));
             return Some(SceneChange::Separator);

@@ -29,7 +29,7 @@ impl Complete {
 impl Scene for Complete {
     fn update(&mut self) -> Option<SceneChange> {
 
-        if is_key_down(KeyCode::Space) {
+        if is_key_down(KeyCode::Enter) {
             return Some(SceneChange::EntryScreen);
         }
 
@@ -147,7 +147,7 @@ impl Scene for Complete {
         );    
 
         draw_text_ex(
-            "PRESS SPACE ",
+            "PRESS ENTER ",
             240.0,
             320.0,
             TextParams {
