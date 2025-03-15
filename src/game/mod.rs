@@ -700,14 +700,6 @@ impl Scene for Game {
             );
         }
 
-        if tiled_map.contains_layer("grasswall") {
-            tiled_map.draw_tiles(
-                "grasswall",
-                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
-                None,
-            );
-        }
-
         if tiled_map.contains_layer("fallthroughtiles") {
             tiled_map.draw_tiles(
                 "fallthroughtiles",

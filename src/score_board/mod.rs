@@ -106,7 +106,7 @@ impl Scene for ScoreBoard {
             },
         );
 
-        let levels = Self::number_to_vec(self.level);
+        let levels = Self::number_to_vec(if self.level == 0 {10} else {self.level});
         for (i, n) in levels.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
