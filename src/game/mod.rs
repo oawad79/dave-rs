@@ -49,6 +49,7 @@ pub struct Game {
 
 impl Game {
     pub fn new(level: u32, retry: bool, cheat: bool) -> Self {
+        
         let resources = storage::get::<Resources>();
         
         let tiled_map = load_map(
@@ -102,8 +103,6 @@ impl Game {
                 });
             }
         }
-
-
 
         let height = tiled_map.layers.get("platform").unwrap().height;
         let width = tiled_map.layers.get("platform").unwrap().width;
@@ -440,9 +439,9 @@ impl Game {
         self.deadly_objects.iter().for_each(|deadly_object| {
             let deadly_rect = Rect::new(
                 deadly_object.world_x + 10.0,
-                deadly_object.world_y - 32.0,
+                deadly_object.world_y - 10.0,
                 10.0,
-                10.0,
+                7.0,
             );
     
             if Player::overlaps(pos, &deadly_rect) && !self.player.is_dead {
@@ -598,7 +597,7 @@ impl Scene for Game {
         }
 
         //handle the player falling out of the game so we bring him from top
-        if pos.y > screen_height() {
+        if pos.y > screen_height() && !self.player.is_dead {
             let actor = self.world.add_actor(vec2(pos.x, 0.0), 32, 32);
             self.player = Player::new(actor, 
                 self.score_board.gun_captured, self.score_board.jetpack_captured);
@@ -664,7 +663,13 @@ impl Scene for Game {
             self.score_board.lives -= 1;
             self.score_board.collectibles = self.collectibles.clone();
             self.score_board.monsters = self.monsters.clone();
+            // TODO
+            // let actor = self.world.add_actor(vec2(self.player_loc.world_x, self.player_loc.world_y - 32.0), 32, 32);
+            // self.player = Player::new(actor, 
+            //     self.score_board.gun_captured, self.score_board.jetpack_captured);
+            
             storage::store(self.score_board.clone());
+            
             return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
             
         }
@@ -698,6 +703,14 @@ impl Scene for Game {
         if tiled_map.contains_layer("grasswall") {
             tiled_map.draw_tiles(
                 "grasswall",
+                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+                None,
+            );
+        }
+
+        if tiled_map.contains_layer("fallthroughtiles") {
+            tiled_map.draw_tiles(
+                "fallthroughtiles",
                 Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
                 None,
             );
