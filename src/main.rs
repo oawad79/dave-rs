@@ -14,17 +14,20 @@ mod player;
 mod resources;
 mod score_board;
 mod separator;
+mod complete;
 
 use game::Game;
 use entry_screen::EntryScreen;
 use separator::Separator;
 use resources::Resources;
+use complete::Complete;
 use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     EntryScreen,
     Game{level: u32, retry: bool, cheat: bool},
-    Separator
+    Separator,
+    Complete
 }
 pub trait Scene {
     fn update(&mut self) -> Option<SceneChange>;
@@ -74,7 +77,9 @@ async fn main() {
             scene = match change {
                 SceneChange::EntryScreen => Box::new(EntryScreen::new()),
                 SceneChange::Game{level, retry, cheat} => Box::new(Game::new(level, retry, cheat)),
-                SceneChange::Separator => Box::new(Separator::new())
+                SceneChange::Separator => Box::new(Separator::new()),
+                SceneChange::Complete => Box::new(Complete::new()),
+
             };
         }
 

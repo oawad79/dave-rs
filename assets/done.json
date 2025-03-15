@@ -17,7 +17,7 @@
             5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
          "height":12,
          "id":1,
-         "name":"Tile Layer 1",
+         "name":"platform",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,

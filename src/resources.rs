@@ -7,6 +7,7 @@ pub struct Resources {
     pub levels: Vec<String>,
     pub intro_map_json: String,
     pub separator_map_json: String,
+    pub done_map_json: String,
     pub font: Font,
     pub numbers: Vec<Texture2D>,
     pub monsters: Vec<Texture2D>,
@@ -72,6 +73,7 @@ impl Resources {
 
         let intro_map_json = load_string("intro.json").await.unwrap();
         let separator_map_json = load_string("seperator.json").await.unwrap();
+        let done_map_json = load_string("done.json").await.unwrap();
 
         let font = load_ttf_font("fonts/MightySouly-lxggD.ttf").await.unwrap();
         
@@ -91,6 +93,7 @@ impl Resources {
             levels,
             intro_map_json,
             separator_map_json,
+            done_map_json,
             font,
             numbers,
             monsters,
