@@ -128,7 +128,7 @@ impl Monster {
         // Create the default draw parameters
         let mut draw_params = DrawTextureParams {
             dest_size: Some(vec2(m.width(), m.height())),
-            flip_y: true,
+            //flip_y: true,
             ..Default::default()
         };
 
