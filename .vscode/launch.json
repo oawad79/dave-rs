@@ -12,5 +12,8 @@
             "args": [],
             "cwd": "${workspaceFolder}"
         }
-    ]
+    ],
+    "env": {
+        "RUST_LOG": "info"
+    }
 }

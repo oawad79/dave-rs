@@ -8,7 +8,7 @@
 
 //this is required to prevent macroquad from opening a 
 //console window in addition to the game window
-#![windows_subsystem = "windows"]
+//#![windows_subsystem = "windows"]
 
 mod bullet;
 mod entry_screen;
@@ -29,7 +29,7 @@ use macroquad::prelude::{collections::storage, *};
 
 pub enum SceneChange {
     EntryScreen,
-    Game{level: u32, retry: bool, cheat: bool},
+    Game{level: u32, retry: bool, cheat: bool, warp_zone: bool},
     Separator,
     Complete
 }
@@ -54,7 +54,6 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    
     //macroquad::logging::info!("started program..!!!");
 
     set_pc_assets_folder("assets");
@@ -80,7 +79,7 @@ async fn main() {
         if let Some(change) = change {
             scene = match change {
                 SceneChange::EntryScreen => Box::new(EntryScreen::new()),
-                SceneChange::Game{level, retry, cheat} => Box::new(Game::new(level, retry, cheat)),
+                SceneChange::Game{level, retry, cheat, warp_zone} => Box::new(Game::new(level, retry, cheat, warp_zone)),
                 SceneChange::Separator => Box::new(Separator::new()),
                 SceneChange::Complete => Box::new(Complete::new()),
 
@@ -104,7 +103,7 @@ async fn main() {
             {
                 if is_key_down(*key) {
                     if let Ok(level) = u32::try_from(i) {
-                        scene = Box::new(Game::new(level, false, true));
+                        scene = Box::new(Game::new(level, false, true, false));
                     }
                 }
             }

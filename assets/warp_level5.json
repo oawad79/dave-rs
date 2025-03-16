@@ -73,6 +73,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":7,
+         "name":"player",
+         "objects":[
+                {
+                 "gid":1042,
+                 "height":32,
+                 "id":53,
+                 "name":"dave",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":32,
+                 "y":64
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":3,
          "name":"water",
          "objects":[
@@ -704,8 +727,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":53,
+ "nextlayerid":8,
+ "nextobjectid":54,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -788,6 +811,58 @@
          "tilecount":1,
          "tileheight":24,
          "tilewidth":344
+        }, 
+        {
+         "columns":1,
+         "firstgid":1042,
+         "image":"images\/dave_idle.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"dave_idle",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":3,
+         "firstgid":1043,
+         "image":"images\/climb-sheet.png",
+         "imageheight":32,
+         "imagewidth":96,
+         "margin":0,
+         "name":"climb-sheet",
+         "spacing":0,
+         "tilecount":3,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1046,
+         "image":"images\/dave_jump.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"dave_jump",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":1047,
+         "image":"images\/dave_walk.png",
+         "imageheight":32,
+         "imagewidth":64,
+         "margin":0,
+         "name":"dave_walk",
+         "spacing":0,
+         "tilecount":2,
+         "tileheight":32,
+         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",

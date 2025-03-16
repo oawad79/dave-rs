@@ -7,6 +7,7 @@ static PROJECT_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets");
 
 pub struct Resources {
     pub levels: Vec<String>,
+    pub warp_zones: HashMap<i32, String>,
     pub intro_map_json: String,
     pub separator_map_json: String,
     pub done_map_json: String,
@@ -34,6 +35,21 @@ impl Resources {
             levels.push(Self::load_embedded_string(entry.path().file_name().unwrap().to_str().unwrap()));
         }); 
 
+        let mut warp_zones: HashMap<i32, String> = HashMap::new();
+        let warp_zones_files: Vec<_> = PROJECT_DIR.find("warp_level*.json").expect("Failed to load warp levels").collect();
+        // warp_zones_files.sort_by(|a, b| {
+        //     let num_a: u32 = a.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(); 
+        //     let num_b: u32 = b.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(); 
+        //     num_a.cmp(&num_b)
+        // });
+
+        warp_zones_files.iter().for_each(|entry| {
+            warp_zones.insert(
+                entry.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(), 
+                Self::load_embedded_string(entry.path().file_name().unwrap().to_str().unwrap())
+            );
+        }); 
+
         let intro_map_json = Self::load_embedded_string("intro.json");
         let separator_map_json = Self::load_embedded_string("seperator.json");
         let done_map_json = Self::load_embedded_string("done.json");
@@ -54,6 +70,7 @@ impl Resources {
 
         Ok(Self { 
             levels,
+            warp_zones,
             intro_map_json,
             separator_map_json,
             done_map_json,

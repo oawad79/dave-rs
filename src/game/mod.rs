@@ -16,6 +16,7 @@ use crate::{
     Scene, SceneChange
 };
 
+
 const EXPLOSION_DURATION: f32 = 2.0;
 
 
@@ -44,15 +45,25 @@ pub struct Game {
     gun: Option<GameObject>,
     cheat: bool,
     monsters: Vec<Monster>,
-    jetpack: Option<GameObject>
+    jetpack: Option<GameObject>,
+    warp_zone: Option<Rect>
+    
 }
 
 impl Game {
-    pub fn new(level: u32, retry: bool, cheat: bool) -> Self {
+    pub fn new(level: u32, retry: bool, cheat: bool, warp_zone:bool) -> Self {
         
         let resources = storage::get::<Resources>();
+        
+        let map_data = if warp_zone {
+            &resources.warp_zones.get(&i32::try_from(level).unwrap()).unwrap()
+        }
+        else {
+            &resources.levels[(if level == 0 {9} else {level - 1}) as usize]
+        };
+        
         let tiled_map = load_map(
-            &resources.levels[(if level == 0 {9} else {level - 1}) as usize],
+            &map_data,
             &[
                 ("images/mytileset.png", resources.get_texture("mytileset").clone()),
                 ("images/dave_walk.png", resources.get_texture("dave_walk").clone()),
@@ -216,6 +227,21 @@ impl Game {
         else {
             vec![]
         };
+        
+        let warp_zone = if tiled_map.contains_layer("warp_zone") {
+            let go = tiled_map.layers.get("warp_zone").unwrap().objects.first().unwrap();
+            Some(Rect {
+                x: go.world_x,
+                y: go.world_y,
+                w: go.world_w,
+                h: go.world_h,
+            })
+                
+        }
+        else {
+            None
+        };
+
 
         Self {
             world,
@@ -242,7 +268,8 @@ impl Game {
             gun,
             cheat,
             monsters,
-            jetpack
+            jetpack,
+            warp_zone
         }
     }
 
@@ -606,6 +633,12 @@ impl Scene for Game {
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
+        if let Some(wz) = &self.warp_zone {
+            if Player::overlaps(pos, wz) {
+                return Some(SceneChange::Game{level: self.score_board.level, retry: false, cheat: self.cheat, warp_zone: true});
+            }
+        }
+
         // Check for collision between player and jetpack
         if let Some(j) = &self.jetpack { 
             if !self.player.has_jetpack && Player::overlaps(pos, &Rect::new(
@@ -667,14 +700,9 @@ impl Scene for Game {
             self.score_board.lives -= 1;
             self.score_board.collectibles = self.collectibles.clone();
             self.score_board.monsters = self.monsters.clone();
-            // TODO
-            // let actor = self.world.add_actor(vec2(self.player_loc.world_x, self.player_loc.world_y - 32.0), 32, 32);
-            // self.player = Player::new(actor, 
-            //     self.score_board.gun_captured, self.score_board.jetpack_captured);
-            
             storage::store(self.score_board.clone());
             
-            return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat});
+            return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat, warp_zone: false});
             
         }
         
