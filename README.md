@@ -1,8 +1,8 @@
-# Dave-RS
+# Dangerous Dave - Rust Edition
 
 A 2D platformer game written in Rust using macroquad, inspired by the classic "Dangerous Dave" game.
 
-![Dave-RS Game](https://via.placeholder.com/800x400?text=Dave-RS+Screenshot)
+![Dave-RS Game](dave.png)
 
 ## 🎮 About
 
@@ -47,6 +47,8 @@ cargo run
 - **Left Ctrl** : Shoot
 - **ESC**: Pause/Menu
 - **F1**: Help 
+- **Ctrl-A**: Toggle Full/Windowed Mode
+- **Ctrl-[1-9, 0]**: Cheats to Skip to levels, 0 for Level 10  
 
 ## 🛠️ Technical Details
 
