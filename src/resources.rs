@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use macroquad::{audio::{load_sound, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
-use glob::glob;
+use include_dir::{include_dir, Dir};
+use macroquad::{audio::{load_sound_from_bytes, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
+
+static PROJECT_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets");
 
 pub struct Resources {
     pub levels: Vec<String>,
@@ -17,74 +19,35 @@ pub struct Resources {
 
 impl Resources {
     async fn new() -> Result<Self, macroquad::Error> {
-        let mut sounds_keys = HashMap::new();
-        let mut textures_keys = HashMap::new();
-
-        // Load sounds
-        for entry in glob("assets/sounds/*.wav").expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => {
-                    let sound = load_sound(
-                            format!("sounds/{}", path.file_name().unwrap().to_str().unwrap()).as_str()
-                        ).await?;
-                    sounds_keys.insert(
-                        path.file_stem().unwrap().to_os_string().into_string().unwrap(), 
-                        sound
-                    );
-                }
-                Err(e) => panic!("{e:?}"),
-            }
-        }
-
-        // Load textures
-        for entry in glob("assets/images/*.png").expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => {
-                    let texture = load_texture(
-                            format!("images/{}", path.file_name().unwrap().to_str().unwrap()).as_str()
-                        ).await?;
-                    textures_keys.insert(
-                        path.file_stem().unwrap().to_os_string().into_string().unwrap(), 
-                        texture
-                    );
-                }
-                Err(e) => panic!("{e:?}"),
-            }
-        }
+        let sounds_keys: HashMap<String, Sound> = Self::load_embedded_sounds("sounds/*.wav").await;
+        let textures_keys = Self::load_embedded_textures("images/*.png");
         
         let mut levels: Vec<String> = Vec::new();
-        
-        let mut levels_files: Vec<_> = glob("assets/level*.json").expect("Failed to load levels").collect();
+        let mut levels_files: Vec<_> = PROJECT_DIR.find("level*.json").expect("Failed to load levels").collect();
         levels_files.sort_by(|a, b| {
-            let num_a: u32 = a.as_ref().unwrap().file_stem().unwrap().to_str().unwrap()[5..].parse().unwrap(); 
-            let num_b: u32 = b.as_ref().unwrap().file_stem().unwrap().to_str().unwrap()[5..].parse().unwrap(); 
+            let num_a: u32 = a.path().file_stem().unwrap().to_str().unwrap()[5..].parse().unwrap(); 
+            let num_b: u32 = b.path().file_stem().unwrap().to_str().unwrap()[5..].parse().unwrap(); 
             num_a.cmp(&num_b)
         });
 
-        for entry in levels_files {
-            match entry {
-                Ok(path) => {
-                    let level = load_string(path.file_name().unwrap().to_str().unwrap()).await.unwrap();
-                    levels.push(level);
-                },
-                Err(e) => panic!("{e:?}")
-            }     
-        }
+        levels_files.iter().for_each(|entry| {
+            levels.push(Self::load_embedded_string(entry.path().file_name().unwrap().to_str().unwrap()));
+        }); 
 
-        let intro_map_json = load_string("intro.json").await.unwrap();
-        let separator_map_json = load_string("seperator.json").await.unwrap();
-        let done_map_json = load_string("done.json").await.unwrap();
-
-        let font = load_ttf_font("fonts/MightySouly-lxggD.ttf").await.unwrap();
+        let intro_map_json = Self::load_embedded_string("intro.json");
+        let separator_map_json = Self::load_embedded_string("seperator.json");
+        let done_map_json = Self::load_embedded_string("done.json");
+        
+        let font = load_ttf_font_from_bytes(PROJECT_DIR.get_file("fonts/MightySouly-lxggD.ttf").unwrap().contents()).unwrap();
         
         let mut numbers: Vec<Texture2D> = Vec::new();
         for i in 0..=9 {
-            numbers.push(load_texture(&format!("images/num{i}.png")).await.unwrap());
+            numbers.push(Self::load_embedded_texture(&format!("images/num{i}.png")));
         }
 
         let mut monsters: Vec<Texture2D> = Vec::new();
         for i in 1..=8 {
-            monsters.push(load_texture(&format!("images/monster{i}.png")).await.unwrap());
+            monsters.push(Self::load_embedded_texture(&format!("images/monster{i}.png")));
         }
         
         //build_textures_atlas();
@@ -102,6 +65,38 @@ impl Resources {
         })
     }
 
+    fn load_embedded_string(path: &str) -> String {
+        let file = PROJECT_DIR.get_file(path).unwrap();
+        str::from_utf8(file.contents()).unwrap().to_string()
+    }
+
+    fn load_embedded_textures(path: &str) -> HashMap<String, Texture2D> {
+        let mut textures_keys: HashMap<String, Texture2D> = HashMap::new();
+        PROJECT_DIR.find(path).unwrap().for_each(|entry| {
+            textures_keys.insert(
+                entry.path().file_stem().unwrap().to_os_string().into_string().unwrap(), 
+                Self::load_embedded_texture(entry.path().display().to_string().as_str())
+            );
+        });
+        
+        textures_keys
+    }
+
+    fn load_embedded_texture(path: &str) -> Texture2D {
+        let file = PROJECT_DIR.get_file(path).unwrap();
+        Texture2D::from_file_with_format(file.contents(), Some(ImageFormat::Png))
+    }
+
+    async fn load_embedded_sounds(path: &str) -> HashMap<String, Sound> {
+        let mut sounds_keys: HashMap<String, Sound> = HashMap::new();
+        for entry in PROJECT_DIR.find(path).unwrap() {
+            let f = PROJECT_DIR.get_file(entry.path().display().to_string()).unwrap();
+            let s = load_sound_from_bytes(f.contents()).await.unwrap();
+            sounds_keys.insert(f.path().file_stem().unwrap().to_os_string().into_string().unwrap(), s);
+        }
+        sounds_keys
+    }
+
     pub fn get_sound(&self, sound_key: &str) -> &Sound {
         self.sounds_keys.get(sound_key).unwrap()
     }
@@ -110,7 +105,6 @@ impl Resources {
         self.textures_keys.get(texture_key).unwrap()
     }
 
-   
     pub async fn load() -> Result<(), macroquad::Error> {
         let resources_loading = start_coroutine(async {
             let resources = Self::new().await.unwrap();

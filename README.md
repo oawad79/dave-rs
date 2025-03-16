@@ -80,8 +80,7 @@ This project is under active development. New features and improvements are bein
 ## 🙏 Credits
 
 - Original "Dangerous Dave" game by John Romero
-- Font assets from [source]
-- Sound effects from [source]
+- Macroquad library by Fedor Logachev
 
 ## 🤝 Contributing
 
