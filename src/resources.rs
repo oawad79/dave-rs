@@ -66,7 +66,7 @@ impl Resources {
     }
 
     fn load_embedded_string(path: &str) -> String {
-        let file = PROJECT_DIR.get_file(path).unwrap();
+        let file = PROJECT_DIR.get_file(path).unwrap_or_else(|| panic!("Unable to load string : {path}"));
         str::from_utf8(file.contents()).unwrap().to_string()
     }
 
@@ -91,8 +91,10 @@ impl Resources {
         let mut sounds_keys: HashMap<String, Sound> = HashMap::new();
         for entry in PROJECT_DIR.find(path).unwrap() {
             let f = PROJECT_DIR.get_file(entry.path().display().to_string()).unwrap();
-            let s = load_sound_from_bytes(f.contents()).await.unwrap();
-            sounds_keys.insert(f.path().file_stem().unwrap().to_os_string().into_string().unwrap(), s);
+            sounds_keys.insert(
+                f.path().file_stem().unwrap().to_os_string().into_string().unwrap(), 
+                load_sound_from_bytes(f.contents()).await.unwrap()
+            );
         }
         sounds_keys
     }

@@ -6,6 +6,10 @@
 //     clippy::cargo,
 // )]
 
+//this is required to prevent macroquad from opening a 
+//console window in addition to the game window
+#![windows_subsystem = "windows"]
+
 mod bullet;
 mod entry_screen;
 mod game;
@@ -51,7 +55,7 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     
-    macroquad::logging::info!("started program..!!!");
+    //macroquad::logging::info!("started program..!!!");
 
     set_pc_assets_folder("assets");
 

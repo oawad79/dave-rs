@@ -51,7 +51,6 @@ impl Game {
     pub fn new(level: u32, retry: bool, cheat: bool) -> Self {
         
         let resources = storage::get::<Resources>();
-        //println!("levels = {:?}", &resources.levels);
         let tiled_map = load_map(
             &resources.levels[(if level == 0 {9} else {level - 1}) as usize],
             &[
