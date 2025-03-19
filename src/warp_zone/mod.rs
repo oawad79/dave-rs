@@ -1,14 +1,22 @@
-use macroquad::{audio::{play_sound, stop_sound, PlaySoundParams}, color::Color, math::{vec2, Rect}, prelude::collections::storage, text::{draw_text_ex, TextParams}, window::screen_height};
+use macroquad::{
+    audio::{play_sound, stop_sound, PlaySoundParams}, 
+    color::Color, math::{vec2, Rect}, 
+    prelude::collections::storage, 
+    text::{draw_text_ex, TextParams}, time::get_frame_time
+};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map};
 
 use crate::{player::Player, resources::Resources, score_board::ScoreBoard, Scene, SceneChange};
+
+const WARP_ZONE_TIME: f32 = 2.0;
 
 pub struct WarpZone {
     player: Player,
     score_board: ScoreBoard,
     world: World,
     sound_playing: bool,
+    timer: f32,
 }
 
 impl WarpZone {
@@ -56,6 +64,7 @@ impl WarpZone {
             score_board,
             world,
             sound_playing: false,
+            timer: WARP_ZONE_TIME
         }
     }
 }
@@ -73,7 +82,13 @@ impl Scene for WarpZone {
             self.sound_playing = true;
         }
 
-        self.player.update(&mut self.world);
+        if self.timer > 0.0 {
+            self.timer -= 400.0 * get_frame_time();
+        }
+        else {
+            self.player.update(&mut self.world);
+            self.timer = WARP_ZONE_TIME;
+        }
 
         if pos.y > 384.0 {
             stop_sound(resources.get_sound("fall"));
@@ -102,7 +117,7 @@ impl Scene for WarpZone {
         draw_text_ex(
             "WARP",
             60.0,
-            screen_height() / 2.0 - 100.0,
+            200.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 60,     
@@ -114,7 +129,7 @@ impl Scene for WarpZone {
         draw_text_ex(
             "ZONE",
             410.0,
-            screen_height() / 2.0 - 100.0,
+            200.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 60,     
