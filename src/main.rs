@@ -72,6 +72,8 @@ async fn main() {
     let resources = storage::get::<Resources>();
 
     let mut show_quit = false;
+    let mut show_help = false;
+    let mut show_restart = false;
 
     loop {
         clear_background(BLACK);
@@ -91,6 +93,13 @@ async fn main() {
         }
 
         scene.draw();
+
+        handle_help_menu(&resources, &mut show_help);
+        
+        if handle_restart_menu(&resources, &mut show_restart) {
+            scene = Box::new(EntryScreen::new());
+            show_restart = false;
+        }
 
         if handle_quit_menu(&resources, &mut show_quit) {
             break;
@@ -135,14 +144,14 @@ fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
         set_default_camera();
         *show_quit = true;
         draw_texture_ex(
-            resources.get_texture("quit"),
-            screen_width() / 2.0 - 120.0,
+            resources.get_texture("exit"),
+            screen_width() / 2.0 - 150.0,
             screen_height() / 2.0 - 20.0,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("quit").width() * 0.7, 
-                    resources.get_texture("quit").height() * 0.7)
+                    resources.get_texture("exit").width(), 
+                    resources.get_texture("exit").height())
                 ), 
                 ..Default::default()
             },
@@ -158,4 +167,64 @@ fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
     }
 
     false
+}
+
+fn handle_help_menu(resources: &Resources, show_help: &mut bool) {
+    if is_key_down(KeyCode::F1) || *show_help {
+        //This helps when we scroll, the quit dialog will scroll with the screen
+        set_default_camera();
+        *show_help = true;
+        draw_texture_ex(
+            resources.get_texture("help"),
+            screen_width() / 2.0 - 220.0,
+            screen_height() / 2.0 - 120.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(
+                    resources.get_texture("help").width(), 
+                    resources.get_texture("help").height())
+                ), 
+                ..Default::default()
+            },
+        );
+
+        if *show_help && is_key_pressed(KeyCode::Escape) {
+            *show_help = false;
+        }
+        
+    }
+
+}
+
+fn handle_restart_menu(resources: &Resources, show_restart: &mut bool) -> bool {
+    if is_key_down(KeyCode::F3) || *show_restart {
+        //This helps when we scroll, the quit dialog will scroll with the screen
+        set_default_camera();
+        *show_restart = true;
+        draw_texture_ex(
+            resources.get_texture("restart"),
+            screen_width() / 2.0 - 190.0,
+            screen_height() / 2.0 - 30.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(
+                    resources.get_texture("restart").width(), 
+                    resources.get_texture("restart").height())
+                ), 
+                ..Default::default()
+            },
+        );
+
+    }
+
+    if *show_restart && is_key_down(KeyCode::Y) {
+        return true;
+    } else if *show_restart && is_key_down(KeyCode::N) {
+        *show_restart = false;
+    } else {
+        // Add an else block to satisfy clippy
+    }
+
+    false
+
 }
