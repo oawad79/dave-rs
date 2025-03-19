@@ -110,7 +110,7 @@ impl Game {
         let resources = storage::get::<Resources>();
         
         let map_data = if is_warp_zone {
-            resources.warp_zones.get(&i32::try_from(level).unwrap()).unwrap()
+            resources.warp_zones.get(&i32::try_from(if level == 0 {10} else {level}).unwrap()).unwrap()
         }
         else {
             &resources.levels[(if level == 0 {9} else {level - 1}) as usize]
@@ -683,6 +683,10 @@ impl Scene for Game {
 
         if let Some(wz) = &self.warp_zone_rect {
             if Player::overlaps(pos, wz) {
+                // self.player.has_jetpack = false;
+                // self.player.jetpack_active = false;
+                // self.player.has_gun = false;
+                self.score_board.jetpack_captured = false;
                 storage::store(self.score_board.clone());
                 return Some(SceneChange::WarpZone);
             }

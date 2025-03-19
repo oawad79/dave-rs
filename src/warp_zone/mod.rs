@@ -48,9 +48,8 @@ impl WarpZone {
         let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
     
         let score_board = storage::get::<ScoreBoard>().clone();
-
-        let player = Player::new(actor, 
-            score_board.gun_captured, score_board.jetpack_captured);
+        
+        let player = Player::new(actor, false, false);
 
         Self {
             player,
@@ -79,6 +78,10 @@ impl Scene for WarpZone {
 
         if pos.y > 384.0 {
             stop_sound(resources.get_sound("fall"));
+
+            //self.player.has_jetpack = false;
+            //self.player.jetpack_active = false;
+            //self.player.has_gun = false;
             storage::store(self.score_board.clone());
             
             if self.score_board.level == 10 {
@@ -107,7 +110,7 @@ impl Scene for WarpZone {
             142.0,
             TextParams {
                 font: Some(&resources.font), 
-                font_size: 40,     
+                font_size: 60,     
                 color: Color{r: 255.0, g: 255.0, b: 255.0, a: 1.0},  
                 ..Default::default()
             },
@@ -119,7 +122,7 @@ impl Scene for WarpZone {
             144.0,
             TextParams {
                 font: Some(&resources.font), 
-                font_size: 40,     
+                font_size: 60,     
                 color: Color{r: 255.0, g: 255.0, b: 255.0, a: 1.0},  
                 ..Default::default()
             },

@@ -40,13 +40,14 @@ impl Resources {
 
         let mut warp_zones: HashMap<i32, String> = HashMap::new();
         let warp_zones_files: Vec<_> = PROJECT_DIR.find("warp_level*.json").expect("Failed to load warp levels").collect();
-        
+        //println!("warp_zones_files = {:?}", warp_zones_files);
         warp_zones_files.iter().for_each(|entry| {
             warp_zones.insert(
                 entry.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(), 
                 Self::load_embedded_string(entry.path().file_name().unwrap().to_str().unwrap())
             );
         }); 
+        //println!("warp_zones = {:?}", warp_zones.get(&10));
 
         let intro_map_json = Self::load_embedded_string("intro.json");
         let separator_map_json = Self::load_embedded_string("seperator.json");
