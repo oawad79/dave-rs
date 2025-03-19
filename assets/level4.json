@@ -1303,6 +1303,19 @@
          "tilecount":1,
          "tileheight":32,
          "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1052,
+         "image":"images\/player_jetpack.png",
+         "imageheight":32,
+         "imagewidth":36,
+         "margin":0,
+         "name":"player_jetpack",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",

@@ -723,6 +723,9 @@ impl Scene for Game {
             32.0,
         )) {
             self.score_board.game_won = false;
+            self.score_board.jetpack_captured = false;
+            self.score_board.gun_captured = false;
+            
             play_sound_once(resources.get_sound("win"));
             if self.score_board.level == 0 {
                 self.score_board.level = 10;
