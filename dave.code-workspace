@@ -4,28 +4,13 @@
 			"path": "."
 		},
 		{
-			"path": "../fishgame-macroquad"
-		},
-		{
 			"path": "../breakout"
 		},
 		{
-			"path": "../macroquad-book-game"
+			"path": "../hello-rust"
 		},
 		{
-			"path": "../brkjam2025-RobomaidRush"
-		},
-		{
-			"path": "../miniquad"
-		},
-		{
-			"path": "../../CLionProjects/opengl-training"
-		},
-		{
-			"path": "../egui-miniquad"
-		},
-		{
-			"path": "../iced-test"
+			"path": "../HandsOnRust"
 		}
 	],
 	"settings": {

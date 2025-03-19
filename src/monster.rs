@@ -27,7 +27,28 @@ pub struct Monster {
     pub rotate: bool,
     rotation_degree: f32,
     rotation_timer: f32,
-    rotate_y_axis: bool
+    rotate_y_axis: bool,
+    pub kill_value: u32,
+}
+
+impl Default for Monster {
+    fn default() -> Self {
+        Self {
+            location: PolyPoint { x: 0.0, y: 0.0 },
+            waypoints: Vec::new(),
+            current_waypoint: 0,
+            alive: true,
+            bullets: Vec::new(),
+            name: String::new(),
+            move_timer: 0.0,
+            bullet_timer: 0.0,
+            rotate: false,
+            rotation_degree: 0.0,
+            rotation_timer: 0.0,
+            rotate_y_axis: false,
+            kill_value: 200
+        }
+    }
 }
 
 impl Monster {
@@ -68,17 +89,10 @@ impl Monster {
                             x: monster_obj.x,
                             y: monster_obj.y
                         },
-                        current_waypoint: 0, 
-                        alive: true,
-                        waypoints: Vec::new(),
-                        bullets: vec![],
                         name: monster_obj.name.clone(),
-                        move_timer: 0.1,
-                        bullet_timer: 6.0,
                         rotate: monster_obj.properties.iter().any(|e| e.name == "rotate"),
-                        rotation_degree: 0.0,
-                        rotation_timer: MONSTER_ROTATION_TIMER,
-                        rotate_y_axis: monster_obj.properties.iter().any(|e| e.name == "y-axis") 
+                        rotate_y_axis: monster_obj.properties.iter().any(|e| e.name == "y-axis"),
+                        ..Default::default()
                     };
 
                     let polygon_pts = monster_obj.polygon.as_ref().unwrap();

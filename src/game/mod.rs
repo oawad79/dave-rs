@@ -19,6 +19,59 @@ use crate::{
 
 const EXPLOSION_DURATION: f32 = 2.0;
 
+struct CollectibleData {
+    offset: f32,
+    value: u32,
+}
+
+enum CollectibleType {
+    Ruby,
+    Diamond,
+    Red,
+    Loli,
+    Cup,
+    Yussuk,
+    King,
+}
+
+impl CollectibleType {
+    fn from(name: &str) -> Self {
+        match name {
+            "ruby" => CollectibleType::Ruby, 
+            "diamond" => CollectibleType::Diamond,
+            "red" => CollectibleType::Red,
+            "loli" => CollectibleType::Loli,
+            "cup" => CollectibleType::Cup,
+            "yussuk" => CollectibleType::Yussuk,
+            "king" => CollectibleType::King,
+            _ => panic!("Invalid collectible type: {}", name),
+        }
+    }
+
+    pub fn data(&self) -> CollectibleData {
+        match self {
+            CollectibleType::Ruby => CollectibleData { offset: 0.0, value: 50 },
+            CollectibleType::Diamond => CollectibleData { offset: 32.0, value: 100 },
+            CollectibleType::Red => CollectibleData { offset: 64.0, value: 150 },
+            CollectibleType::Loli => CollectibleData { offset: 96.0, value: 400 },
+            CollectibleType::Cup => CollectibleData { offset: 128.0, value: 1000 },
+            CollectibleType::Yussuk => CollectibleData { offset: 160.0, value: 600 },
+            CollectibleType::King => CollectibleData { offset: 192.0, value: 700 },
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        match self {
+            CollectibleType::Ruby => "ruby",
+            CollectibleType::Diamond => "diamond",
+            CollectibleType::Red => "red",
+            CollectibleType::Loli => "loli",
+            CollectibleType::Cup => "cup",
+            CollectibleType::Yussuk => "yussuk",
+            CollectibleType::King => "king",
+        }
+    }
+}
 
 pub struct Game {
     world: World,
@@ -46,24 +99,25 @@ pub struct Game {
     cheat: bool,
     monsters: Vec<Monster>,
     jetpack: Option<GameObject>,
-    warp_zone: Option<Rect>
+    warp_zone: Option<Rect>,
+    is_warp_zone: bool
     
 }
 
 impl Game {
-    pub fn new(level: u32, retry: bool, cheat: bool, warp_zone:bool) -> Self {
+    pub fn new(level: u32, retry: bool, cheat: bool, is_warp_zone: bool) -> Self {
         
         let resources = storage::get::<Resources>();
         
-        let map_data = if warp_zone {
-            &resources.warp_zones.get(&i32::try_from(level).unwrap()).unwrap()
+        let map_data = if is_warp_zone {
+            resources.warp_zones.get(&i32::try_from(level).unwrap()).unwrap()
         }
         else {
             &resources.levels[(if level == 0 {9} else {level - 1}) as usize]
         };
         
         let tiled_map = load_map(
-            &map_data,
+            map_data,
             &[
                 ("images/mytileset.png", resources.get_texture("mytileset").clone()),
                 ("images/dave_walk.png", resources.get_texture("dave_walk").clone()),
@@ -269,7 +323,8 @@ impl Game {
             cheat,
             monsters,
             jetpack,
-            warp_zone
+            warp_zone,
+            is_warp_zone
         }
     }
 
@@ -306,19 +361,11 @@ impl Game {
 
     fn draw_collectibles(&self, tiled_map: &Map) {
         for diamond in &self.collectibles {
-            let x = match diamond.name.as_str() {
-                "ruby" => 0.0,
-                "diamond" => 32.0,
-                "red" => 64.0,
-                "loli" => 96.0,
-                "cup" => 128.0,
-                "yussuk" => 160.0,
-                _ => 192.0
-            };
+            let offset = CollectibleType::from(diamond.name.as_str()).data().offset;
 
             tiled_map.spr_ex(
                 "collectibles",
-                Rect::new(x, 0.0, 32.0, 32.0),
+                Rect::new(offset, 0.0, 32.0, 32.0),
                 Rect::new(diamond.world_x, diamond.world_y - 32.0, 32.0, 32.0),
             );
         }
@@ -448,12 +495,12 @@ impl Game {
     
             if Player::overlaps(pos, &jewellery_rect) {
                 if !self.score_board.game_won && jewellery.name == "cup" {
-                    self.score_board.score += 100;
+                    self.score_board.score += CollectibleType::Cup.data().value;
                     self.score_board.game_won = true;
                     play_sound_once(resources.get_sound("trophy"));
                 }
                 else {
-                    self.score_board.score += 10;
+                    self.score_board.score += CollectibleType::from(&jewellery.name).data().value;
                     jewellery.collected = Option::Some(true);
                     play_sound_once(resources.get_sound("getitem"));
                 }
@@ -496,6 +543,7 @@ impl Game {
                 if Player::overlaps(pos, &monster.monster_rectangle()) {
                     self.player.is_dead = true;
                     monster.alive = false;
+                    self.score_board.score += monster.kill_value;
                     
                     self.monster_explosion_active = true;
                     self.monster_explosion_timer = EXPLOSION_DURATION;
@@ -682,6 +730,7 @@ impl Scene for Game {
             else {
                 self.score_board.level += 1;
             }
+            self.score_board.score += 2000;
             storage::store(self.score_board.clone());
             stop_sound(resources.get_sound("jetPackActivated"));
             return Some(SceneChange::Separator);
@@ -701,7 +750,6 @@ impl Scene for Game {
             self.score_board.collectibles = self.collectibles.clone();
             self.score_board.monsters = self.monsters.clone();
             storage::store(self.score_board.clone());
-            
             return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat, warp_zone: false});
             
         }

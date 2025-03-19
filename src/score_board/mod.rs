@@ -94,7 +94,7 @@ impl Scene for ScoreBoard {
 
         draw_texture_ex(
             resources.get_texture("level"),
-            self.position.0 + 220.0,
+            self.position.0 + 240.0,
             5.0,
             WHITE,
             DrawTextureParams {
@@ -110,7 +110,7 @@ impl Scene for ScoreBoard {
         for (i, n) in levels.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                self.position.0 + 320.0 + (i as f32 * 20.0),
+                self.position.0 + 340.0 + (i as f32 * 20.0),
                 7.0,
                 WHITE,
                 DrawTextureParams {
