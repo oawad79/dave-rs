@@ -674,9 +674,6 @@ impl Scene for Game {
 
         if let Some(wz) = &self.warp_zone_rect {
             if Player::overlaps(pos, wz) {
-                // self.player.has_jetpack = false;
-                // self.player.jetpack_active = false;
-                // self.player.has_gun = false;
                 self.score_board.jetpack_captured = false;
                 storage::store(self.score_board.clone());
                 return Some(SceneChange::WarpZone);
@@ -818,12 +815,8 @@ impl Scene for Game {
             bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
         });
 
-        
-        
-
         None
     }
-
     fn draw(&self) {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();
