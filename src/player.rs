@@ -12,7 +12,7 @@ use macroquad_tiled::Map;
 
 use crate::{bullet::{Bullet, BulletDirection}, score_board::{self, ScoreBoard}, Resources};
 
-const GRAVITY: f32 = 500.0;
+const GRAVITY: f32 = 400.0;
 const JUMP_VELOCITY: f32 = -280.0;
 const JETPACK_VELOCITY: f32 = 100.0;
 

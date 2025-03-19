@@ -683,7 +683,6 @@ impl Scene for Game {
 
         if let Some(wz) = &self.warp_zone_rect {
             if Player::overlaps(pos, wz) {
-                //return Some(SceneChange::Game{level: self.score_board.level, retry: false, cheat: self.cheat, warp_zone: true});
                 storage::store(self.score_board.clone());
                 return Some(SceneChange::WarpZone);
             }
@@ -753,7 +752,10 @@ impl Scene for Game {
             } 
             
             self.score_board.lives -= 1;
-            self.score_board.collectibles = self.collectibles.clone();
+            if !self.is_warp_zone {
+                self.score_board.collectibles = self.collectibles.clone();
+            }
+            
             self.score_board.monsters = self.monsters.clone();
             storage::store(self.score_board.clone());
             return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat, warp_zone: false});
