@@ -57,8 +57,6 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    //macroquad::logging::info!("started program..!!!");
-
     set_pc_assets_folder("assets");
 
     let mut is_full_screen: bool = false;
@@ -91,22 +89,42 @@ async fn main() {
             };
         }
 
-
         scene.draw();
 
-        handle_help_menu(&resources, &mut show_help);
+        //handle_help_menu(&resources, &mut show_help);
+        handle_menu(
+            &resources,
+            &mut show_help,
+            KeyCode::F1,
+            "help",
+            vec2(-220.0, -120.0),
+            None,
+        );
         
-        if handle_restart_menu(&resources, &mut show_restart) {
+        if handle_menu(
+            &resources,
+            &mut show_restart,
+            KeyCode::F3,
+            "restart",
+            vec2(-190.0, -30.0),
+            Some(KeyCode::Y),
+        ) {
             scene = Box::new(EntryScreen::new());
             show_restart = false;
         }
 
-        if handle_quit_menu(&resources, &mut show_quit) {
+        if handle_menu(
+            &resources,
+            &mut show_quit,
+            KeyCode::Escape,
+            "exit",
+            vec2(-150.0, -20.0),
+            Some(KeyCode::Y),
+        ) {
             break;
         }
 
         if is_key_down(KeyCode::LeftControl) {
-            // Check if any number key (0-9) is pressed
             for (i, key) in [
                 KeyCode::Key0, KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4,
                 KeyCode::Key5, KeyCode::Key6, KeyCode::Key7, KeyCode::Key8, KeyCode::Key9,
@@ -133,98 +151,43 @@ async fn main() {
 
         next_frame().await;
     }
-
-   
-
 }
 
-fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
-    if is_key_down(KeyCode::Escape) || *show_quit {
-        //This helps when we scroll, the quit dialog will scroll with the screen
+fn handle_menu(
+    resources: &Resources,
+    show_menu: &mut bool,
+    key_to_show: KeyCode,
+    texture_name: &str,
+    texture_offset: Vec2,
+    confirm_key: Option<KeyCode>,
+) -> bool {
+    if is_key_down(key_to_show) || *show_menu {
         set_default_camera();
-        *show_quit = true;
+        *show_menu = true;
         draw_texture_ex(
-            resources.get_texture("exit"),
-            screen_width() / 2.0 - 150.0,
-            screen_height() / 2.0 - 20.0,
+            resources.get_texture(texture_name),
+            screen_width() / 2.0 + texture_offset.x,
+            screen_height() / 2.0 + texture_offset.y,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("exit").width(), 
-                    resources.get_texture("exit").height())
-                ), 
+                    resources.get_texture(texture_name).width(),
+                    resources.get_texture(texture_name).height(),
+                )),
                 ..Default::default()
             },
         );
     }
 
-    if *show_quit && is_key_down(KeyCode::Y) {
-        return true;
-    } else if *show_quit && is_key_down(KeyCode::N) {
-        *show_quit = false;
-    } else {
-        // Add an else block to satisfy clippy
-    }
-
-    false
-}
-
-fn handle_help_menu(resources: &Resources, show_help: &mut bool) {
-    if is_key_pressed(KeyCode::F1) || *show_help {
-        //This helps when we scroll, the quit dialog will scroll with the screen
-        set_default_camera();
-        *show_help = true;
-        draw_texture_ex(
-            resources.get_texture("help"),
-            screen_width() / 2.0 - 220.0,
-            screen_height() / 2.0 - 120.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture("help").width(), 
-                    resources.get_texture("help").height())
-                ), 
-                ..Default::default()
-            },
-        );
-
-        if *show_help && is_key_pressed(KeyCode::Escape) {
-            *show_help = false;
+    if let Some(confirm_key) = confirm_key {
+        if *show_menu && is_key_down(confirm_key) {
+            return true;
+        } else if *show_menu && is_key_down(KeyCode::N) {
+            *show_menu = false;
         }
-        
-    }
-
-}
-
-fn handle_restart_menu(resources: &Resources, show_restart: &mut bool) -> bool {
-    if is_key_down(KeyCode::F3) || *show_restart {
-        //This helps when we scroll, the quit dialog will scroll with the screen
-        set_default_camera();
-        *show_restart = true;
-        draw_texture_ex(
-            resources.get_texture("restart"),
-            screen_width() / 2.0 - 190.0,
-            screen_height() / 2.0 - 30.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture("restart").width(), 
-                    resources.get_texture("restart").height())
-                ), 
-                ..Default::default()
-            },
-        );
-
-    }
-
-    if *show_restart && is_key_down(KeyCode::Y) {
-        return true;
-    } else if *show_restart && is_key_down(KeyCode::N) {
-        *show_restart = false;
-    } else {
-        // Add an else block to satisfy clippy
+    } else if *show_menu && is_key_pressed(KeyCode::Escape) {
+        *show_menu = false;
     }
 
     false
-
 }
