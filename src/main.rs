@@ -88,9 +88,9 @@ async fn main() {
                 SceneChange::WarpZone => Box::new(WarpZone::new()),
                 SceneChange::Separator => Box::new(Separator::new()),
                 SceneChange::Complete => Box::new(Complete::new()),
-
             };
         }
+
 
         scene.draw();
 
@@ -170,7 +170,7 @@ fn handle_quit_menu(resources: &Resources, show_quit: &mut bool) -> bool {
 }
 
 fn handle_help_menu(resources: &Resources, show_help: &mut bool) {
-    if is_key_down(KeyCode::F1) || *show_help {
+    if is_key_pressed(KeyCode::F1) || *show_help {
         //This helps when we scroll, the quit dialog will scroll with the screen
         set_default_camera();
         *show_help = true;
