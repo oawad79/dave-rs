@@ -200,9 +200,9 @@ impl Player {
             self.speed.y = JUMP_VELOCITY;
         }
         
-        if self.simulate_right || is_key_down(KeyCode::Right) {
+        if !self.attach && (self.simulate_right || is_key_down(KeyCode::Right)) {
             self.speed.x = 100.0;
-        } else if self.simulate_left || is_key_down(KeyCode::Left) {
+        } else if !self.attach && (self.simulate_left || is_key_down(KeyCode::Left)) {
             self.speed.x = -100.0;
         } else {
             self.speed.x = 0.;
