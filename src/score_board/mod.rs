@@ -10,6 +10,8 @@ use macroquad::{
 
 use crate::{monster::Monster, resources::Resources, Scene, SceneChange};
 
+
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct GameObject {
     pub world_x: f32,

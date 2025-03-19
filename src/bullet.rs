@@ -2,8 +2,7 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum BulletDirection {
     Left,
-    Right,
-    Still
+    Right
 }
 #[derive(Debug, Clone)]
 pub struct Bullet {

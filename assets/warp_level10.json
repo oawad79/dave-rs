@@ -66,6 +66,12 @@
                  "y":64
                 }],
          "opacity":1,
+         "properties":[
+                {
+                 "name":"attach",
+                 "type":"bool",
+                 "value":true
+                }],
          "type":"objectgroup",
          "visible":true,
          "x":0,

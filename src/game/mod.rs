@@ -7,7 +7,7 @@ use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
 use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
 
-use crate::score_board::{self, GameObject};
+use crate::score_board::GameObject;
 use crate::{
     player::Player, 
     monster::Monster, 
@@ -57,18 +57,6 @@ impl CollectibleType {
             CollectibleType::Cup => CollectibleData { offset: 128.0, value: 1000 },
             CollectibleType::Yussuk => CollectibleData { offset: 160.0, value: 600 },
             CollectibleType::King => CollectibleData { offset: 192.0, value: 700 },
-        }
-    }
-
-    pub fn as_str(&self) -> &str {
-        match self {
-            CollectibleType::Ruby => "ruby",
-            CollectibleType::Diamond => "diamond",
-            CollectibleType::Red => "red",
-            CollectibleType::Loli => "loli",
-            CollectibleType::Cup => "cup",
-            CollectibleType::Yussuk => "yussuk",
-            CollectibleType::King => "king",
         }
     }
 }
@@ -176,7 +164,8 @@ impl Game {
         world.add_static_tiled_layer(tree_static_colliders, 32., 32., width as usize, 2);
 
         let player_loc = tiled_map.layers.get("player").unwrap().objects.first().unwrap();
-
+        
+        
         let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
     
         let mut score_board = 
@@ -190,8 +179,10 @@ impl Game {
             score_board.level = level;
         }
 
+        let attach = tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.get("attach");
+
         let player = Player::new(actor, 
-            score_board.gun_captured, score_board.jetpack_captured);
+            score_board.gun_captured, score_board.jetpack_captured, attach.is_some());
 
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
         let collectibles = 
@@ -674,7 +665,7 @@ impl Scene for Game {
         if pos.y > screen_height() && !self.player.is_dead {
             let actor = self.world.add_actor(vec2(pos.x, 0.0), 32, 32);
             self.player = Player::new(actor, 
-                self.score_board.gun_captured, self.score_board.jetpack_captured);
+                self.score_board.gun_captured, self.score_board.jetpack_captured, false);
         }
 
         self.handle_collecting_valuables(&resources, pos);

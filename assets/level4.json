@@ -865,6 +865,12 @@
                  "height":32,
                  "id":82,
                  "name":"dave",
+                 "properties":[
+                        {
+                         "name":"attach",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

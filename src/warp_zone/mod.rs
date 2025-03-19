@@ -1,4 +1,4 @@
-use macroquad::{audio::{play_sound, stop_sound, PlaySoundParams}, color::Color, math::{vec2, Rect}, prelude::collections::storage, text::{draw_text_ex, TextParams}};
+use macroquad::{audio::{play_sound, stop_sound, PlaySoundParams}, color::Color, math::{vec2, Rect}, prelude::collections::storage, text::{draw_text_ex, TextParams}, window::screen_height};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map};
 
@@ -49,7 +49,7 @@ impl WarpZone {
     
         let score_board = storage::get::<ScoreBoard>().clone();
         
-        let player = Player::new(actor, false, false);
+        let player = Player::new(actor, false, false, false);
 
         Self {
             player,
@@ -73,15 +73,10 @@ impl Scene for WarpZone {
             self.sound_playing = true;
         }
 
-        //self.player.simulate_right = true;
         self.player.update(&mut self.world);
 
         if pos.y > 384.0 {
             stop_sound(resources.get_sound("fall"));
-
-            //self.player.has_jetpack = false;
-            //self.player.jetpack_active = false;
-            //self.player.has_gun = false;
             storage::store(self.score_board.clone());
             
             if self.score_board.level == 10 {
@@ -100,14 +95,14 @@ impl Scene for WarpZone {
         let resources = storage::get::<Resources>();
 
         tiled_map
-            .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 352.0), None);
+            .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 384.0), None);
         
         self.score_board.draw();
 
         draw_text_ex(
             "WARP",
             60.0,
-            142.0,
+            screen_height() / 2.0 - 100.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 60,     
@@ -119,7 +114,7 @@ impl Scene for WarpZone {
         draw_text_ex(
             "ZONE",
             410.0,
-            144.0,
+            screen_height() / 2.0 - 100.0,
             TextParams {
                 font: Some(&resources.font), 
                 font_size: 60,     

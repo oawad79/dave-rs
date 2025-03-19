@@ -50,7 +50,7 @@ impl Separator {
         let score_board = storage::get::<ScoreBoard>().clone();
 
         let player = Player::new(actor, 
-            score_board.gun_captured, score_board.jetpack_captured);
+            score_board.gun_captured, score_board.jetpack_captured, false);
 
         Self {
             player,

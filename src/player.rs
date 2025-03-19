@@ -10,7 +10,7 @@ use macroquad_platformer::{Actor, Tile, World};
 use macroquad::prelude::*;
 use macroquad_tiled::Map;
 
-use crate::{bullet::{Bullet, BulletDirection}, score_board::{self, ScoreBoard}, Resources};
+use crate::{bullet::{Bullet, BulletDirection}, Resources};
 
 const GRAVITY: f32 = 470.0;
 const JUMP_VELOCITY: f32 = -280.0;
@@ -29,11 +29,12 @@ pub struct Player {
     pub has_jetpack: bool,
     pub jetpack_active: bool,
     pub climbing: bool,
-    pub climbing_active: bool
+    pub climbing_active: bool,
+    attach: bool
 }
 
 impl Player {
-    pub fn new(collider: Actor, has_gun: bool, has_jetpack: bool) -> Self {
+    pub fn new(collider: Actor, has_gun: bool, has_jetpack: bool, attach: bool) -> Self {
         Self {
             collider,
             speed: vec2(0., 0.),
@@ -47,7 +48,8 @@ impl Player {
             has_jetpack,
             jetpack_active: false,
             climbing: false,
-            climbing_active: false
+            climbing_active: false,
+            attach
         }
     }
 
@@ -174,7 +176,7 @@ impl Player {
         self.animated_player.update();
 
         // player movement control
-        if !on_ground && !self.jetpack_active && !self.climbing_active {
+        if !self.attach && !on_ground && !self.jetpack_active && !self.climbing_active {
             self.speed.y += GRAVITY * delta;
         } else if self.jetpack_active || self.climbing_active {
             if is_key_down(KeyCode::Up) {
@@ -187,6 +189,10 @@ impl Player {
                 self.speed.y = 0.0;
             }
         } 
+
+        if is_key_down(KeyCode::Down) {
+            self.attach = false;
+        }
 
         
         if !self.climbing && is_key_pressed(KeyCode::Up) && on_ground {

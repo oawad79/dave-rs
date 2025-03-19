@@ -1,7 +1,7 @@
 use macroquad::{color::WHITE, input::{is_key_down, KeyCode}, math::Rect, prelude::collections::storage, text::{draw_text_ex, TextParams}};
 use macroquad_tiled::{load_map, Map};
 
-use crate::{resources::{self, Resources}, Scene, SceneChange};
+use crate::{resources::Resources, Scene, SceneChange};
 
 pub struct Complete {
     tiled_map: Map,
