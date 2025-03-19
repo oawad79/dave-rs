@@ -19,6 +19,7 @@ mod resources;
 mod score_board;
 mod separator;
 mod complete;
+mod warp_zone;
 
 use game::Game;
 use entry_screen::EntryScreen;
@@ -26,12 +27,14 @@ use separator::Separator;
 use resources::Resources;
 use complete::Complete;
 use macroquad::prelude::{collections::storage, *};
+use warp_zone::WarpZone;
 
 pub enum SceneChange {
     EntryScreen,
     Game{level: u32, retry: bool, cheat: bool, warp_zone: bool},
     Separator,
-    Complete
+    Complete,
+    WarpZone
 }
 pub trait Scene {
     fn update(&mut self) -> Option<SceneChange>;
@@ -80,6 +83,7 @@ async fn main() {
             scene = match change {
                 SceneChange::EntryScreen => Box::new(EntryScreen::new()),
                 SceneChange::Game{level, retry, cheat, warp_zone} => Box::new(Game::new(level, retry, cheat, warp_zone)),
+                SceneChange::WarpZone => Box::new(WarpZone::new()),
                 SceneChange::Separator => Box::new(Separator::new()),
                 SceneChange::Complete => Box::new(Complete::new()),
 

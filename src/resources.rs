@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use include_dir::{include_dir, Dir};
 use macroquad::{audio::{load_sound_from_bytes, Sound}, prelude::{collections::storage, coroutines::start_coroutine, *}};
 
+use crate::warp_zone;
+
 static PROJECT_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets");
 
 pub struct Resources {
@@ -10,6 +12,7 @@ pub struct Resources {
     pub warp_zones: HashMap<i32, String>,
     pub intro_map_json: String,
     pub separator_map_json: String,
+    pub warp_zone_separator_map_json: String,
     pub done_map_json: String,
     pub font: Font,
     pub numbers: Vec<Texture2D>,
@@ -37,12 +40,7 @@ impl Resources {
 
         let mut warp_zones: HashMap<i32, String> = HashMap::new();
         let warp_zones_files: Vec<_> = PROJECT_DIR.find("warp_level*.json").expect("Failed to load warp levels").collect();
-        // warp_zones_files.sort_by(|a, b| {
-        //     let num_a: u32 = a.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(); 
-        //     let num_b: u32 = b.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(); 
-        //     num_a.cmp(&num_b)
-        // });
-
+        
         warp_zones_files.iter().for_each(|entry| {
             warp_zones.insert(
                 entry.path().file_stem().unwrap().to_str().unwrap()[10..].parse().unwrap(), 
@@ -53,6 +51,7 @@ impl Resources {
         let intro_map_json = Self::load_embedded_string("intro.json");
         let separator_map_json = Self::load_embedded_string("seperator.json");
         let done_map_json = Self::load_embedded_string("done.json");
+        let warp_zone_separator_map_json = Self::load_embedded_string("warp.json");
         
         let font = load_ttf_font_from_bytes(PROJECT_DIR.get_file("fonts/MightySouly-lxggD.ttf").unwrap().contents()).unwrap();
         
@@ -73,6 +72,7 @@ impl Resources {
             warp_zones,
             intro_map_json,
             separator_map_json,
+            warp_zone_separator_map_json,
             done_map_json,
             font,
             numbers,

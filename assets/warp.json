@@ -3,70 +3,44 @@
  "infinite":false,
  "layers":[
         {
-         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":12,
          "id":1,
          "name":"platform",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":20,
+         "width":19,
          "x":0,
          "y":0
         }, 
         {
          "draworder":"topdown",
-         "id":2,
-         "name":"Object Layer 1",
+         "id":3,
+         "name":"player",
          "objects":[
                 {
-                 "height":84.5,
-                 "id":1,
-                 "name":"",
+                 "gid":1025,
+                 "height":32,
+                 "id":3,
+                 "name":"dave",
                  "rotation":0,
-                 "text":
-                    {
-                     "color":"#5500ff",
-                     "fontfamily":"Aldhabi",
-                     "pixelsize":93,
-                     "text":"Warp",
-                     "wrap":true
-                    },
                  "type":"",
                  "visible":true,
-                 "width":157.5,
-                 "x":60.5,
-                 "y":142
-                }, 
-                {
-                 "height":84.5,
-                 "id":2,
-                 "name":"",
-                 "rotation":0,
-                 "text":
-                    {
-                     "color":"#5500ff",
-                     "fontfamily":"Aldhabi",
-                     "pixelsize":93,
-                     "text":"Zone",
-                     "wrap":true
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":157.5,
-                 "x":410.25,
-                 "y":144.25
+                 "width":32,
+                 "x":288,
+                 "y":64
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -74,8 +48,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":3,
- "nextobjectid":3,
+ "nextlayerid":4,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -93,9 +67,48 @@
          "tilecount":1024,
          "tileheight":32,
          "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1025,
+         "image":"images\/dave_idle.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"dave_idle",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":1026,
+         "image":"images\/dave_jump.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"dave_jump",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":1027,
+         "image":"images\/dave_walk.png",
+         "imageheight":32,
+         "imagewidth":64,
+         "margin":0,
+         "name":"dave_walk",
+         "spacing":0,
+         "tilecount":2,
+         "tileheight":32,
+         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",
  "version":"1.10",
- "width":20
+ "width":19
 }

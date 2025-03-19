@@ -99,7 +99,7 @@ pub struct Game {
     cheat: bool,
     monsters: Vec<Monster>,
     jetpack: Option<GameObject>,
-    warp_zone: Option<Rect>,
+    warp_zone_rect: Option<Rect>,
     is_warp_zone: bool
     
 }
@@ -282,7 +282,7 @@ impl Game {
             vec![]
         };
         
-        let warp_zone = if tiled_map.contains_layer("warp_zone") {
+        let warp_zone_rect = if tiled_map.contains_layer("warp_zone") {
             let go = tiled_map.layers.get("warp_zone").unwrap().objects.first().unwrap();
             Some(Rect {
                 x: go.world_x,
@@ -323,7 +323,7 @@ impl Game {
             cheat,
             monsters,
             jetpack,
-            warp_zone,
+            warp_zone_rect,
             is_warp_zone
         }
     }
@@ -681,9 +681,11 @@ impl Scene for Game {
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
-        if let Some(wz) = &self.warp_zone {
+        if let Some(wz) = &self.warp_zone_rect {
             if Player::overlaps(pos, wz) {
-                return Some(SceneChange::Game{level: self.score_board.level, retry: false, cheat: self.cheat, warp_zone: true});
+                //return Some(SceneChange::Game{level: self.score_board.level, retry: false, cheat: self.cheat, warp_zone: true});
+                storage::store(self.score_board.clone());
+                return Some(SceneChange::WarpZone);
             }
         }
 
