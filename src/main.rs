@@ -91,7 +91,6 @@ async fn main() {
 
         scene.draw();
 
-        //handle_help_menu(&resources, &mut show_help);
         handle_menu(
             &resources,
             &mut show_help,
@@ -124,32 +123,40 @@ async fn main() {
             break;
         }
 
-        if is_key_down(KeyCode::LeftControl) {
-            for (i, key) in [
-                KeyCode::Key0, KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4,
-                KeyCode::Key5, KeyCode::Key6, KeyCode::Key7, KeyCode::Key8, KeyCode::Key9,
-            ]
-            .iter()
-            .enumerate()
-            {
-                if is_key_down(*key) {
-                    if let Ok(level) = u32::try_from(i) {
-                        scene = Box::new(Game::new(level, false, true, false));
-                    }
-                }
-            }
-        }
+        handle_cheat_code(&mut scene);
 
         if is_key_pressed(KeyCode::A) && is_key_down(KeyCode::LeftControl) {
-            is_full_screen = !is_full_screen;
-
-            set_fullscreen(is_full_screen);
-            if !is_full_screen {
-                request_new_screen_size(1000.0, 650.0);
-            }
+            toggle_fullscreen(&mut is_full_screen);
         }
 
         next_frame().await;
+    }
+}
+
+fn handle_cheat_code(scene: &mut Box<dyn Scene>) {
+    if is_key_down(KeyCode::LeftControl) {
+        for (i, key) in [
+            KeyCode::Key0, KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4,
+            KeyCode::Key5, KeyCode::Key6, KeyCode::Key7, KeyCode::Key8, KeyCode::Key9,
+        ]
+        .iter()
+        .enumerate()
+        {
+            if is_key_down(*key) {
+                if let Ok(level) = u32::try_from(i) {
+                    *scene = Box::new(Game::new(level, false, true, false));
+                }
+            }
+        }
+    }
+}
+
+fn toggle_fullscreen(is_full_screen: &mut bool) {
+    *is_full_screen = !*is_full_screen;
+
+    set_fullscreen(*is_full_screen);
+    if !*is_full_screen {
+        request_new_screen_size(1000.0, 650.0);
     }
 }
 
