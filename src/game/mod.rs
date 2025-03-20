@@ -226,7 +226,7 @@ impl Game {
                 width: jetpack_object.world_w,
                 height: jetpack_object.world_h,
                 name: jetpack_object.name.clone(),
-                collected: None,
+                collected: if score_board.jetpack_captured { Some(true) } else { None },
                 progress: 0.0
             })
         }
@@ -469,7 +469,7 @@ impl Game {
             tiled_map.spr_ex(
                 "jetpack2",
                 Rect::new(0.0, 0.0, 32.0, 32.0),
-            Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
+                Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
             );
         }
         
@@ -787,6 +787,7 @@ impl Scene for Game {
             if !self.is_warp_zone {
                 self.score_board.collectibles = self.collectibles.clone();
                 self.score_board.monsters = self.monsters.clone();
+                self.score_board.jetpack_captured = self.player.has_jetpack; 
             }            
             
             storage::store(self.score_board.clone());

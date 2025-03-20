@@ -126,6 +126,7 @@ impl Player {
                 self.jetpack_active = false;
                 self.jetpack_timer_active = false;
                 self.has_jetpack = false;
+                
                 stop_sound(resources.get_sound("jetPackActivated"));
             }
         }
