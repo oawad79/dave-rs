@@ -15,7 +15,7 @@ use crate::{bullet::{Bullet, BulletDirection}, Resources};
 const GRAVITY: f32 = 400.0;
 const JUMP_VELOCITY: f32 = -250.0;
 const JETPACK_VELOCITY: f32 = 100.0;
-
+const JETPACK_TIMER: f32 = 10.0;
 pub struct Player {
     pub collider: Actor,
     pub speed: Vec2,
@@ -30,7 +30,10 @@ pub struct Player {
     pub jetpack_active: bool,
     pub climbing: bool,
     pub climbing_active: bool,
-    attach: bool
+    attach: bool,
+    pub jetpack_timer: f32,
+    jetpack_timer_active: bool,
+    pub progress: f32
 }
 
 impl Player {
@@ -49,7 +52,10 @@ impl Player {
             jetpack_active: false,
             climbing: false,
             climbing_active: false,
-            attach
+            attach,
+            jetpack_timer: 0.0,
+            jetpack_timer_active: false,
+            progress: 0.0
         }
     }
 
@@ -111,14 +117,31 @@ impl Player {
             self.animated_player.set_animation(4);   
         }
 
+
+        if self.jetpack_active {
+            self.jetpack_timer += get_frame_time();
+            self.progress = (1.0 - (self.jetpack_timer / JETPACK_TIMER)).max(0.0);
+
+            if self.jetpack_timer >= JETPACK_TIMER {
+                self.jetpack_active = false;
+                self.jetpack_timer_active = false;
+                stop_sound(resources.get_sound("jetPackActivated"));
+            }
+        }
+
         if is_key_pressed(KeyCode::LeftAlt) && self.has_jetpack {
             self.jetpack_active = !self.jetpack_active;
+            
             if self.jetpack_active {
+                self.jetpack_timer = 0.0;
+                self.jetpack_timer_active = true;
+                
                 play_sound(resources.get_sound("jetPackActivated"), PlaySoundParams {
                     looped: true, 
                     volume: 1.0
                 });
             } else {
+                self.jetpack_timer_active = false;
                 stop_sound(resources.get_sound("jetPackActivated"));
             }
         }

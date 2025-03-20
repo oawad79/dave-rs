@@ -32,7 +32,7 @@
          "objects":[
                 {
                  "gid":1038,
-                 "height":24,
+                 "height":15.6883116883117,
                  "id":51,
                  "name":"",
                  "rotation":0,
@@ -261,8 +261,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":16,
- "nextobjectid":55,
+ "nextlayerid":17,
+ "nextobjectid":56,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

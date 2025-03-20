@@ -19,6 +19,7 @@ use crate::{
 
 const EXPLOSION_DURATION: f32 = 2.0;
 
+
 struct CollectibleData {
     offset: f32,
     value: u32,
@@ -88,7 +89,7 @@ pub struct Game {
     monsters: Vec<Monster>,
     jetpack: Option<GameObject>,
     warp_zone_rect: Option<Rect>,
-    is_warp_zone: bool
+    is_warp_zone: bool,
     
 }
 
@@ -197,6 +198,7 @@ impl Game {
                         height: entry.world_h,
                         name: entry.name.clone(),
                         collected: None,
+                        progress: 0.0
                     }
             ).collect::<Vec<GameObject>>()};
 
@@ -209,6 +211,7 @@ impl Game {
                 height: gun_object.world_h,
                 name: gun_object.name.clone(),
                 collected: None,
+                progress: 0.0
             })
         }
         else {
@@ -224,6 +227,7 @@ impl Game {
                 height: jetpack_object.world_h,
                 name: jetpack_object.name.clone(),
                 collected: None,
+                progress: 0.0
             })
         }
         else {
@@ -239,6 +243,7 @@ impl Game {
             height: door.world_h,
             name: door.name.clone(),
             collected: None,
+            progress: 0.0
         };
         
         let (animated_fire, fires) = 
@@ -314,7 +319,8 @@ impl Game {
             monsters,
             jetpack,
             warp_zone_rect,
-            is_warp_zone
+            is_warp_zone,
+            
         }
     }
 
@@ -411,6 +417,41 @@ impl Game {
     fn draw_jetpack(&self, tiled_map: &Map, jetpack: &GameObject, resources: &Resources) {
         if self.player.has_jetpack {
             draw_texture_ex(
+                resources.get_texture("jetpack_over"),
+                self.message_coord.0 + self.camera.target.x - 210.0,
+                self.message_coord.1 - 32.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(
+                        resources.get_texture("jetpack_over").width() * 0.7, 
+                        resources.get_texture("jetpack_over").height() * 0.7
+                    )), 
+                    ..Default::default()
+                },
+            );
+
+            
+            
+            let width = resources.get_texture("jetpack_progress").width() * 0.7;
+            let height = resources.get_texture("jetpack_progress").height() * 0.7;
+
+            let bar_width = width * self.player.progress;
+
+            // Define the texture cropping rectangle (shrink from right to left)
+            let source_rect = Some(Rect::new(0.0, 0.0, bar_width, height));
+            
+            draw_texture_ex(
+                resources.get_texture("jetpack_progress"),
+                self.message_coord.0 + self.camera.target.x - 214.0,
+                self.message_coord.1 - 36.0,
+                WHITE,
+                DrawTextureParams {
+                    source: source_rect,
+                    ..Default::default()
+                },
+            );
+
+            draw_texture_ex(
                 resources.get_texture("jetpack"),
                 self.message_coord.0 + self.camera.target.x - 410.0,
                 self.message_coord.1 - 32.0,
@@ -425,6 +466,8 @@ impl Game {
             );
         }
         else {
+            //TODO I think this is wrong, this means when the player picks a jetpack, the 
+            //rest of all jetpacks in the level will disappear
             tiled_map.spr_ex(
                 "jetpack2",
                 Rect::new(0.0, 0.0, 32.0, 32.0),
@@ -676,7 +719,7 @@ impl Scene for Game {
                 return Some(SceneChange::WarpZone);
             }
         }
-
+        
         // Check for collision between player and jetpack
         if let Some(j) = &self.jetpack { 
             if !self.player.has_jetpack && Player::overlaps(pos, &Rect::new(
@@ -762,6 +805,8 @@ impl Scene for Game {
             }
         }
 
+        
+
         if self.player_explosion_active {
             self.player_explosion_timer -= get_frame_time();
             if self.player_explosion_timer <= 0.0 {
@@ -828,8 +873,10 @@ impl Scene for Game {
             self.draw_gun(&tiled_map, g, &resources);
         }
 
-        if let Some(j) = &self.jetpack {
-            self.draw_jetpack(&tiled_map, j, &resources);
+        if let Some(j) = self.jetpack.as_ref() {
+            let mut j = j.clone();
+            j.progress = self.player.progress;
+            self.draw_jetpack(&tiled_map, &j, &resources);
         }
 
 
@@ -837,12 +884,12 @@ impl Scene for Game {
             draw_texture_ex(
                 resources.get_texture("door_enable_banner"),
                 self.message_coord.0 + self.camera.target.x - 300.0,
-                self.message_coord.1 - 32.0,
+                self.message_coord.1 - 14.0,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
                         resources.get_texture("door_enable_banner").width() , 
-                        resources.get_texture("door_enable_banner").height() 
+                        resources.get_texture("door_enable_banner").height() * 0.5
                     )), 
                     ..Default::default()
                 },

@@ -20,6 +20,7 @@ pub struct GameObject {
     pub height: f32,
     pub name: String,
     pub collected: Option<bool>,
+    pub progress: f32
 }
 
 #[derive(Clone)]
