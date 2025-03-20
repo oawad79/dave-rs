@@ -94,7 +94,6 @@ pub struct Game {
 
 impl Game {
     pub fn new(level: u32, retry: bool, cheat: bool, is_warp_zone: bool) -> Self {
-        
         let resources = storage::get::<Resources>();
         
         let map_data = if is_warp_zone {
@@ -744,11 +743,11 @@ impl Scene for Game {
             self.score_board.lives -= 1;
             if !self.is_warp_zone {
                 self.score_board.collectibles = self.collectibles.clone();
-            }
+                self.score_board.monsters = self.monsters.clone();
+            }            
             
-            self.score_board.monsters = self.monsters.clone();
             storage::store(self.score_board.clone());
-            return Some(SceneChange::Game{level: self.score_board.level, retry: true, cheat: self.cheat, warp_zone: false});
+            return Some(SceneChange::Game{level: self.score_board.level, retry: !self.is_warp_zone, cheat: self.cheat, warp_zone: false});
             
         }
         

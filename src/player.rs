@@ -12,8 +12,8 @@ use macroquad_tiled::Map;
 
 use crate::{bullet::{Bullet, BulletDirection}, Resources};
 
-const GRAVITY: f32 = 470.0;
-const JUMP_VELOCITY: f32 = -280.0;
+const GRAVITY: f32 = 400.0;
+const JUMP_VELOCITY: f32 = -250.0;
 const JETPACK_VELOCITY: f32 = 100.0;
 
 pub struct Player {
