@@ -133,7 +133,6 @@ impl Player {
             self.jetpack_active = !self.jetpack_active;
             
             if self.jetpack_active {
-                self.jetpack_timer = 0.0;
                 self.jetpack_timer_active = true;
                 
                 play_sound(resources.get_sound("jetPackActivated"), PlaySoundParams {
