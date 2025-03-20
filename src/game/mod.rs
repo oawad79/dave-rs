@@ -415,7 +415,8 @@ impl Game {
     }
 
     fn draw_jetpack(&self, tiled_map: &Map, jetpack: &GameObject, resources: &Resources) {
-        if self.player.has_jetpack {
+        
+        if jetpack.collected.unwrap_or(false) && self.player.has_jetpack {
             draw_texture_ex(
                 resources.get_texture("jetpack_over"),
                 self.message_coord.0 + self.camera.target.x - 210.0,
@@ -430,8 +431,6 @@ impl Game {
                 },
             );
 
-            
-            
             let width = resources.get_texture("jetpack_progress").width() * 0.7;
             let height = resources.get_texture("jetpack_progress").height() * 0.7;
 
@@ -465,15 +464,15 @@ impl Game {
                 },
             );
         }
-        else {
-            //TODO I think this is wrong, this means when the player picks a jetpack, the 
-            //rest of all jetpacks in the level will disappear
+        
+        if !jetpack.collected.unwrap_or(false) {
             tiled_map.spr_ex(
                 "jetpack2",
                 Rect::new(0.0, 0.0, 32.0, 32.0),
-                Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
+            Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
             );
         }
+        
     }
 
     fn draw_animated_objects(&self, tiled_map: &Map) {
@@ -731,6 +730,7 @@ impl Scene for Game {
                 play_sound_once(resources.get_sound("jetPackActivated"));
                 self.player.has_jetpack = true;
                 self.score_board.jetpack_captured = true;
+                self.jetpack.as_mut().unwrap().collected = Some(true);
             }
         }
 
@@ -874,9 +874,7 @@ impl Scene for Game {
         }
 
         if let Some(j) = self.jetpack.as_ref() {
-            let mut j = j.clone();
-            j.progress = self.player.progress;
-            self.draw_jetpack(&tiled_map, &j, &resources);
+            self.draw_jetpack(&tiled_map, j, &resources);
         }
 
 
