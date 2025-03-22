@@ -20,9 +20,11 @@ mod score_board;
 mod separator;
 mod complete;
 mod warp_zone;
+mod input_manager;
 
 use game::Game;
 use entry_screen::EntryScreen;
+use input_manager::InputManager;
 use separator::Separator;
 use resources::Resources;
 use complete::Complete;
@@ -59,8 +61,6 @@ fn window_conf() -> Conf {
 async fn main() {
     set_pc_assets_folder("assets");
 
-    let mut is_full_screen: bool = false;
-
     let _ = Resources::load().await;
     
     let main_camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
@@ -72,6 +72,8 @@ async fn main() {
     let mut show_quit = false;
     let mut show_help = false;
     let mut show_restart = false;
+
+    let mut input_manager = InputManager::new();
 
     loop {
         clear_background(BLACK);
@@ -91,7 +93,7 @@ async fn main() {
 
         scene.draw();
 
-        handle_menu(
+        input_manager.handle_menu(
             &resources,
             &mut show_help,
             KeyCode::F1,
@@ -100,7 +102,7 @@ async fn main() {
             None,
         );
         
-        if handle_menu(
+        if input_manager.handle_menu(
             &resources,
             &mut show_restart,
             KeyCode::F3,
@@ -112,7 +114,7 @@ async fn main() {
             show_restart = false;
         }
 
-        if handle_menu(
+        if input_manager.handle_menu(
             &resources,
             &mut show_quit,
             KeyCode::Escape,
@@ -123,79 +125,11 @@ async fn main() {
             break;
         }
 
-        handle_cheat_code(&mut scene);
+        InputManager::handle_cheat_code(&mut scene);
 
-        if is_key_pressed(KeyCode::A) && is_key_down(KeyCode::LeftControl) {
-            toggle_fullscreen(&mut is_full_screen);
-        }
-
+        input_manager.toggle_fullscreen();
+        
         next_frame().await;
     }
-}
-
-fn handle_cheat_code(scene: &mut Box<dyn Scene>) {
-    if is_key_down(KeyCode::LeftControl) {
-        for (i, key) in [
-            KeyCode::Key0, KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4,
-            KeyCode::Key5, KeyCode::Key6, KeyCode::Key7, KeyCode::Key8, KeyCode::Key9,
-        ]
-        .iter()
-        .enumerate()
-        {
-            if is_key_down(*key) {
-                if let Ok(level) = u32::try_from(i) {
-                    *scene = Box::new(Game::new(level, false, true, false));
-                }
-            }
-        }
-    }
-}
-
-fn toggle_fullscreen(is_full_screen: &mut bool) {
-    *is_full_screen = !*is_full_screen;
-
-    set_fullscreen(*is_full_screen);
-    if !*is_full_screen {
-        request_new_screen_size(1000.0, 650.0);
-    }
-}
-
-fn handle_menu(
-    resources: &Resources,
-    show_menu: &mut bool,
-    key_to_show: KeyCode,
-    texture_name: &str,
-    texture_offset: Vec2,
-    confirm_key: Option<KeyCode>,
-) -> bool {
-    if is_key_down(key_to_show) || *show_menu {
-        set_default_camera();
-        *show_menu = true;
-        draw_texture_ex(
-            resources.get_texture(texture_name),
-            screen_width() / 2.0 + texture_offset.x,
-            screen_height() / 2.0 + texture_offset.y,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture(texture_name).width(),
-                    resources.get_texture(texture_name).height(),
-                )),
-                ..Default::default()
-            },
-        );
-    }
-
-    if let Some(confirm_key) = confirm_key {
-        if *show_menu && is_key_down(confirm_key) {
-            return true;
-        } else if *show_menu && is_key_down(KeyCode::N) {
-            *show_menu = false;
-        }
-    } else if *show_menu && is_key_pressed(KeyCode::Escape) {
-        *show_menu = false;
-    }
-
-    false
 }
 
