@@ -24,6 +24,20 @@ impl Complete {
             tiled_map
         }
     }
+
+    fn draw_texture(text: &str, x: f32, y: f32, resources: &Resources) {
+        draw_text_ex(
+            text,
+            x,
+            y,
+            TextParams {
+                font: Some(&resources.font), 
+                font_size: 25,     
+                color: WHITE,  
+                ..Default::default()
+            },
+        );
+    }
 }
 
 impl Scene for Complete {
@@ -42,121 +56,67 @@ impl Scene for Complete {
         self.tiled_map
             .draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 384.0), None);
 
-        draw_text_ex(
-            "CONGRATULATIONS !",
-            230.0,
-            70.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
-        );
-
-        draw_text_ex(
-            "YOU MADE IT THROUGH ALL THE PERILOUS AREAS IN ",
+        Complete::draw_texture("CONGRATULATIONS !", 230.0, 70.0, &resources);
+        Complete::draw_texture("YOU MADE IT THROUGH ALL THE PERILOUS AREAS IN ",
             50.0,
-            130.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            110.0,
+            &resources
         );
 
-        draw_text_ex(
+        Complete::draw_texture(
+            "THE DAVE THE DUCK ADVENTURE !",
+            50.0,
+            150.0,
+            &resources
+        );
+
+        Complete::draw_texture(
             "CLYDE'S HIDEOUT!",
             50.0,
             150.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            &resources
         );
          
-        draw_text_ex(
-        "VERY GOOD WORK! DID YOU FIND THE 4 WARP ZONES ? ",
+        Complete::draw_texture(
+            "VERY GOOD WORK! DID YOU FIND THE 4 WARP ZONES ? ",
             50.0,
             190.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            &resources
         );    
 
-        draw_text_ex(
+        Complete::draw_texture(
             "THEY ARE LOCATED ON LEVELS 5, 8, 9 AND 10. JUST ",
             50.0,
-            210.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            210.0,  
+            &resources
         );    
 
-        draw_text_ex(
+        Complete::draw_texture(
             "JUMP OFF THE TOP OF THE SCREEN AT THE EXTREME ",
             50.0,
             230.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            &resources
         );    
 
-        draw_text_ex(
+        Complete::draw_texture(
             "LEFT OR RIGHT EDGE OF THE WORLD AND VIOLA ! YOU'RE ",
             50.0,
             250.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            &resources
         );    
 
-        draw_text_ex(
+        Complete::draw_texture(
             "THERE ! ",
             50.0,
             270.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            &resources
         );    
 
-        draw_text_ex(
+        Complete::draw_texture(
             "PRESS ENTER ",
             240.0,
             320.0,
-            TextParams {
-                font: Some(&resources.font), 
-                font_size: 25,     
-                color: WHITE,  
-
-                ..Default::default()
-            },
+            &resources
         );    
 
     }    
