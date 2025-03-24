@@ -18,8 +18,11 @@ use crate::{
 };
 use collectibles::CollectibleType;
 
+
 mod collectibles;
 mod animations;
+mod renderer;
+
 
 const EXPLOSION_DURATION: f32 = 2.0;
 pub struct Game {
@@ -300,166 +303,6 @@ impl Game {
             atlas: Some(AtlasConfig::new(5, 1, 0..)),
             ..Default::default()
         }
-    }
-    
-    fn draw_collectibles(&self, tiled_map: &Map) {
-        for diamond in &self.collectibles {
-            let offset = CollectibleType::from(diamond.name.as_str()).data().offset;
-
-            tiled_map.spr_ex(
-                "collectibles",
-                Rect::new(offset, 0.0, 32.0, 32.0),
-                Rect::new(diamond.world_x, diamond.world_y - 32.0, 32.0, 32.0),
-            );
-        }
-    }
-
-    fn draw_door(&self, tiled_map: &Map) {
-        tiled_map.spr_ex(
-            "door",
-            Rect::new(0.0, 0.0, 32.0, 32.0),
-            Rect::new(self.door.world_x, self.door.world_y - 32.0, 32.0, 32.0),
-        );
-    }
-
-    fn draw_gun(&self, tiled_map: &Map, gun: &GameObject, resources: &Resources) {
-        if !self.player.has_gun {
-            tiled_map.spr_ex(
-                "gun_icon",
-                Rect::new(0.0, 0.0, 32.0, 32.0),
-                Rect::new(gun.world_x, gun.world_y - 32.0, 32.0, 32.0),
-            );
-        }
-        else {
-            draw_texture_ex(
-                resources.get_texture("gun"),
-                self.message_coord.0 + self.camera.target.x + 50.0,
-                self.message_coord.1 - 32.0,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("gun").width() * 0.7 , 
-                        resources.get_texture("gun").height() * 0.7
-                    )), 
-                    ..Default::default()
-                },
-            );
-
-            draw_texture_ex(
-                resources.get_texture("gun_icon"),
-                self.message_coord.0 + self.camera.target.x + 110.0,
-                self.message_coord.1 - 32.0,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("gun_icon").width() , 
-                        resources.get_texture("gun_icon").height() 
-                    )), 
-                    ..Default::default()
-                },
-            );
-        }
-    }
-
-    fn draw_jetpack(&self, tiled_map: &Map, jetpack: &GameObject, resources: &Resources) {
-        
-        if jetpack.collected.unwrap_or(false) && self.player.has_jetpack {
-            draw_texture_ex(
-                resources.get_texture("jetpack_over"),
-                self.message_coord.0 + self.camera.target.x - 210.0,
-                self.message_coord.1 - 32.0,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("jetpack_over").width() * 0.7, 
-                        resources.get_texture("jetpack_over").height() * 0.7
-                    )), 
-                    ..Default::default()
-                },
-            );
-
-            let width = resources.get_texture("jetpack_progress").width() * 0.7;
-            let height = resources.get_texture("jetpack_progress").height() * 0.7;
-
-            let bar_width = width * self.player.progress;
-
-            // Define the texture cropping rectangle (shrink from right to left)
-            let source_rect = Some(Rect::new(0.0, 0.0, bar_width, height));
-            
-            draw_texture_ex(
-                resources.get_texture("jetpack_progress"),
-                self.message_coord.0 + self.camera.target.x - 214.0,
-                self.message_coord.1 - 36.0,
-                WHITE,
-                DrawTextureParams {
-                    source: source_rect,
-                    ..Default::default()
-                },
-            );
-
-            draw_texture_ex(
-                resources.get_texture("jetpack"),
-                self.message_coord.0 + self.camera.target.x - 410.0,
-                self.message_coord.1 - 32.0,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("jetpack").width() * 0.7, 
-                        resources.get_texture("jetpack").height() * 0.7
-                    )), 
-                    ..Default::default()
-                },
-            );
-        }
-        
-        if !jetpack.collected.unwrap_or(false) {
-            tiled_map.spr_ex(
-                "jetpack2",
-                Rect::new(0.0, 0.0, 32.0, 32.0),
-                Rect::new(jetpack.world_x, jetpack.world_y - 32.0, 32.0, 32.0),
-            );
-        }
-        
-    }
-
-    fn draw_animated_objects(&self, tiled_map: &Map) {
-        if let Some(animated_fire) = &self.animated_fire {
-            for fire in &self.fires {
-                tiled_map.spr_ex(
-                    "fire1-sheet",
-                    animated_fire.frame().source_rect,
-                    Rect::new(fire.world_x, fire.world_y - 32.0, 32.0, 32.0),
-                );
-            }
-        }
-
-        if let Some(animated_water) = &self.animated_water {
-            for water in &self.waters {
-                tiled_map.spr_ex(
-                    "water1-sheet",
-                    animated_water.frame().source_rect,
-                    Rect::new(water.world_x, water.world_y - 32.0, 32.0, 32.0),
-                );
-            }
-        }
-
-        if let Some(animated_grass) = &self.animated_grass {
-            for grass in &self.grasses {
-                tiled_map.spr_ex(
-                    "deadly",
-                    animated_grass.frame().source_rect,
-                    Rect::new(grass.world_x, grass.world_y - 32.0, 32.0, 32.0),
-                );
-            }
-        }
-    }
-
-    fn draw_tiles(&self, tiled_map: &Map) {
-        tiled_map.draw_tiles(
-            "platform",
-            Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
-            None,
-        );
     }
     
     fn handle_collecting_valuables(&mut self, resources: &Resources, pos: Vec2) {
@@ -812,37 +655,51 @@ impl Scene for Game {
         let resources = storage::get::<Resources>();
 
         self.score_board.draw();
-        self.draw_tiles(&tiled_map);
-        self.draw_collectibles(&tiled_map);
-        self.draw_door(&tiled_map);
-        self.draw_animated_objects(&tiled_map);
+        
+        // Replace direct drawing with calls to the rendering module
+        
+        super::game::renderer::draw_tiles(&tiled_map, self.width_tiles, self.height_tiles);
+        renderer::draw_collectibles(&self.collectibles, &tiled_map);
+        renderer::draw_door(&self.door, &tiled_map);
+        renderer::draw_animated_objects(
+            &tiled_map,
+            &self.animated_fire,
+            &self.fires,
+            &self.animated_water,
+            &self.waters,
+            &self.animated_grass,
+            &self.grasses
+        );
         
         if let Some(g) = &self.gun {
-            self.draw_gun(&tiled_map, g, &resources);
-        }
-
-        if let Some(j) = self.jetpack.as_ref() {
-            self.draw_jetpack(&tiled_map, j, &resources);
-        }
-
-
-        if self.score_board.game_won {
-            draw_texture_ex(
-                resources.get_texture("door_enable_banner"),
-                self.message_coord.0 + self.camera.target.x - 300.0,
-                self.message_coord.1 - 14.0,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("door_enable_banner").width() , 
-                        resources.get_texture("door_enable_banner").height() * 0.5
-                    )), 
-                    ..Default::default()
-                },
+            renderer::draw_gun(
+                &tiled_map, 
+                g, 
+                &resources, 
+                self.player.has_gun, 
+                self.message_coord, 
+                self.camera.target.x
             );
         }
 
+        if let Some(j) = self.jetpack.as_ref() {
+            super::game::renderer::draw_jetpack(
+                &tiled_map, 
+                j, 
+                &resources, 
+                self.player.has_jetpack, 
+                self.player.progress,
+                self.message_coord, 
+                self.camera.target.x
+            );
+        }
+
+        renderer::draw_door_enable_banner(
+            self.score_board.game_won, 
+            &resources, 
+            self.message_coord, 
+            self.camera.target.x
+        );
         
-    }
-}
+    }}
 

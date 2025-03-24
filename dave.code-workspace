@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../HandsOnRust"
+		},
+		{
+			"path": "../hello-mod"
 		}
 	],
 	"settings": {
