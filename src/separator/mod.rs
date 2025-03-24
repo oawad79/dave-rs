@@ -84,7 +84,8 @@ impl Scene for Separator {
             if self.score_board.level == 10 {
                 return Some(SceneChange::Complete);
             }
-            return Some(SceneChange::Game { level: self.score_board.level, retry: false, cheat: false, warp_zone: false });
+            return Some(SceneChange::Game { level: self.score_board.level, 
+                retry: false, cheat: false, warp_zone: false });
         }
 
         self.score_board.position = (5.0, 5.0);
