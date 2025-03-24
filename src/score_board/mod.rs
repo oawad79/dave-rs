@@ -57,6 +57,22 @@ impl ScoreBoard {
             .map(|c| c.to_digit(10).unwrap())
             .collect()
     }
+
+    fn draw_texture(resources: &Resources, texture_key: &str, x: f32, y: f32) {
+        draw_texture_ex(
+            resources.get_texture(texture_key),
+            x,
+            y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(
+                    resources.get_texture(texture_key).width() , 
+                    resources.get_texture(texture_key).height() 
+                )), 
+                ..Default::default()
+            },
+        );
+    }
 }
 
 impl Scene for ScoreBoard {
@@ -67,20 +83,8 @@ impl Scene for ScoreBoard {
     fn draw(&self) {
         let resources = storage::get::<Resources>();
 
-        draw_texture_ex(
-            resources.get_texture("score"),
-            self.position.0,
-            5.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture("score").width() , 
-                    resources.get_texture("score").height() 
-                )), 
-                ..Default::default()
-            },
-        );
-
+        Self::draw_texture(&resources, "score", self.position.0, 5.0);
+        
         let score = Self::number_to_vec(self.score);
         for (i, n) in score.iter().enumerate() {
             draw_texture_ex(
@@ -95,20 +99,8 @@ impl Scene for ScoreBoard {
             );
         }
 
-        draw_texture_ex(
-            resources.get_texture("level"),
-            self.position.0 + 240.0,
-            5.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture("level").width(), 
-                    resources.get_texture("level").height()
-                )), 
-                ..Default::default()
-            },
-        );
-
+        Self::draw_texture(&resources, "level", self.position.0 + 240.0, 5.0);
+        
         let levels = Self::number_to_vec(if self.level == 0 {10} else {self.level});
         for (i, n) in levels.iter().enumerate() {
             draw_texture_ex(
@@ -123,48 +115,16 @@ impl Scene for ScoreBoard {
             );
         }
 
-        draw_texture_ex(
-            resources.get_texture("daves"),
-            self.position.0 + 400.0,
-            5.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture("daves").width(), 
-                    resources.get_texture("daves").height()
-                )), 
-                ..Default::default()
-            },
-        );
-
+        Self::draw_texture(&resources, "daves", self.position.0 + 400.0, 5.0);
+        
         for i in 0..self.lives {
-            draw_texture_ex(
-                resources.get_texture("DaveFace"),
-                self.position.0 + 510.0 + (i as f32 * 30.0),
-                2.0,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("DaveFace").width(), 
-                        resources.get_texture("DaveFace").height()
-                    )), 
-                    ..Default::default()
-                },
+            Self::draw_texture(&resources, 
+                "DaveFace", 
+                self.position.0 + 510.0 + (i as f32 * 30.0), 2.0
             );
         }
 
-        draw_texture_ex(
-            resources.get_texture("thin"),
-            self.position.0,
-            30.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture("thin").width() , 
-                    resources.get_texture("thin").height() * 0.5)
-                ), 
-                ..Default::default()
-            },
-        );
+        Self::draw_texture(&resources, "thin", self.position.0, 30.0);
+        
     }
 }
