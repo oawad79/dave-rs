@@ -25,34 +25,53 @@ mod renderer;
 
 
 const EXPLOSION_DURATION: f32 = 2.0;
+
+pub struct GameWorld {
+    pub world: World,
+    pub height_tiles: i32,
+    pub width_tiles: i32,
+    pub camera: Camera2D
+}
+
+pub struct GameState {
+    pub monster_explosion_active: bool,
+    pub monster_explosion_timer: f32,
+    pub player_explosion_active: bool,
+    pub player_explosion_timer: f32,
+    pub message_coord: (f32, f32),
+    pub cheat: bool,
+    pub is_warp_zone: bool,
+}
+
+pub struct AnimationAssets {
+    pub animated_fire: Option<AnimatedSprite>,
+    pub animated_water: Option<AnimatedSprite>,
+    pub animated_grass: Option<AnimatedSprite>,
+    pub fires: Vec<Object>,
+    pub waters: Vec<Object>,
+    pub grasses: Vec<Object>,
+}
+
 pub struct Game {
-    world: World,
+    game_world: GameWorld,
+    game_state: GameState,
+    animation_assets: AnimationAssets,
     player: Player,
     collectibles: Vec<GameObject>,
     door: GameObject,
     score_board: ScoreBoard,
-    height_tiles: i32,
-    width_tiles: i32,
-    animated_fire: Option<AnimatedSprite>,
-    animated_water: Option<AnimatedSprite>,
-    fires: Vec<Object>,
-    waters: Vec<Object>,
-    camera: Camera2D,
-    animated_grass: Option<AnimatedSprite>,
-    grasses: Vec<Object>,
+    //animated_fire: Option<AnimatedSprite>,
+    //animated_water: Option<AnimatedSprite>,
+    //fires: Vec<Object>,
+    //waters: Vec<Object>,
+    //animated_grass: Option<AnimatedSprite>,
+    //grasses: Vec<Object>,
     explosions: Vec<(Emitter, Vec2)>,
-    monster_explosion_active: bool,
-    monster_explosion_timer: f32,
-    player_explosion_active: bool,
-    player_explosion_timer: f32,
     deadly_objects: Vec<Object>,
-    message_coord: (f32, f32),
     gun: Option<GameObject>,
-    cheat: bool,
     monsters: Vec<Monster>,
     jetpack: Option<GameObject>,
     warp_zone_rect: Option<Rect>,
-    is_warp_zone: bool,
     
 }
 
@@ -209,6 +228,8 @@ impl Game {
             progress: 0.0
         };
         
+        
+
         let (animated_fire, fires) = 
                             Animations::load_animation(&tiled_map, "fire", 3);
         let (animated_water, waters) = 
@@ -217,11 +238,22 @@ impl Game {
         let (animated_grass, grasses) = 
                             Animations::load_animation(&tiled_map, "grass", 4);
 
+        let animation_assets = AnimationAssets {
+            animated_fire,
+            animated_water,
+            animated_grass,
+            fires,
+            waters,
+            grasses,
+        };
+
+        
+
         let mut deadly_objects: Vec<Object> = Vec::new();
 
-        deadly_objects.extend(fires.iter().cloned());
-        deadly_objects.extend(waters.iter().cloned());
-        deadly_objects.extend(grasses.iter().cloned());
+        deadly_objects.extend(animation_assets.fires.iter().cloned());
+        deadly_objects.extend(animation_assets.waters.iter().cloned());
+        deadly_objects.extend(animation_assets.grasses.iter().cloned());
         
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
 
@@ -254,35 +286,50 @@ impl Game {
             None
         };
 
-
-        Self {
+        let game_world = GameWorld {
             world,
-            player,
-            collectibles,
-            door,
-            score_board,
             height_tiles: height as i32,
             width_tiles: width as i32,
-            animated_fire,
-            fires,
-            animated_water,
-            waters,
-            camera,
-            animated_grass,
-            grasses,
-            explosions: vec![],
+            camera
+        };
+
+        let game_state = GameState {
             monster_explosion_active: false,
             monster_explosion_timer: 2.0,
             player_explosion_active: false,
             player_explosion_timer: 2.0,
-            deadly_objects,
             message_coord,
-            gun,
             cheat,
+            is_warp_zone: false,
+        };
+
+        Self {
+            game_world,
+            game_state,
+            animation_assets,
+            player,
+            collectibles,
+            door,
+            score_board,
+            // animated_fire,
+            // fires,
+            // animated_water,
+            // waters,
+            // animated_grass,
+            // grasses,
+            explosions: vec![],
+            // monster_explosion_active: false,
+            // monster_explosion_timer: 2.0,
+            // player_explosion_active: false,
+            // player_explosion_timer: 2.0,
+            deadly_objects,
+            //message_coord,
+            gun,
+            //cheat,
             monsters,
             jetpack,
             warp_zone_rect,
-            is_warp_zone,
+            //is_warp_zone,
             
         }
     }
@@ -341,8 +388,8 @@ impl Game {
     
             if Player::overlaps(pos, &deadly_rect) && !self.player.is_dead {
                 self.player.is_dead = true;    
-                self.player_explosion_active = true;
-                self.player_explosion_timer = EXPLOSION_DURATION;
+                self.game_state.player_explosion_active = true;
+                self.game_state.player_explosion_timer = EXPLOSION_DURATION;
     
                 if self.explosions.is_empty() {
                     self.explosions.push((Emitter::new(EmitterConfig {
@@ -367,10 +414,10 @@ impl Game {
                     monster.alive = false;
                     self.score_board.score += monster.kill_value;
                     
-                    self.monster_explosion_active = true;
-                    self.monster_explosion_timer = EXPLOSION_DURATION;
-                    self.player_explosion_active = true;
-                    self.player_explosion_timer = EXPLOSION_DURATION;
+                    self.game_state.monster_explosion_active = true;
+                    self.game_state.monster_explosion_timer = EXPLOSION_DURATION;
+                    self.game_state.player_explosion_active = true;
+                    self.game_state.player_explosion_timer = EXPLOSION_DURATION;
     
                     if self.explosions.is_empty() {
                         self.explosions.push((Emitter::new(EmitterConfig {
@@ -424,8 +471,8 @@ impl Game {
                         bullet.collided = true;
                         self.player.is_dead = true;
 
-                        self.player_explosion_active = true;
-                        self.player_explosion_timer = EXPLOSION_DURATION;
+                        self.game_state.player_explosion_active = true;
+                        self.game_state.player_explosion_timer = EXPLOSION_DURATION;
 
                         if self.explosions.is_empty() {
                             self.explosions.push((Emitter::new(EmitterConfig {
@@ -440,7 +487,7 @@ impl Game {
                 }
     
                 monster.bullets.retain(|bullet| {
-                    if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
+                    if self.game_world.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
                         return false
                     }
             
@@ -461,40 +508,40 @@ impl Scene for Game {
         let tiled_map = storage::get::<Map>();
 
         // Set the camera to follow the player
-        set_camera(&self.camera);
+        set_camera(&self.game_world.camera);
 
         if tiled_map.contains_layer("night") {
             tiled_map.draw_tiles(
                 "night",
-                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+                Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
                 None,
             );
         }
 
-        let pos = self.world.actor_pos(self.player.collider);
+        let pos = self.game_world.world.actor_pos(self.player.collider);
 
         //Update camera position to follow the player
         if self.score_board.level > 1 || self.score_board.level == 0 {
             let screen_width = screen_width();
             let target_x = if (pos.x > screen_width / 2.0) && 
-                              (pos.x < (self.width_tiles * 32) as f32 - screen_width / 3.4) {
+                              (pos.x < (self.game_world.width_tiles * 32) as f32 - screen_width / 3.4) {
                 pos.x
-            } else if pos.x > 200.0 && pos.x < (self.width_tiles * 32) as f32 - 
+            } else if pos.x > 200.0 && pos.x < (self.game_world.width_tiles * 32) as f32 - 
                               (if screen_width > 1000.0 {screen_width / 5.0} else {screen_width / 3.0}) {
                 pos.x + 170.0
             } else if pos.x < 200.0 {
                 305.0
             } else {
-                self.camera.target.x
+                self.game_world.camera.target.x
             };
 
-            self.camera.target.x = self.camera.target.x + (target_x - self.camera.target.x) * 0.1;
-            self.score_board.position = (self.camera.target.x - 300.0, pos.y);
+            self.game_world.camera.target.x = self.game_world.camera.target.x + (target_x - self.game_world.camera.target.x) * 0.1;
+            self.score_board.position = (self.game_world.camera.target.x - 300.0, pos.y);
         }
 
         //handle the player falling out of the game so we bring him from top
         if pos.y > screen_height() && !self.player.is_dead {
-            self.world.set_actor_position(self.player.collider, vec2(pos.x, 0.0));
+            self.game_world.world.set_actor_position(self.player.collider, vec2(pos.x, 0.0));
         }
 
         self.handle_collecting_valuables(&resources, pos);
@@ -554,7 +601,7 @@ impl Scene for Game {
             if self.score_board.level == 0 {
                 self.score_board.level = 10;
             }
-            else if !self.is_warp_zone {
+            else if !self.game_state.is_warp_zone {
                 self.score_board.level += 1;
             }
             self.score_board.score += 2000;
@@ -567,21 +614,21 @@ impl Scene for Game {
 
         self.handle_collision_with_deadly(&resources, pos);
 
-        if !self.player_explosion_active && self.player.is_dead {
+        if !self.game_state.player_explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
                 play_sound_once(resources.get_sound("gameoverman"));
                 return Some(SceneChange::EntryScreen);
             } 
             
             self.score_board.lives -= 1;
-            if !self.is_warp_zone {
+            if !self.game_state.is_warp_zone {
                 self.score_board.collectibles = self.collectibles.clone();
                 self.score_board.monsters = self.monsters.clone();
                 self.score_board.jetpack_captured = self.player.has_jetpack; 
             }            
             
             storage::store(self.score_board.clone());
-            return Some(SceneChange::Game{level: self.score_board.level, retry: !self.is_warp_zone, cheat: self.cheat, warp_zone: false});
+            return Some(SceneChange::Game{level: self.score_board.level, retry: !self.game_state.is_warp_zone, cheat: self.game_state.cheat, warp_zone: false});
             
         }
         
@@ -589,26 +636,26 @@ impl Scene for Game {
             explosion.draw(vec2(coords.x, coords.y));
         }
 
-        if self.monster_explosion_active {
-            self.monster_explosion_timer -= get_frame_time();
-            if self.monster_explosion_timer <= 0.0 {
-                self.monster_explosion_active = false;
+        if self.game_state.monster_explosion_active {
+            self.game_state.monster_explosion_timer -= get_frame_time();
+            if self.game_state.monster_explosion_timer <= 0.0 {
+                self.game_state.monster_explosion_active = false;
             }
         }
 
         
 
-        if self.player_explosion_active {
-            self.player_explosion_timer -= get_frame_time();
-            if self.player_explosion_timer <= 0.0 {
-                self.player_explosion_active = false;
+        if self.game_state.player_explosion_active {
+            self.game_state.player_explosion_timer -= get_frame_time();
+            if self.game_state.player_explosion_timer <= 0.0 {
+                self.game_state.player_explosion_active = false;
             }
         }
         
         if tiled_map.contains_layer("tree_collider") {
             tiled_map.draw_tiles(
                 "tree_collider",
-                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+                Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
                 None,
             );
         }
@@ -616,32 +663,32 @@ impl Scene for Game {
         if tiled_map.contains_layer("fallthroughtiles") {
             tiled_map.draw_tiles(
                 "fallthroughtiles",
-                Rect::new(0.0, 0.0, (self.width_tiles * 32) as f32, (self.height_tiles * 32) as f32),
+                Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
                 None,
             );
         }
 
-        self.player.update(&mut self.world);
+        self.player.update(&mut self.game_world.world);
 
-        if self.animated_fire.is_some() {
-            self.animated_fire.as_mut().unwrap().update();
+        if self.animation_assets.animated_fire.is_some() {
+            self.animation_assets.animated_fire.as_mut().unwrap().update();
         }
 
-        if self.animated_water.is_some() {
-            self.animated_water.as_mut().unwrap().update();
+        if self.animation_assets.animated_water.is_some() {
+            self.animation_assets.animated_water.as_mut().unwrap().update();
         }
 
-        if self.animated_grass.is_some() {
-            self.animated_grass.as_mut().unwrap().update();
+        if self.animation_assets.animated_grass.is_some() {
+            self.animation_assets.animated_grass.as_mut().unwrap().update();
         }
         
-        let screen_left = self.camera.target.x - screen_width() / 2.0;
-        let screen_right = self.camera.target.x + screen_width() / 2.0;
+        let screen_left = self.game_world.camera.target.x - screen_width() / 2.0;
+        let screen_right = self.game_world.camera.target.x + screen_width() / 2.0;
 
         self.monster_mechanics(&resources, pos);
 
         self.player.bullets.retain(|bullet| {
-            if self.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
+            if self.game_world.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
                 return false
             }
 
@@ -658,17 +705,17 @@ impl Scene for Game {
         
         // Replace direct drawing with calls to the rendering module
         
-        renderer::draw_tiles(&tiled_map, self.width_tiles, self.height_tiles);
+        renderer::draw_tiles(&tiled_map, self.game_world.width_tiles, self.game_world.height_tiles);
         renderer::draw_collectibles(&self.collectibles, &tiled_map);
         renderer::draw_door(&self.door, &tiled_map);
         renderer::draw_animated_objects(
             &tiled_map,
-            &self.animated_fire,
-            &self.fires,
-            &self.animated_water,
-            &self.waters,
-            &self.animated_grass,
-            &self.grasses
+            &self.animation_assets.animated_fire,
+            &self.animation_assets.fires,
+            &self.animation_assets.animated_water,
+            &self.animation_assets.waters,
+            &self.animation_assets.animated_grass,
+            &self.animation_assets.grasses
         );
         
         if let Some(g) = &self.gun {
@@ -677,8 +724,8 @@ impl Scene for Game {
                 g, 
                 &resources, 
                 self.player.has_gun, 
-                self.message_coord, 
-                self.camera.target.x
+                self.game_state.message_coord, 
+                self.game_world.camera.target.x
             );
         }
 
@@ -689,16 +736,16 @@ impl Scene for Game {
                 &resources, 
                 self.player.has_jetpack, 
                 self.player.progress,
-                self.message_coord, 
-                self.camera.target.x
+                self.game_state.message_coord, 
+                self.game_world.camera.target.x
             );
         }
 
         renderer::draw_door_enable_banner(
             self.score_board.game_won, 
             &resources, 
-            self.message_coord, 
-            self.camera.target.x
+            self.game_state.message_coord, 
+            self.game_world.camera.target.x
         );
         
     }}
