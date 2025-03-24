@@ -658,7 +658,7 @@ impl Scene for Game {
         
         // Replace direct drawing with calls to the rendering module
         
-        super::game::renderer::draw_tiles(&tiled_map, self.width_tiles, self.height_tiles);
+        renderer::draw_tiles(&tiled_map, self.width_tiles, self.height_tiles);
         renderer::draw_collectibles(&self.collectibles, &tiled_map);
         renderer::draw_door(&self.door, &tiled_map);
         renderer::draw_animated_objects(
@@ -683,7 +683,7 @@ impl Scene for Game {
         }
 
         if let Some(j) = self.jetpack.as_ref() {
-            super::game::renderer::draw_jetpack(
+            renderer::draw_jetpack(
                 &tiled_map, 
                 j, 
                 &resources, 
