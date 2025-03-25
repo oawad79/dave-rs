@@ -1,7 +1,7 @@
-use std::ops::Deref;
 use std::vec;
 
 use animations::Animations;
+use collision::CollisionManager;
 use macroquad::prelude::{*, animation::*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
@@ -22,6 +22,7 @@ use collectibles::CollectibleType;
 mod collectibles;
 mod animations;
 mod renderer;
+mod collision;
 
 
 const EXPLOSION_DURATION: f32 = 2.0;
@@ -333,154 +334,6 @@ impl Game {
         }
     }
     
-    fn handle_collecting_valuables(&mut self, resources: &Resources, pos: Vec2) {
-        // Check for collision between player and Jewellery
-        for jewellery in & mut self.collectibles {
-            let jewellery_rect = Rect::new(
-                jewellery.world_x,
-                jewellery.world_y - 32.0,
-                32.0,
-                32.0,
-            );
-    
-            if Player::overlaps(pos, &jewellery_rect) {
-                if !self.score_board.game_won && jewellery.name == "cup" {
-                    self.score_board.score += CollectibleType::Cup.data().value;
-                    self.score_board.game_won = true;
-                    play_sound_once(resources.get_sound("trophy"));
-                }
-                else {
-                    self.score_board.score += CollectibleType::from(&jewellery.name).data().value;
-                    jewellery.collected = Option::Some(true);
-                    play_sound_once(resources.get_sound("getitem"));
-                }
-            }
-        }
-    }
-    
-    fn handle_collision_with_deadly(&mut self, resources: &impl Deref<Target = Resources>, pos: Vec2) {
-        self.deadly_objects.iter().for_each(|deadly_object| {
-            let deadly_rect = Rect::new(
-                deadly_object.world_x + 10.0,
-                deadly_object.world_y - 10.0,
-                10.0,
-                7.0,
-            );
-    
-            if Player::overlaps(pos, &deadly_rect) && !self.player.is_dead {
-                self.player.is_dead = true;    
-                self.game_state.player_explosion_active = true;
-                self.game_state.player_explosion_timer = EXPLOSION_DURATION;
-    
-                if self.explosions.is_empty() {
-                    self.explosions.push((Emitter::new(EmitterConfig {
-                        amount: 40,
-                        texture: Some(resources.get_texture("explosion").clone()),
-                        ..Self::particle_explosion()
-                    }), vec2(pos.x + 32.0, pos.y)));
-                }
-                play_sound_once(resources.get_sound("explosion"));
-                play_sound_once(resources.get_sound("hd-die-dave-7"));
-            }
-        });
-    }
-    
-    fn monster_mechanics(&mut self, resources: &Resources, pos: Vec2) {
-        self.monsters.iter_mut().for_each(|monster| {
-            if monster.alive {
-                monster.update(pos);
-    
-                if Player::overlaps(pos, &monster.monster_rectangle()) {
-                    self.player.is_dead = true;
-                    monster.alive = false;
-                    self.score_board.score += monster.kill_value;
-                    
-                    self.game_state.monster_explosion_active = true;
-                    self.game_state.monster_explosion_timer = EXPLOSION_DURATION;
-                    self.game_state.player_explosion_active = true;
-                    self.game_state.player_explosion_timer = EXPLOSION_DURATION;
-    
-                    if self.explosions.is_empty() {
-                        self.explosions.push((Emitter::new(EmitterConfig {
-                            amount: 40,
-                            texture: Some(resources.get_texture("explosion").clone()),
-                            ..Self::particle_explosion()
-                        }), vec2(pos.x, pos.y)));
-                        self.explosions.push((Emitter::new(EmitterConfig {
-                            amount: 40,
-                            texture: Some(resources.get_texture("explosion").clone()),
-                            ..Self::particle_explosion()
-                        }), monster.current_location()));
-                    }
-    
-                    play_sound_once(resources.get_sound("explosion"));
-                    play_sound_once(resources.get_sound("hd-die-dave-7"));
-                }
-    
-                for bullet in &mut self.player.bullets {
-                    let bullet_rect = Rect {
-                        x: bullet.x,
-                        y: bullet.y,
-                        w: resources.get_texture("bullet").width(),
-                        h: resources.get_texture("bullet").height()
-                    };
-    
-                    if bullet_rect.overlaps(&monster.monster_rectangle()) {
-                        bullet.collided = true;
-                        monster.alive = false;
-                        if self.explosions.is_empty() {
-                            self.explosions.push((Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.get_texture("explosion").clone()),
-                                ..Self::particle_explosion()
-                            }), monster.current_location()));
-                        }
-    
-                        play_sound_once(resources.get_sound("explosion"));
-                    }
-                }
-    
-                for bullet in &mut monster.bullets {
-                    let bullet_rect = Rect {
-                        x: bullet.x,
-                        y: bullet.y,
-                        w: resources.get_texture("monster_bullet").width(),
-                        h: resources.get_texture("monster_bullet").height()
-                    };
-    
-                    if Player::overlaps(pos, &bullet_rect) {
-                        bullet.collided = true;
-                        self.player.is_dead = true;
-
-                        self.game_state.player_explosion_active = true;
-                        self.game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-                        if self.explosions.is_empty() {
-                            self.explosions.push((Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.get_texture("explosion").clone()),
-                                ..Self::particle_explosion()
-                            }), vec2(pos.x, pos.y)));
-                        }
-    
-                        play_sound_once(resources.get_sound("explosion"));
-                    }
-                }
-    
-                monster.bullets.retain(|bullet| {
-                    if self.game_world.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
-                        return false
-                    }
-            
-                    if !bullet.collided && bullet.x > pos.x - 100.0 {
-                        return true;
-                    }
-            
-                    false
-                });
-            }
-        });
-    }
 }
 
 impl Scene for Game {
@@ -525,75 +378,40 @@ impl Scene for Game {
             self.game_world.world.set_actor_position(self.player.collider, vec2(pos.x, 0.0));
         }
 
-        self.handle_collecting_valuables(&resources, pos);
+        CollisionManager::handle_collecting_valuables(&mut self.collectibles, pos, &mut self.score_board, &resources);
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
-        if let Some(wz) = &self.warp_zone_rect {
-            if Player::overlaps(pos, wz) {
-                self.score_board.jetpack_captured = false;
-                storage::store(self.score_board.clone());
-                return Some(SceneChange::WarpZone);
-            }
-        }
-        
-        // Check for collision between player and jetpack
-        if let Some(j) = &self.jetpack { 
-            if !self.player.has_jetpack && Player::overlaps(pos, &Rect::new(
-                j.world_x,
-                j.world_y - 32.0,
-                32.0,
-                32.0,
-            )) {
-                play_sound_once(resources.get_sound("jetPackActivated"));
-                self.player.has_jetpack = true;
-                self.score_board.jetpack_captured = true;
-                self.jetpack.as_mut().unwrap().collected = Some(true);
-            }
-        }
-
-        // Check for collision between player and gun
-        if let Some(g) = &self.gun { 
-            if !self.player.has_gun && Player::overlaps(pos, &Rect::new(
-                g.world_x,
-                g.world_y - 32.0,
-                32.0,
-                32.0,
-            )) {
-                play_sound_once(resources.get_sound("gotspecial"));
-                self.player.has_gun = true;
-                self.score_board.gun_captured = true;
-            }
-        }
-        
-        // Check for collision between player and door
-        if self.score_board.game_won && Player::overlaps(pos, &Rect::new(
-            self.door.world_x,
-            self.door.world_y - 32.0,
-            32.0,
-            32.0,
-        )) {
-            self.score_board.game_won = false;
+        if CollisionManager::check_warp_zone_collision(&self.warp_zone_rect, pos) {
             self.score_board.jetpack_captured = false;
-            self.score_board.gun_captured = false;
-
-            play_sound_once(resources.get_sound("win"));
-
-            if self.score_board.level == 0 {
-                self.score_board.level = 10;
-            }
-            else if !self.game_state.is_warp_zone {
-                self.score_board.level += 1;
-            }
-            self.score_board.score += 2000;
             storage::store(self.score_board.clone());
+            return Some(SceneChange::WarpZone);
+        }
+
+        CollisionManager::check_special_item_collisions(
+            &mut self.player, 
+            &self.gun, 
+            &mut self.jetpack, 
+            &mut self.score_board, 
+            &resources, 
+            pos
+        );
+
+        if CollisionManager::check_door_collision(
+            &self.door, 
+            &mut self.score_board, 
+            self.game_state.is_warp_zone, 
+            pos
+        ) {
+            storage::store(self.score_board.clone());
+            play_sound_once(resources.get_sound("win"));
             stop_sound(resources.get_sound("jetPackActivated"));
             return Some(SceneChange::Separator);
         }
-        
+
         self.explosions.retain(|(explosion, _)| explosion.config.emitting);
 
-        self.handle_collision_with_deadly(&resources, pos);
+        CollisionManager::handle_collision_with_deadly(&self.deadly_objects, &mut self.player, &mut self.explosions, &mut self.game_state.player_explosion_active, &mut self.game_state.player_explosion_timer, &resources, pos);
 
         if !self.game_state.player_explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
@@ -666,7 +484,16 @@ impl Scene for Game {
         let screen_left = self.game_world.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_world.camera.target.x + screen_width() / 2.0;
 
-        self.monster_mechanics(&resources, pos);
+        CollisionManager::handle_monster_collisions(
+            &mut self.monsters, 
+            &mut self.player, 
+            &mut self.score_board, 
+            &mut self.explosions, 
+            &mut self.game_state, 
+            &resources, 
+            &mut self.game_world.world, 
+            pos
+        );
 
         self.player.bullets.retain(|bullet| {
             if self.game_world.world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
