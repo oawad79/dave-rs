@@ -6,7 +6,7 @@ use macroquad::prelude::{*, animation::*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{load_map, Map, Object};
-use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
+use macroquad_particles::Emitter;
 
 use crate::score_board::GameObject;
 use crate::{
@@ -24,8 +24,6 @@ mod animations;
 mod renderer;
 mod collision;
 
-
-const EXPLOSION_DURATION: f32 = 2.0;
 
 pub struct GameWorld {
     pub world: World,
@@ -315,25 +313,6 @@ impl Game {
             
         }
     }
-
-    pub fn particle_explosion() -> EmitterConfig {
-        EmitterConfig {
-            local_coords: false,
-            one_shot: true,
-            emitting: true,
-            lifetime: EXPLOSION_DURATION,
-            lifetime_randomness: 0.3,
-            explosiveness: 0.65,
-            initial_direction_spread: 2.0 * std::f32::consts::PI,
-            initial_velocity: 200.0,
-            initial_velocity_randomness: 0.8,
-            size: 16.0,
-            size_randomness: 0.3,
-            atlas: Some(AtlasConfig::new(5, 1, 0..)),
-            ..Default::default()
-        }
-    }
-    
 }
 
 impl Scene for Game {
