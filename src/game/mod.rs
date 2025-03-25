@@ -5,7 +5,7 @@ use collision::CollisionManager;
 use macroquad::prelude::{*, animation::*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
-use macroquad_tiled::{load_map, Map, Object};
+use macroquad_tiled::{Map, Object};
 use macroquad_particles::Emitter;
 
 use crate::score_board::GameObject;
@@ -118,35 +118,13 @@ impl Game {
             score_board.gun_captured, score_board.jetpack_captured, 
             initialization::should_attach_player(&tiled_map));
 
-        let objects_layer = tiled_map.layers.get("collectibles").unwrap();
         let collectibles = 
-            if retry { score_board.collectibles.clone() } 
-            else { 
-                objects_layer.objects
-                .iter()
-                .map(|entry| 
-                    GameObject {
-                        world_x: entry.world_x,
-                        world_y: entry.world_y,
-                        width: entry.world_w,
-                        height: entry.world_h,
-                        name: entry.name.clone(),
-                        collected: None,
-                        progress: 0.0
-                    }
-            ).collect::<Vec<GameObject>>()};
+            initialization::load_objects_in_layer(retry, &score_board, &tiled_map, "collectibles");    
+        
 
         let gun = if tiled_map.contains_layer("gun") {     
-            let gun_object = tiled_map.layers.get("gun").unwrap().objects.first().unwrap();    
-            Some(GameObject {
-                world_x: gun_object.world_x,
-                world_y: gun_object.world_y,
-                width: gun_object.world_w,
-                height: gun_object.world_h,
-                name: gun_object.name.clone(),
-                collected: None,
-                progress: 0.0
-            })
+            initialization::load_objects_in_layer(
+                retry, &score_board, &tiled_map, "gun").first().cloned()
         }
         else {
             None
