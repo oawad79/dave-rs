@@ -3,6 +3,31 @@ use macroquad_tiled::{load_map, Map};
 
 use crate::resources::Resources;
 
+pub fn should_attach_player(tiled_map: &Map) -> bool {
+    tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.contains_key("attach")
+}
+
+// pub fn f() -> {
+//     let collectibles = 
+//             if retry { score_board.collectibles.clone() } 
+//             else { 
+//                 objects_layer.objects
+//                 .iter()
+//                 .map(|entry| 
+//                     GameObject {
+//                         world_x: entry.world_x,
+//                         world_y: entry.world_y,
+//                         width: entry.world_w,
+//                         height: entry.world_h,
+//                         name: entry.name.clone(),
+//                         collected: None,
+//                         progress: 0.0
+//                     }
+//             ).collect::<Vec<GameObject>>()};
+
+//     collectibles
+// }
+
 pub fn load_static_colliders(layer_name: &str, tiled_map: &Map, tyle_type: Tile) -> Vec<Tile> {
     let mut static_colliders = vec![];
     for (_x, _y, tile) in tiled_map.tiles(layer_name, None) {

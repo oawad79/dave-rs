@@ -82,7 +82,7 @@ impl Game {
         let static_colliders = 
                 initialization::load_static_colliders(
                     "platform", &tiled_map, Tile::Solid);
-                    
+
         let tree_static_colliders = 
                 if tiled_map.contains_layer("tree_collider") { 
                     initialization::load_static_colliders(
@@ -100,8 +100,7 @@ impl Game {
         world.add_static_tiled_layer(tree_static_colliders, 32., 32., width as usize, 2);
 
         let player_loc = tiled_map.layers.get("player").unwrap().objects.first().unwrap();
-        
-        
+                
         let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
     
         let mut score_board = 
@@ -115,10 +114,9 @@ impl Game {
             score_board.level = level;
         }
 
-        let attach = tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.get("attach");
-
         let player = Player::new(actor, 
-            score_board.gun_captured, score_board.jetpack_captured, attach.is_some());
+            score_board.gun_captured, score_board.jetpack_captured, 
+            initialization::should_attach_player(&tiled_map));
 
         let objects_layer = tiled_map.layers.get("collectibles").unwrap();
         let collectibles = 
