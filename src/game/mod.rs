@@ -23,6 +23,7 @@ mod collectibles;
 mod animations;
 mod renderer;
 mod collision;
+mod initialization;
 
 
 pub struct GameWorld {
@@ -72,40 +73,8 @@ impl Game {
     pub fn new(level: u32, retry: bool, cheat: bool, is_warp_zone: bool) -> Self {
         let resources = storage::get::<Resources>();
         
-        let map_data = if is_warp_zone {
-            resources.warp_zones.get(&i32::try_from(if level == 0 {10} else {level}).unwrap()).unwrap()
-        }
-        else {
-            &resources.levels[(if level == 0 {9} else {level - 1}) as usize]
-        };
+        let tiled_map = initialization::load_map_data(&resources, level, is_warp_zone);
         
-        let tiled_map = load_map(
-            map_data,
-            &[
-                ("images/mytileset.png", resources.get_texture("mytileset").clone()),
-                ("images/dave_walk.png", resources.get_texture("dave_walk").clone()),
-                ("images/dave_idle.png", resources.get_texture("dave_idle").clone()),
-                ("images/dave_jump.png", resources.get_texture("dave_jump").clone()),
-                ("images/collectibles.png", resources.get_texture("collectibles").clone()),
-                ("images/door.png", resources.get_texture("door").clone()),
-                ("images/tuple.png", resources.get_texture("tuple").clone()),
-                ("images/tuple_r.png", resources.get_texture("tuple_r").clone()),   
-                ("images/deadly.png", resources.get_texture("deadly").clone()),     
-                ("images/fire1-sheet.png", resources.get_texture("fire1-sheet").clone()),
-                ("images/water1-sheet.png", resources.get_texture("water1-sheet").clone()),
-                ("images/door_enable_banner.png", resources.get_texture("door_enable_banner").clone()),
-                ("images/gun_icon.png", resources.get_texture("gun_icon").clone()),
-                ("images/gun.png", resources.get_texture("gun").clone()),
-                ("images/jetpack2.png", resources.get_texture("jetpack2").clone()),
-                ("images/player_jetpack.png", resources.get_texture("player_jetpack").clone()),
-                ("images/stars-sheet.png", resources.get_texture("stars-sheet").clone()),
-                ("images/tree.png", resources.get_texture("tree").clone()),
-                ("images/climb-sheet.png", resources.get_texture("climb-sheet").clone()),
-            ],
-            &[],
-        )
-        .unwrap();
-
         storage::store(tiled_map);
 
         let tiled_map = storage::get::<Map>();
@@ -273,7 +242,6 @@ impl Game {
                 w: go.world_w,
                 h: go.world_h,
             })
-                
         }
         else {
             None
@@ -310,7 +278,6 @@ impl Game {
             monsters,
             jetpack,
             warp_zone_rect,
-            
         }
     }
 }
@@ -420,8 +387,6 @@ impl Scene for Game {
                 self.game_state.monster_explosion_active = false;
             }
         }
-
-        
 
         if self.game_state.player_explosion_active {
             self.game_state.player_explosion_timer -= get_frame_time();
