@@ -79,27 +79,19 @@ impl Game {
 
         let tiled_map = storage::get::<Map>();
 
-        let mut static_colliders = vec![];
-        for (_x, _y, tile) in tiled_map.tiles("platform", None) {
-            static_colliders.push(if tile.is_some() {
-                Tile::Solid
-            } else {
-                Tile::Empty
-            });
-        }
-
-        let mut tree_static_colliders = vec![];
-        if tiled_map.contains_layer("tree_collider") {
-            
-            for (_x, _y, tile) in tiled_map.tiles("tree_collider", None) {
-                tree_static_colliders.push(if tile.is_some() {
-                    Tile::JumpThrough
-                } else {
-                    Tile::Empty
-                });
-            }
-        }
-
+        let static_colliders = 
+                initialization::load_static_colliders(
+                    "platform", &tiled_map, Tile::Solid);
+                    
+        let tree_static_colliders = 
+                if tiled_map.contains_layer("tree_collider") { 
+                    initialization::load_static_colliders(
+                        "tree_collider", &tiled_map, Tile::JumpThrough)
+                } 
+                else { 
+                    vec![] 
+                };
+        
         let height = tiled_map.layers.get("platform").unwrap().height;
         let width = tiled_map.layers.get("platform").unwrap().width;
         

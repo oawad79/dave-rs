@@ -1,6 +1,20 @@
+use macroquad_platformer::Tile;
 use macroquad_tiled::{load_map, Map};
 
 use crate::resources::Resources;
+
+pub fn load_static_colliders(layer_name: &str, tiled_map: &Map, tyle_type: Tile) -> Vec<Tile> {
+    let mut static_colliders = vec![];
+    for (_x, _y, tile) in tiled_map.tiles(layer_name, None) {
+        static_colliders.push(if tile.is_some() {
+            tyle_type
+        } else {
+            Tile::Empty
+        });
+    }
+    static_colliders
+}
+
 
 pub fn load_map_data(resources: &Resources, level: u32, is_warp_zone: bool) -> Map {
     let map_data = if is_warp_zone {
