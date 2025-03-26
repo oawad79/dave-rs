@@ -76,14 +76,10 @@ impl CollisionManager {
         false
     }
 
-    pub fn check_special_item_collisions(
-        player: &mut Player,
-        gun: &Option<GameObject>,
+    pub fn check_jetpack_collision(player: &mut Player,
         jetpack: &mut Option<GameObject>,
         score_board: &mut crate::score_board::ScoreBoard,
-        resources: &Resources,
-        player_pos: Vec2,
-    ) {
+        player_pos: Vec2) -> bool {
         // Check for collision between player and jetpack
         if let Some(j) = jetpack {
             if !player.has_jetpack
@@ -92,13 +88,25 @@ impl CollisionManager {
                     &Rect::new(j.world_x, j.world_y - 32.0, 32.0, 32.0),
                 )
             {
-                play_sound_once(resources.get_sound("jetPackActivated"));
                 player.has_jetpack = true;
                 score_board.jetpack_captured = true;
                 jetpack.as_mut().unwrap().collected = Some(true);
+                return true;
             }
+
+            return false;
         }
 
+        false
+
+    }
+
+    pub fn check_gun_collision(
+        player: &mut Player,
+        gun: &Option<GameObject>,
+        score_board: &mut crate::score_board::ScoreBoard,
+        player_pos: Vec2,
+    ) -> bool {
         // Check for collision between player and gun
         if let Some(g) = gun {
             if !player.has_gun
@@ -107,11 +115,15 @@ impl CollisionManager {
                     &Rect::new(g.world_x, g.world_y - 32.0, 32.0, 32.0),
                 )
             {
-                play_sound_once(resources.get_sound("gotspecial"));
                 player.has_gun = true;
                 score_board.gun_captured = true;
+                return true;
             }
+
+            return false;
         }
+
+        false
     }
 
     pub fn handle_monster_collisions(

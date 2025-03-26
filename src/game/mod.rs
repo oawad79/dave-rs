@@ -18,7 +18,6 @@ use crate::{
 };
 use collectibles::CollectibleType;
 
-
 mod collectibles;
 mod animations;
 mod renderer;
@@ -43,19 +42,19 @@ pub struct GameState {
     pub is_warp_zone: bool,
 }
 
-pub struct AnimationAssets {
-    pub animated_fire: Option<AnimatedSprite>,
-    pub animated_water: Option<AnimatedSprite>,
-    pub animated_grass: Option<AnimatedSprite>,
-    pub fires: Vec<Object>,
-    pub waters: Vec<Object>,
-    pub grasses: Vec<Object>,
-}
+// pub struct AnimationAssets {
+//     pub animated_fire: Option<AnimatedSprite>,
+//     pub animated_water: Option<AnimatedSprite>,
+//     pub animated_grass: Option<AnimatedSprite>,
+//     pub fires: Vec<Object>,
+//     pub waters: Vec<Object>,
+//     pub grasses: Vec<Object>,
+// }
 
 pub struct Game {
     game_world: GameWorld,
     game_state: GameState,
-    animation_assets: AnimationAssets,
+    animation_assets: Animations,
     player: Player,
     collectibles: Vec<GameObject>,
     door: GameObject,
@@ -158,33 +157,13 @@ impl Game {
             progress: 0.0
         };
         
-        
+        let animation_assets = Animations::load(&tiled_map);
 
-        let (animated_fire, fires) = 
-                            Animations::load_animation(&tiled_map, "fire", 3);
-        let (animated_water, waters) = 
-                            Animations::load_animation(&tiled_map, "water", 5);
-
-        let (animated_grass, grasses) = 
-                            Animations::load_animation(&tiled_map, "grass", 4);
-
-        let animation_assets = AnimationAssets {
-            animated_fire,
-            animated_water,
-            animated_grass,
-            fires,
-            waters,
-            grasses,
-        };
-
-        
-
-        let mut deadly_objects: Vec<Object> = Vec::new();
-
+        let mut deadly_objects = vec![];
         deadly_objects.extend(animation_assets.fires.iter().cloned());
         deadly_objects.extend(animation_assets.waters.iter().cloned());
         deadly_objects.extend(animation_assets.grasses.iter().cloned());
-        
+
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
 
         let message_coord = (
@@ -302,14 +281,23 @@ impl Scene for Game {
             return Some(SceneChange::WarpZone);
         }
 
-        CollisionManager::check_special_item_collisions(
+        if CollisionManager::check_gun_collision(
             &mut self.player, 
             &self.gun, 
+            &mut self.score_board, 
+            pos
+        ) {
+            play_sound_once(resources.get_sound("gotspecial"));
+        }
+
+        if CollisionManager::check_jetpack_collision(
+            &mut self.player, 
             &mut self.jetpack, 
             &mut self.score_board, 
-            &resources, 
             pos
-        );
+        ) {
+            play_sound_once(resources.get_sound("jetPackActivated"));
+        }
 
         if CollisionManager::check_door_collision(
             &self.door, 

@@ -2,11 +2,36 @@ use macroquad::prelude::{animation::{AnimatedSprite, Animation}, *};
 use macroquad_tiled::{Map, Object};
 
 pub struct Animations {
-    // pub animated_object: Option<AnimatedSprite>,
-    // pub objects: Vec<Object>,
+    pub animated_fire: Option<AnimatedSprite>,
+    pub animated_water: Option<AnimatedSprite>,
+    pub animated_grass: Option<AnimatedSprite>,
+    pub fires: Vec<Object>,
+    pub waters: Vec<Object>,
+    pub grasses: Vec<Object>,
 }
 
 impl Animations {
+
+    pub fn load(tiled_map: &Map) -> Self {
+        let (animated_fire, fires) = 
+                            Animations::load_animation(tiled_map, "fire", 3);
+        let (animated_water, waters) = 
+                            Animations::load_animation(tiled_map, "water", 5);
+        let (animated_grass, grasses) = 
+                            Animations::load_animation(tiled_map, "grass", 4);
+
+        
+
+        Self {
+            animated_fire,
+            animated_water,
+            animated_grass,
+            fires,
+            waters,
+            grasses,
+        }
+    }
+
     fn create_animation(name: &str, frames: u32) -> AnimatedSprite {
         let mut ani = AnimatedSprite::new(
             32,
