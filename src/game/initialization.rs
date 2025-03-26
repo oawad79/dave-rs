@@ -1,7 +1,7 @@
 use macroquad_platformer::Tile;
 use macroquad_tiled::{load_map, Map};
 
-use crate::{resources::Resources, score_board::{self, GameObject, ScoreBoard}};
+use crate::{resources::Resources, score_board::{GameObject, ScoreBoard}};
 
 pub fn should_attach_player(tiled_map: &Map) -> bool {
     tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.contains_key("attach")
@@ -11,7 +11,7 @@ pub fn load_objects_in_layer(retry: bool,
     score_board: &ScoreBoard, 
     tiled_map: &Map, 
     layer_name: &str) -> Vec<GameObject> {
-        
+
     let objects_layer = tiled_map.layers.get(layer_name).unwrap();
 
     if retry { score_board.collectibles.clone() } 
