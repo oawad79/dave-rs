@@ -1,3 +1,4 @@
+use macroquad::time::get_frame_time;
 use macroquad_tiled::Map;
 
 pub struct GameState {
@@ -25,6 +26,22 @@ impl GameState {
             message_coord,
             cheat,
             is_warp_zone,
+        }
+    }
+
+    pub fn update(&mut self) {
+        if self.monster_explosion_active {
+            self.monster_explosion_timer -= get_frame_time();
+            if self.monster_explosion_timer <= 0.0 {
+                self.monster_explosion_active = false;
+            }
+        }
+
+        if self.player_explosion_active {
+            self.player_explosion_timer -= get_frame_time();
+            if self.player_explosion_timer <= 0.0 {
+                self.player_explosion_active = false;
+            }
         }
     }
 }

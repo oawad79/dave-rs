@@ -287,19 +287,7 @@ impl Scene for Game {
             explosion.draw(vec2(coords.x, coords.y));
         }
 
-        if self.game_state.monster_explosion_active {
-            self.game_state.monster_explosion_timer -= get_frame_time();
-            if self.game_state.monster_explosion_timer <= 0.0 {
-                self.game_state.monster_explosion_active = false;
-            }
-        }
-
-        if self.game_state.player_explosion_active {
-            self.game_state.player_explosion_timer -= get_frame_time();
-            if self.game_state.player_explosion_timer <= 0.0 {
-                self.game_state.player_explosion_active = false;
-            }
-        }
+        self.game_state.update();
         
         if tiled_map.contains_layer("tree_collider") {
             tiled_map.draw_tiles(
