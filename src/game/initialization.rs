@@ -1,10 +1,40 @@
-use macroquad_platformer::Tile;
+use macroquad::math::vec2;
+use macroquad_platformer::{Actor, Tile, World};
 use macroquad_tiled::{load_map, Map};
 
 use crate::{resources::Resources, score_board::{GameObject, ScoreBoard}};
 
 pub fn should_attach_player(tiled_map: &Map) -> bool {
     tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.contains_key("attach")
+}
+
+pub fn create_world(
+    width: i32,
+    tiled_map: &Map,
+) -> (World, Actor) {
+
+    let static_colliders = 
+                load_static_colliders(
+                    "platform", &tiled_map, Tile::Solid);
+
+    let tree_static_colliders = 
+            if tiled_map.contains_layer("tree_collider") { 
+                load_static_colliders(
+                    "tree_collider", &tiled_map, Tile::JumpThrough)
+            } 
+            else { 
+                vec![] 
+            };
+
+    let mut world = World::new();
+    world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
+    world.add_static_tiled_layer(tree_static_colliders, 32., 32., width as usize, 2);
+
+    let player_loc = tiled_map.layers.get("player").unwrap().objects.first().unwrap();
+                 
+    let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
+
+    (world, actor)
 }
 
 pub fn load_objects_in_layer(retry: bool, 

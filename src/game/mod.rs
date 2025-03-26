@@ -68,30 +68,14 @@ impl Game {
 
         let tiled_map = storage::get::<Map>();
 
-        let static_colliders = 
-                initialization::load_static_colliders(
-                    "platform", &tiled_map, Tile::Solid);
-
-        let tree_static_colliders = 
-                if tiled_map.contains_layer("tree_collider") { 
-                    initialization::load_static_colliders(
-                        "tree_collider", &tiled_map, Tile::JumpThrough)
-                } 
-                else { 
-                    vec![] 
-                };
-        
         let height = tiled_map.layers.get("platform").unwrap().height;
         let width = tiled_map.layers.get("platform").unwrap().width;
         
-        let mut world = World::new();
-        world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
-        world.add_static_tiled_layer(tree_static_colliders, 32., 32., width as usize, 2);
+        let (world, actor) = initialization::create_world(
+            width as i32, 
+            &tiled_map
+        );    
 
-        let player_loc = tiled_map.layers.get("player").unwrap().objects.first().unwrap();
-                
-        let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 32, 32);
-    
         let mut score_board = 
                         if (cheat || level == 1) && !retry {
                             ScoreBoard::new()
