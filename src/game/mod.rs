@@ -35,16 +35,6 @@ pub struct GameWorld {
     pub width_tiles: i32
 }
 
-// pub struct GameState {
-//     pub monster_explosion_active: bool,
-//     pub monster_explosion_timer: f32,
-//     pub player_explosion_active: bool,
-//     pub player_explosion_timer: f32,
-//     pub message_coord: (f32, f32),
-//     pub cheat: bool,
-//     pub is_warp_zone: bool,
-// }
-
 pub struct Game {
     game_world: GameWorld,
     game_state: GameState,
