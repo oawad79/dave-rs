@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use macroquad::{
     audio::play_sound_once,
-    math::{Rect, Vec2, vec2},
+    math::{vec2, Rect, Vec2}, prelude::animation::AnimatedSprite,
 };
 use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
 use macroquad_platformer::Tile;
@@ -245,7 +247,7 @@ impl CollisionManager {
     }
 
     pub fn handle_collision_with_deadly(
-        deadly_objects: &Vec<Object>,
+        deadly_objects: &HashMap<String, (Option<AnimatedSprite>, Vec<Object>)>,
         player: &mut Player,
         explosions: &mut Vec<(Emitter, Vec2)>,
         player_explosion_active: &mut bool,
@@ -253,10 +255,12 @@ impl CollisionManager {
         resources: &Resources,
         player_pos: Vec2,
     ) {
-        deadly_objects.iter().for_each(|deadly_object| {
-            let deadly_rect = Rect::new(
-                deadly_object.world_x + 10.0,
-                deadly_object.world_y - 10.0,
+        
+        deadly_objects.iter().for_each(|(_, (_, objects))| {
+            objects.iter().for_each(|object| {
+                let deadly_rect = Rect::new(
+                object.world_x + 10.0,
+                object.world_y - 10.0,
                 10.0,
                 7.0,
             );
@@ -280,7 +284,8 @@ impl CollisionManager {
                 play_sound_once(resources.get_sound("hd-die-dave-7"));
             }
         });
-    }
+    });
+}
 
     pub fn handle_collecting_valuables(
         collectibles: &mut Vec<GameObject>,

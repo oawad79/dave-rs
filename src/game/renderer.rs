@@ -5,6 +5,8 @@ use crate::score_board::GameObject;
 use crate::resources::Resources;
 use crate::game::CollectibleType;
 
+use super::animations::Animations;
+
 /// Draws all collectible items on the map
 pub fn draw_collectibles(collectibles: &[GameObject], tiled_map: &Map) {
     for diamond in collectibles {
@@ -142,42 +144,19 @@ pub fn draw_jetpack(
     }
 }
 
-/// Draws all animated objects (fire, water, grass)
-pub fn draw_animated_objects(
-    tiled_map: &Map,
-    animated_fire: &Option<AnimatedSprite>,
-    fires: &[Object],
-    animated_water: &Option<AnimatedSprite>,
-    waters: &[Object],
-    animated_grass: &Option<AnimatedSprite>,
-    grasses: &[Object]
-) {
-    if let Some(animated_fire) = animated_fire {
-        for fire in fires {
-            tiled_map.spr_ex(
-                "fire1-sheet",
-                animated_fire.frame().source_rect,
-                Rect::new(fire.world_x, fire.world_y - 32.0, 32.0, 32.0),
-            );
-        }
+pub fn draw_animations(tiled_map: &Map, animations: &Animations) {
+    for (sheet, (animated, objects)) in animations.deadly_objects.iter() {
+        draw_animated(tiled_map, sheet, animated, objects);
     }
+}
 
-    if let Some(animated_water) = animated_water {
-        for water in waters {
+pub fn draw_animated(tiled_map: &Map, sheet: &str, animated: &Option<AnimatedSprite>, objects: &[Object]) {
+    if let Some(animated) = animated {
+        for object in objects {
             tiled_map.spr_ex(
-                "water1-sheet",
-                animated_water.frame().source_rect,
-                Rect::new(water.world_x, water.world_y - 32.0, 32.0, 32.0),
-            );
-        }
-    }
-
-    if let Some(animated_grass) = animated_grass {
-        for grass in grasses {
-            tiled_map.spr_ex(
-                "deadly",
-                animated_grass.frame().source_rect,
-                Rect::new(grass.world_x, grass.world_y - 32.0, 32.0, 32.0),
+                sheet,
+                animated.frame().source_rect,
+                Rect::new(object.world_x, object.world_y - 32.0, 32.0, 32.0),
             );
         }
     }

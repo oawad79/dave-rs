@@ -5,7 +5,7 @@ use collision::CollisionManager;
 use macroquad::prelude::{*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
-use macroquad_tiled::{Map, Object};
+use macroquad_tiled::Map;
 use macroquad_particles::Emitter;
 
 use crate::score_board::GameObject;
@@ -45,13 +45,13 @@ pub struct GameState {
 pub struct Game {
     game_world: GameWorld,
     game_state: GameState,
-    animation_assets: Animations,
+    animations: Animations,
     player: Player,
     collectibles: Vec<GameObject>,
     door: GameObject,
     score_board: ScoreBoard,
     explosions: Vec<(Emitter, Vec2)>,
-    deadly_objects: Vec<Object>,
+    //deadly_objects: Vec<Object>,
     gun: Option<GameObject>,
     monsters: Vec<Monster>,
     jetpack: Option<GameObject>,
@@ -111,7 +111,6 @@ impl Game {
         let collectibles = 
             initialization::load_objects_in_layer(retry, &score_board, &tiled_map, "collectibles");    
         
-
         let gun = if tiled_map.contains_layer("gun") {     
             initialization::load_objects_in_layer(
                 retry, &score_board, &tiled_map, "gun").first().cloned()
@@ -148,12 +147,7 @@ impl Game {
             progress: 0.0
         };
         
-        let animation_assets = Animations::new(&tiled_map);
-
-        let mut deadly_objects = vec![];
-        deadly_objects.extend(animation_assets.fires.iter().cloned());
-        deadly_objects.extend(animation_assets.waters.iter().cloned());
-        deadly_objects.extend(animation_assets.grasses.iter().cloned());
+        let animations = Animations::load_deadly_objects(&tiled_map);
 
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
 
@@ -205,13 +199,13 @@ impl Game {
         Self {
             game_world,
             game_state,
-            animation_assets,
+            animations,
             player,
             collectibles,
             door,
             score_board,
             explosions: vec![],
-            deadly_objects,
+            //deadly_objects,
             gun,
             monsters,
             jetpack,
@@ -304,7 +298,7 @@ impl Scene for Game {
 
         self.explosions.retain(|(explosion, _)| explosion.config.emitting);
 
-        CollisionManager::handle_collision_with_deadly(&self.deadly_objects, &mut self.player, &mut self.explosions, &mut self.game_state.player_explosion_active, &mut self.game_state.player_explosion_timer, &resources, pos);
+        CollisionManager::handle_collision_with_deadly(&self.animations.deadly_objects, &mut self.player, &mut self.explosions, &mut self.game_state.player_explosion_active, &mut self.game_state.player_explosion_timer, &resources, pos);
 
         if !self.game_state.player_explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
@@ -360,7 +354,7 @@ impl Scene for Game {
 
         self.player.update(&mut self.game_world.world);
 
-        self.animation_assets.update();
+        self.animations.update();
 
         let screen_left = self.game_world.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_world.camera.target.x + screen_width() / 2.0;
@@ -392,20 +386,12 @@ impl Scene for Game {
 
         self.score_board.draw();
         
-        // Replace direct drawing with calls to the rendering module
-        
         renderer::draw_tiles(&tiled_map, self.game_world.width_tiles, self.game_world.height_tiles);
         renderer::draw_collectibles(&self.collectibles, &tiled_map);
         renderer::draw_door(&self.door, &tiled_map);
-        renderer::draw_animated_objects(
-            &tiled_map,
-            &self.animation_assets.animated_fire,
-            &self.animation_assets.fires,
-            &self.animation_assets.animated_water,
-            &self.animation_assets.waters,
-            &self.animation_assets.animated_grass,
-            &self.animation_assets.grasses
-        );
+        
+
+        renderer::draw_animations(&tiled_map, &self.animations);
         
         if let Some(g) = &self.gun {
             renderer::draw_gun(

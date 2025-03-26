@@ -1,18 +1,15 @@
+use std::collections::HashMap;
+
 use macroquad::prelude::{animation::{AnimatedSprite, Animation}, *};
 use macroquad_tiled::{Map, Object};
 
 pub struct Animations {
-    pub animated_fire: Option<AnimatedSprite>,
-    pub animated_water: Option<AnimatedSprite>,
-    pub animated_grass: Option<AnimatedSprite>,
-    pub fires: Vec<Object>,
-    pub waters: Vec<Object>,
-    pub grasses: Vec<Object>,
+    pub deadly_objects: HashMap<String, (Option<AnimatedSprite>, Vec<Object>)>
 }
 
 impl Animations {
 
-    pub fn new(tiled_map: &Map) -> Self {
+    pub fn load_deadly_objects(tiled_map: &Map) -> Animations {
         let (animated_fire, fires) = 
                             Animations::load_animation(tiled_map, "fire", 3);
         let (animated_water, waters) = 
@@ -20,31 +17,23 @@ impl Animations {
         let (animated_grass, grasses) = 
                             Animations::load_animation(tiled_map, "grass", 4);
 
-        
+        let deadly_objects = HashMap::from([
+            ("fire1-sheet".to_string(), (animated_fire, fires)),
+            ("water1-sheet".to_string(), (animated_water, waters)),
+            ("deadly".to_string(), (animated_grass, grasses)),
+        ]);
 
-        Self {
-            animated_fire,
-            animated_water,
-            animated_grass,
-            fires,
-            waters,
-            grasses,
+        Animations {
+            deadly_objects
         }
     }
 
     pub fn update(&mut self) {
-        if self.animated_fire.is_some() {
-            self.animated_fire.as_mut().unwrap().update();
+        for (_, (animated, _)) in self.deadly_objects.iter_mut() {
+            if let Some(animated) = animated {
+                animated.update();
+            }
         }
-
-        if self.animated_water.is_some() {
-            self.animated_water.as_mut().unwrap().update();
-        }
-
-        if self.animated_grass.is_some() {
-            self.animated_grass.as_mut().unwrap().update();
-        }
-        
     }
 
     fn create_animation(name: &str, frames: u32) -> AnimatedSprite {
