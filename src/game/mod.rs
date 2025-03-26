@@ -254,7 +254,8 @@ impl Scene for Game {
             self.game_world.world.set_actor_position(self.player.collider, vec2(pos.x, 0.0));
         }
 
-        CollisionManager::handle_collecting_valuables(&mut self.collectibles, pos, &mut self.score_board, &resources);
+        CollisionManager::handle_collecting_valuables(
+            &mut self.collectibles, pos, &mut self.score_board, &resources);
 
         self.collectibles.retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
@@ -296,7 +297,15 @@ impl Scene for Game {
 
         self.explosions.retain(|(explosion, _)| explosion.config.emitting);
 
-        CollisionManager::handle_collision_with_deadly(&self.animations.deadly_objects, &mut self.player, &mut self.explosions, &mut self.game_state.player_explosion_active, &mut self.game_state.player_explosion_timer, &resources, pos);
+        CollisionManager::handle_collision_with_deadly(
+            &self.animations.deadly_objects, 
+            &mut self.player, 
+            &mut self.explosions, 
+            &mut self.game_state.player_explosion_active, 
+            &mut self.game_state.player_explosion_timer, 
+            &resources, 
+            pos
+        );
 
         if !self.game_state.player_explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
