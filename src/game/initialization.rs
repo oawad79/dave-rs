@@ -1,11 +1,30 @@
-use macroquad::math::vec2;
+use macroquad::math::{vec2, Rect};
 use macroquad_platformer::{Actor, Tile, World};
 use macroquad_tiled::{load_map, Map};
 
 use crate::{resources::Resources, score_board::{GameObject, ScoreBoard}};
 
+use super::GameState;
+
 pub fn should_attach_player(tiled_map: &Map) -> bool {
     tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.contains_key("attach")
+}
+
+pub fn initial_state(tiled_map: &Map, cheat: bool) -> GameState {
+    let message_coord = (
+        tiled_map.layers.get("message").unwrap().objects[0].world_x, 
+        tiled_map.layers.get("message").unwrap().objects[0].world_y
+    );
+
+    GameState {
+        monster_explosion_active: false,
+        monster_explosion_timer: 2.0,
+        player_explosion_active: false,
+        player_explosion_timer: 2.0,
+        message_coord,
+        cheat,
+        is_warp_zone: false,
+    }
 }
 
 pub fn create_world(
@@ -59,6 +78,45 @@ pub fn load_objects_in_layer(retry: bool,
                 progress: 0.0
             }
     ).collect::<Vec<GameObject>>()}
+
+}
+
+pub fn load_collision_zone_in_layer(tiled_map: &Map, 
+    layer_name: &str) -> Option<Rect> {
+
+    if tiled_map.contains_layer(layer_name) {
+        let go = tiled_map.layers.get(layer_name).unwrap().objects.first().unwrap();
+        Some(Rect {
+            x: go.world_x,
+            y: go.world_y,
+            w: go.world_w,
+            h: go.world_h,
+        })
+    }
+    else {
+        None
+    }
+
+}
+
+pub fn load_object_in_layer(tiled_map: &Map, 
+    layer_name: &str) -> Option<GameObject> {
+
+    let objects_layer = tiled_map.layers.get(layer_name).unwrap();
+
+    objects_layer.objects
+        .iter()
+        .map(|entry| 
+            GameObject {
+                world_x: entry.world_x,
+                world_y: entry.world_y,
+                width: entry.world_w,
+                height: entry.world_h,
+                name: entry.name.clone(),
+                collected: None,
+                progress: 0.0
+            }
+    ).next()
 
 }
 

@@ -103,41 +103,34 @@ impl Game {
         };
 
         let jetpack = if tiled_map.contains_layer("jetpack") {
-            let jetpack_object = tiled_map.layers.get("jetpack").unwrap().objects.first().unwrap();    
-            Some(GameObject {
-                world_x: jetpack_object.world_x,
-                world_y: jetpack_object.world_y,
-                width: jetpack_object.world_w,
-                height: jetpack_object.world_h,
-                name: jetpack_object.name.clone(),
-                collected: if score_board.jetpack_captured { Some(true) } else { None },
-                progress: 0.0
-            })
+            initialization::load_objects_in_layer(
+                retry, &score_board, &tiled_map, "jetpack").first().cloned()
         }
         else {
             None
         };
 
-        let door = tiled_map.layers.get("door").unwrap().objects.first().unwrap();
-
-        let door = GameObject {
-            world_x: door.world_x,
-            world_y: door.world_y,
-            width: door.world_w,
-            height: door.world_h,
-            name: door.name.clone(),
-            collected: None,
-            progress: 0.0
-        };
         
+
+        // let jetpack = if tiled_map.contains_layer("jetpack") {
+        //     let jetpack_object = tiled_map.layers.get("jetpack").unwrap().objects.first().unwrap();    
+        //     Some(GameObject {
+        //         world_x: jetpack_object.world_x,
+        //         world_y: jetpack_object.world_y,
+        //         width: jetpack_object.world_w,
+        //         height: jetpack_object.world_h,
+        //         name: jetpack_object.name.clone(),
+        //         collected: if score_board.jetpack_captured { Some(true) } else { None },
+        //         progress: 0.0
+        //     })
+        // }
+        // else {
+        //     None
+        // };
+
         let animations = Animations::load_deadly_objects(&tiled_map);
 
         let camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
-
-        let message_coord = (
-            tiled_map.layers.get("message").unwrap().objects[0].world_x, 
-            tiled_map.layers.get("message").unwrap().objects[0].world_y
-        );
 
         let monsters: Vec<Monster>  = if retry {
             score_board.monsters.clone()
@@ -149,19 +142,9 @@ impl Game {
             vec![]
         };
         
-        let warp_zone_rect = if tiled_map.contains_layer("warp_zone") {
-            let go = tiled_map.layers.get("warp_zone").unwrap().objects.first().unwrap();
-            Some(Rect {
-                x: go.world_x,
-                y: go.world_y,
-                w: go.world_w,
-                h: go.world_h,
-            })
-        }
-        else {
-            None
-        };
-
+        let warp_zone_rect = initialization::load_collision_zone_in_layer(
+            &tiled_map, "warp_zone");
+        
         let game_world = GameWorld {
             world,
             height_tiles: height as i32,
@@ -169,23 +152,13 @@ impl Game {
             camera
         };
 
-        let game_state = GameState {
-            monster_explosion_active: false,
-            monster_explosion_timer: 2.0,
-            player_explosion_active: false,
-            player_explosion_timer: 2.0,
-            message_coord,
-            cheat,
-            is_warp_zone: false,
-        };
-
         Self {
             game_world,
-            game_state,
+            game_state: initialization::initial_state(&tiled_map, cheat),
             animations,
             player,
             collectibles,
-            door,
+            door: initialization::load_object_in_layer(&tiled_map, "door").unwrap(),
             score_board,
             explosions: vec![],
             gun,
