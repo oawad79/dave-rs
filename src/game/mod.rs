@@ -1,6 +1,7 @@
 use std::vec;
 
 use animations::Animations;
+use camera::GameCamera;
 use collision::CollisionManager;
 use macroquad::prelude::{*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
@@ -23,13 +24,13 @@ mod animations;
 mod renderer;
 mod collision;
 mod initialization;
+mod camera;
 
 
 pub struct GameWorld {
     pub world: World,
     pub height_tiles: i32,
-    pub width_tiles: i32,
-    pub camera: Camera2D
+    pub width_tiles: i32
 }
 
 pub struct GameState {
@@ -45,6 +46,7 @@ pub struct GameState {
 pub struct Game {
     game_world: GameWorld,
     game_state: GameState,
+    game_camera: GameCamera,
     animations: Animations,
     player: Player,
     collectibles: Vec<GameObject>,
@@ -130,8 +132,6 @@ impl Game {
 
         let animations = Animations::load_deadly_objects(&tiled_map);
 
-        let camera = Camera2D::from_display_rect(Rect::new(0.0, 384.0, 608.0, -384.0));
-
         let monsters: Vec<Monster>  = if retry {
             score_board.monsters.clone()
         } 
@@ -148,13 +148,13 @@ impl Game {
         let game_world = GameWorld {
             world,
             height_tiles: height as i32,
-            width_tiles: width as i32,
-            camera
+            width_tiles: width as i32
         };
 
         Self {
             game_world,
             game_state: initialization::initial_state(&tiled_map, cheat),
+            game_camera: GameCamera::new(),
             animations,
             player,
             collectibles,
@@ -175,7 +175,7 @@ impl Scene for Game {
         let tiled_map = storage::get::<Map>();
 
         // Set the camera to follow the player
-        set_camera(&self.game_world.camera);
+        self.game_camera.set_active();
 
         if tiled_map.contains_layer("night") {
             tiled_map.draw_tiles(
@@ -188,23 +188,15 @@ impl Scene for Game {
         let pos = self.game_world.world.actor_pos(self.player.collider);
 
         //Update camera position to follow the player
-        if self.score_board.level > 1 || self.score_board.level == 0 {
-            let screen_width = screen_width();
-            let target_x = if (pos.x > screen_width / 2.0) && 
-                              (pos.x < (self.game_world.width_tiles * 32) as f32 - screen_width / 3.4) {
-                pos.x
-            } else if pos.x > 200.0 && pos.x < (self.game_world.width_tiles * 32) as f32 - 
-                              (if screen_width > 1000.0 {screen_width / 5.0} else {screen_width / 3.0}) {
-                pos.x + 170.0
-            } else if pos.x < 200.0 {
-                305.0
-            } else {
-                self.game_world.camera.target.x
-            };
+        self.game_camera.update(
+            pos, 
+            self.score_board.level, 
+            self.game_world.width_tiles
+        );
 
-            self.game_world.camera.target.x = self.game_world.camera.target.x + (target_x - self.game_world.camera.target.x) * 0.1;
-            self.score_board.position = (self.game_world.camera.target.x - 300.0, pos.y);
-        }
+        // Update scoreboard position based on camera
+        self.score_board.position = self.game_camera.get_score_board_position(pos.y);
+
 
         //handle the player falling out of the game so we bring him from top
         if pos.y > screen_height() && !self.player.is_dead {
@@ -325,8 +317,9 @@ impl Scene for Game {
 
         self.animations.update();
 
-        let screen_left = self.game_world.camera.target.x - screen_width() / 2.0;
-        let screen_right = self.game_world.camera.target.x + screen_width() / 2.0;
+        let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
+        let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
+
 
         CollisionManager::handle_monster_collisions(
             &mut self.monsters, 
@@ -369,7 +362,7 @@ impl Scene for Game {
                 &resources, 
                 self.player.has_gun, 
                 self.game_state.message_coord, 
-                self.game_world.camera.target.x
+                self.game_camera.camera.target.x
             );
         }
 
@@ -381,7 +374,7 @@ impl Scene for Game {
                 self.player.has_jetpack, 
                 self.player.progress,
                 self.game_state.message_coord, 
-                self.game_world.camera.target.x
+                self.game_camera.camera.target.x
             );
         }
 
@@ -389,7 +382,7 @@ impl Scene for Game {
             self.score_board.game_won, 
             &resources, 
             self.game_state.message_coord, 
-            self.game_world.camera.target.x
+            self.game_camera.camera.target.x
         );
         
     }}
