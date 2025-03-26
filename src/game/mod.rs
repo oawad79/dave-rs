@@ -3,6 +3,7 @@ use std::vec;
 use animations::Animations;
 use camera::GameCamera;
 use collision::CollisionManager;
+use game_state::GameState;
 use macroquad::prelude::{*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
@@ -25,6 +26,7 @@ mod renderer;
 mod collision;
 mod initialization;
 mod camera;
+mod game_state;
 
 
 pub struct GameWorld {
@@ -33,15 +35,15 @@ pub struct GameWorld {
     pub width_tiles: i32
 }
 
-pub struct GameState {
-    pub monster_explosion_active: bool,
-    pub monster_explosion_timer: f32,
-    pub player_explosion_active: bool,
-    pub player_explosion_timer: f32,
-    pub message_coord: (f32, f32),
-    pub cheat: bool,
-    pub is_warp_zone: bool,
-}
+// pub struct GameState {
+//     pub monster_explosion_active: bool,
+//     pub monster_explosion_timer: f32,
+//     pub player_explosion_active: bool,
+//     pub player_explosion_timer: f32,
+//     pub message_coord: (f32, f32),
+//     pub cheat: bool,
+//     pub is_warp_zone: bool,
+// }
 
 pub struct Game {
     game_world: GameWorld,
@@ -151,7 +153,7 @@ impl Game {
 
         Self {
             game_world,
-            game_state: initialization::initial_state(&tiled_map, cheat),
+            game_state: GameState::new(&tiled_map, cheat, is_warp_zone),
             game_camera: GameCamera::new(),
             animations: Animations::load_deadly_objects(&tiled_map),
             player,

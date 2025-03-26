@@ -4,27 +4,8 @@ use macroquad_tiled::{load_map, Map};
 
 use crate::{resources::Resources, score_board::{GameObject, ScoreBoard}};
 
-use super::GameState;
-
 pub fn should_attach_player(tiled_map: &Map) -> bool {
     tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.contains_key("attach")
-}
-
-pub fn initial_state(tiled_map: &Map, cheat: bool) -> GameState {
-    let message_coord = (
-        tiled_map.layers.get("message").unwrap().objects[0].world_x, 
-        tiled_map.layers.get("message").unwrap().objects[0].world_y
-    );
-
-    GameState {
-        monster_explosion_active: false,
-        monster_explosion_timer: 2.0,
-        player_explosion_active: false,
-        player_explosion_timer: 2.0,
-        message_coord,
-        cheat,
-        is_warp_zone: false,
-    }
 }
 
 pub fn create_world(
@@ -34,12 +15,12 @@ pub fn create_world(
 
     let static_colliders = 
                 load_static_colliders(
-                    "platform", &tiled_map, Tile::Solid);
+                    "platform", tiled_map, Tile::Solid);
 
     let tree_static_colliders = 
             if tiled_map.contains_layer("tree_collider") { 
                 load_static_colliders(
-                    "tree_collider", &tiled_map, Tile::JumpThrough)
+                    "tree_collider", tiled_map, Tile::JumpThrough)
             } 
             else { 
                 vec![] 
@@ -170,10 +151,4 @@ pub fn load_map_data(resources: &Resources, level: u32, is_warp_zone: bool) -> M
 
 }
 
-// pub fn initialize_world(tiled_map: &Map) -> (World, i32, i32) {
-//     // Logic to set up the world
-// }
 
-// pub fn create_player(world: &mut World, tiled_map: &Map, has_gun: bool, has_jetpack: bool) -> Player {
-//     // Player initialization logic
-// }
