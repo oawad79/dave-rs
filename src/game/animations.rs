@@ -12,7 +12,7 @@ pub struct Animations {
 
 impl Animations {
 
-    pub fn load(tiled_map: &Map) -> Self {
+    pub fn new(tiled_map: &Map) -> Self {
         let (animated_fire, fires) = 
                             Animations::load_animation(tiled_map, "fire", 3);
         let (animated_water, waters) = 
@@ -30,6 +30,21 @@ impl Animations {
             waters,
             grasses,
         }
+    }
+
+    pub fn update(&mut self) {
+        if self.animated_fire.is_some() {
+            self.animated_fire.as_mut().unwrap().update();
+        }
+
+        if self.animated_water.is_some() {
+            self.animated_water.as_mut().unwrap().update();
+        }
+
+        if self.animated_grass.is_some() {
+            self.animated_grass.as_mut().unwrap().update();
+        }
+        
     }
 
     fn create_animation(name: &str, frames: u32) -> AnimatedSprite {

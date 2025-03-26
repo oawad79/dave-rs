@@ -2,7 +2,7 @@ use std::vec;
 
 use animations::Animations;
 use collision::CollisionManager;
-use macroquad::prelude::{*, animation::*, collections::storage};
+use macroquad::prelude::{*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
 use macroquad_tiled::{Map, Object};
@@ -41,15 +41,6 @@ pub struct GameState {
     pub cheat: bool,
     pub is_warp_zone: bool,
 }
-
-// pub struct AnimationAssets {
-//     pub animated_fire: Option<AnimatedSprite>,
-//     pub animated_water: Option<AnimatedSprite>,
-//     pub animated_grass: Option<AnimatedSprite>,
-//     pub fires: Vec<Object>,
-//     pub waters: Vec<Object>,
-//     pub grasses: Vec<Object>,
-// }
 
 pub struct Game {
     game_world: GameWorld,
@@ -157,7 +148,7 @@ impl Game {
             progress: 0.0
         };
         
-        let animation_assets = Animations::load(&tiled_map);
+        let animation_assets = Animations::new(&tiled_map);
 
         let mut deadly_objects = vec![];
         deadly_objects.extend(animation_assets.fires.iter().cloned());
@@ -369,18 +360,8 @@ impl Scene for Game {
 
         self.player.update(&mut self.game_world.world);
 
-        if self.animation_assets.animated_fire.is_some() {
-            self.animation_assets.animated_fire.as_mut().unwrap().update();
-        }
+        self.animation_assets.update();
 
-        if self.animation_assets.animated_water.is_some() {
-            self.animation_assets.animated_water.as_mut().unwrap().update();
-        }
-
-        if self.animation_assets.animated_grass.is_some() {
-            self.animation_assets.animated_grass.as_mut().unwrap().update();
-        }
-        
         let screen_left = self.game_world.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_world.camera.target.x + screen_width() / 2.0;
 
