@@ -321,7 +321,12 @@ impl Scene for Game {
             }            
             
             storage::store(self.score_board.clone());
-            return Some(SceneChange::Game{level: self.score_board.level, retry: !self.game_state.is_warp_zone, cheat: self.game_state.cheat, warp_zone: false});
+            return Some(SceneChange::Game{
+                level: self.score_board.level, 
+                retry: !self.game_state.is_warp_zone, 
+                cheat: self.game_state.cheat, 
+                warp_zone: false
+            });
             
         }
         
