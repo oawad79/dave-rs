@@ -10,24 +10,22 @@ pub fn should_attach_player(tiled_map: &Map) -> bool {
 pub fn load_objects_in_layer(retry: bool, score_board: &ScoreBoard, tiled_map: &Map, layer_name: &str) -> Vec<GameObject> {
     let objects_layer = tiled_map.layers.get(layer_name).unwrap();
 
-    let collectibles = 
-            if retry { score_board.collectibles.clone() } 
-            else { 
-                objects_layer.objects
-                .iter()
-                .map(|entry| 
-                    GameObject {
-                        world_x: entry.world_x,
-                        world_y: entry.world_y,
-                        width: entry.world_w,
-                        height: entry.world_h,
-                        name: entry.name.clone(),
-                        collected: None,
-                        progress: 0.0
-                    }
-            ).collect::<Vec<GameObject>>()};
+    if retry { score_board.collectibles.clone() } 
+    else { 
+        objects_layer.objects
+        .iter()
+        .map(|entry| 
+            GameObject {
+                world_x: entry.world_x,
+                world_y: entry.world_y,
+                width: entry.world_w,
+                height: entry.world_h,
+                name: entry.name.clone(),
+                collected: None,
+                progress: 0.0
+            }
+    ).collect::<Vec<GameObject>>()}
 
-    collectibles
 }
 
 pub fn load_static_colliders(layer_name: &str, tiled_map: &Map, tyle_type: Tile) -> Vec<Tile> {
