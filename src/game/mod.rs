@@ -130,8 +130,6 @@ impl Game {
         //     None
         // };
 
-        let animations = Animations::load_deadly_objects(&tiled_map);
-
         let monsters: Vec<Monster>  = if retry {
             score_board.monsters.clone()
         } 
@@ -155,7 +153,7 @@ impl Game {
             game_world,
             game_state: initialization::initial_state(&tiled_map, cheat),
             game_camera: GameCamera::new(),
-            animations,
+            animations: Animations::load_deadly_objects(&tiled_map),
             player,
             collectibles,
             door: initialization::load_object_in_layer(&tiled_map, "door").unwrap(),
@@ -180,7 +178,10 @@ impl Scene for Game {
         if tiled_map.contains_layer("night") {
             tiled_map.draw_tiles(
                 "night",
-                Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
+                Rect::new(
+                    0.0, 0.0, 
+                    (self.game_world.width_tiles * 32) as f32, 
+                    (self.game_world.height_tiles * 32) as f32),
                 None,
             );
         }
@@ -200,7 +201,8 @@ impl Scene for Game {
 
         //handle the player falling out of the game so we bring him from top
         if pos.y > screen_height() && !self.player.is_dead {
-            self.game_world.world.set_actor_position(self.player.collider, vec2(pos.x, 0.0));
+            self.game_world.world.set_actor_position(
+                self.player.collider, vec2(pos.x, 0.0));
         }
 
         CollisionManager::handle_collecting_valuables(
