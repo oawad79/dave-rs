@@ -1,16 +1,36 @@
 use macroquad::{
-    audio::{play_sound, play_sound_once, stop_sound, PlaySoundParams}, 
-    math::{vec2, Rect, Vec2}, 
+    audio::{
+        PlaySoundParams,
+        play_sound,
+        play_sound_once,
+        stop_sound,
+    },
+    math::{
+        Rect,
+        Vec2,
+        vec2,
+    },
     prelude::{
-        animation::{AnimatedSprite, Animation}, 
-        collections::storage
-    }
+        animation::{
+            AnimatedSprite,
+            Animation,
+        },
+        collections::storage,
+        *,
+    },
 };
-use macroquad_platformer::{Actor, Tile, World};
-use macroquad::prelude::*;
+use macroquad_platformer::{
+    Actor,
+    Tile,
+    World,
+};
 use macroquad_tiled::Map;
 
-use crate::{bullet::{Bullet, BulletDirection}, Resources};
+use super::bullet::{
+    Bullet,
+    BulletDirection,
+};
+use crate::Resources;
 
 const GRAVITY: f32 = 400.0;
 const JUMP_VELOCITY: f32 = -250.0;
@@ -33,7 +53,7 @@ pub struct Player {
     attach: bool,
     pub jetpack_timer: f32,
     jetpack_timer_active: bool,
-    pub progress: f32
+    pub progress: f32,
 }
 
 impl Player {
@@ -55,28 +75,23 @@ impl Player {
             attach,
             jetpack_timer: 0.0,
             jetpack_timer_active: false,
-            progress: 0.0
+            progress: 0.0,
         }
     }
 
     pub fn overlaps(pos: Vec2, game_object: &Rect) -> bool {
-        let player_rect = Rect::new(
-            pos.x,
-            pos.y,
-            32.0,
-            32.0,
-        );
+        let player_rect = Rect::new(pos.x, pos.y, 32.0, 32.0);
         player_rect.overlaps(game_object)
     }
 
     pub fn update(&mut self, world: &mut World) {
         let resources = storage::get::<Resources>();
         let tiled_map = storage::get::<Map>();
-        
+
         let delta = get_frame_time();
 
         let pos = world.actor_pos(self.collider);
-        
+
         let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
 
         if self.is_dead {
@@ -104,19 +119,16 @@ impl Player {
                     self.facing_left = false;
                     flip = 32.0;
                 }
-            } 
-            else {
+            } else {
                 state = "dave_idle";
                 self.animated_player.set_animation(1); // idle
                 flip = if self.facing_left { -32.0 } else { 32.0 };
             }
-        }
-        else {
+        } else {
             flip = 32.0;
             state = "climb-sheet";
-            self.animated_player.set_animation(4);   
+            self.animated_player.set_animation(4);
         }
-
 
         if self.jetpack_active {
             self.jetpack_timer += get_frame_time();
@@ -126,21 +138,24 @@ impl Player {
                 self.jetpack_active = false;
                 self.jetpack_timer_active = false;
                 self.has_jetpack = false;
-                
+
                 stop_sound(resources.get_sound("jetPackActivated"));
             }
         }
 
         if is_key_pressed(KeyCode::LeftAlt) && self.has_jetpack {
             self.jetpack_active = !self.jetpack_active;
-            
+
             if self.jetpack_active {
                 self.jetpack_timer_active = true;
-                
-                play_sound(resources.get_sound("jetPackActivated"), PlaySoundParams {
-                    looped: true, 
-                    volume: 1.0
-                });
+
+                play_sound(
+                    resources.get_sound("jetPackActivated"),
+                    PlaySoundParams {
+                        looped: true,
+                        volume: 1.0,
+                    },
+                );
             } else {
                 self.jetpack_timer_active = false;
                 stop_sound(resources.get_sound("jetPackActivated"));
@@ -151,28 +166,27 @@ impl Player {
             if world.collide_tag(2, pos, 10, 32) == Tile::JumpThrough {
                 if is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down) {
                     if !self.climbing {
-                        play_sound(resources.get_sound("climb"), PlaySoundParams {
-                            looped: true, 
-                            volume: 0.2
-                        });
+                        play_sound(
+                            resources.get_sound("climb"),
+                            PlaySoundParams {
+                                looped: true,
+                                volume: 0.2,
+                            },
+                        );
                     }
 
                     self.climbing = true;
                     self.climbing_active = true;
-                }   
-                else {
+                } else {
                     self.climbing = false;
                     stop_sound(resources.get_sound("climb"));
-
-                }     
-            }
-            else {
+                }
+            } else {
                 self.climbing_active = false;
                 self.climbing = false;
                 stop_sound(resources.get_sound("climb"));
             }
         }
-    
 
         if self.jetpack_active {
             self.animated_player.set_animation(3);
@@ -181,9 +195,9 @@ impl Player {
 
         if self.climbing {
             state = "climb-sheet";
-            self.animated_player.set_animation(4);    
+            self.animated_player.set_animation(4);
         }
-        
+
         if !self.is_dead {
             tiled_map.spr_ex(
                 state,
@@ -205,25 +219,22 @@ impl Player {
         } else if self.jetpack_active || self.climbing_active {
             if is_key_down(KeyCode::Up) {
                 self.speed.y = -JETPACK_VELOCITY;
-            } 
-            else if is_key_down(KeyCode::Down) {
+            } else if is_key_down(KeyCode::Down) {
                 self.speed.y = JETPACK_VELOCITY;
-            }
-            else {
+            } else {
                 self.speed.y = 0.0;
             }
-        } 
+        }
 
         if is_key_down(KeyCode::Down) {
             self.attach = false;
         }
 
-        
         if !self.climbing && is_key_pressed(KeyCode::Up) && on_ground {
             play_sound_once(resources.get_sound("jump"));
             self.speed.y = JUMP_VELOCITY;
         }
-        
+
         if !self.attach && (self.simulate_right || is_key_down(KeyCode::Right)) {
             self.speed.x = 100.0;
         } else if !self.attach && (self.simulate_left || is_key_down(KeyCode::Left)) {
@@ -232,13 +243,17 @@ impl Player {
             self.speed.x = 0.;
         }
 
-        if is_key_pressed(KeyCode::LeftControl) && self.has_gun  {
+        if is_key_pressed(KeyCode::LeftControl) && self.has_gun {
             self.bullets.push(Bullet {
                 x: pos.x + 10.0,
                 y: pos.y,
                 speed: 250.0,
                 collided: false,
-                direction: if self.facing_left {BulletDirection::Left} else {BulletDirection::Right} 
+                direction: if self.facing_left {
+                    BulletDirection::Left
+                } else {
+                    BulletDirection::Right
+                },
             });
             play_sound_once(resources.get_sound("shoot"));
         }
@@ -246,8 +261,7 @@ impl Player {
         for bullet in &mut self.bullets {
             if bullet.direction == BulletDirection::Left {
                 bullet.x -= bullet.speed * delta;
-            }
-            else {
+            } else {
                 bullet.x += bullet.speed * delta;
             }
         }
@@ -260,10 +274,14 @@ impl Player {
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("bullet").width(), 
-                        resources.get_texture("bullet").height()
+                        resources.get_texture("bullet").width(),
+                        resources.get_texture("bullet").height(),
                     )),
-                    rotation: if bullet.direction == BulletDirection::Left { std::f32::consts::PI } else { 0.0 },
+                    rotation: if bullet.direction == BulletDirection::Left {
+                        std::f32::consts::PI
+                    } else {
+                        0.0
+                    },
                     ..Default::default()
                 },
             );
@@ -271,9 +289,7 @@ impl Player {
 
         world.move_h(self.collider, self.speed.x * delta);
         world.move_v(self.collider, self.speed.y * delta);
-
     }
-
 }
 
 pub enum AnimationState {
@@ -281,7 +297,7 @@ pub enum AnimationState {
     Idle,
     Jump,
     Fly,
-    Climb
+    Climb,
 }
 
 impl AnimationState {
@@ -291,7 +307,7 @@ impl AnimationState {
             Self::Idle => "idle",
             Self::Jump => "jump",
             Self::Fly => "fly",
-            Self::Climb => "climb"
+            Self::Climb => "climb",
         }
     }
 }
@@ -335,4 +351,3 @@ pub fn animated_player() -> AnimatedSprite {
         true,
     )
 }
-

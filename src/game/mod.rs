@@ -26,26 +26,30 @@ use macroquad_platformer::{
     World,
 };
 use macroquad_tiled::Map;
+use monster::Monster;
+use player::Player;
+use score_board::{
+    GameObject,
+    ScoreBoard,
+};
 
 use crate::{
     Scene,
     SceneChange,
-    monster::Monster,
-    player::Player,
     resources::Resources,
-    score_board::{
-        GameObject,
-        ScoreBoard,
-    },
 };
 
 mod animations;
+mod bullet;
 mod camera;
 mod collectibles;
 mod collision;
 mod game_state;
 mod initialization;
+mod monster;
+pub mod player;
 mod renderer;
+pub mod score_board;
 
 static EXPLOSION_DURATION: f32 = 2.0;
 
@@ -358,7 +362,7 @@ impl Scene for Game {
         let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
 
-        handle_monster_collisions(
+        Monster::handle_monster_collisions(
             &mut self.monsters,
             &mut self.player,
             &mut self.score_board,

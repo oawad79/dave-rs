@@ -1,11 +1,20 @@
-use macroquad::prelude::animation::AnimatedSprite;
-use macroquad::prelude::*;
-use macroquad_tiled::{Map, Object};
-use crate::score_board::GameObject;
-use crate::resources::Resources;
-use crate::game::CollectibleType;
+use macroquad::prelude::{
+    animation::AnimatedSprite,
+    *,
+};
+use macroquad_tiled::{
+    Map,
+    Object,
+};
 
 use super::animations::Animations;
+use crate::{
+    game::{
+        CollectibleType,
+        score_board::GameObject,
+    },
+    resources::Resources,
+};
 
 /// Draws all collectible items on the map
 pub fn draw_collectibles(collectibles: &[GameObject], tiled_map: &Map) {
@@ -31,12 +40,12 @@ pub fn draw_door(door: &GameObject, tiled_map: &Map) {
 
 /// Draws the gun pickup and icon
 pub fn draw_gun(
-    tiled_map: &Map, 
-    gun: &GameObject, 
+    tiled_map: &Map,
+    gun: &GameObject,
     resources: &Resources,
     player_has_gun: bool,
     message_coord: (f32, f32),
-    camera_target_x: f32
+    camera_target_x: f32,
 ) {
     if !player_has_gun {
         tiled_map.spr_ex(
@@ -44,8 +53,7 @@ pub fn draw_gun(
             Rect::new(0.0, 0.0, 32.0, 32.0),
             Rect::new(gun.world_x, gun.world_y - 32.0, 32.0, 32.0),
         );
-    }
-    else {
+    } else {
         draw_texture_ex(
             resources.get_texture("gun"),
             message_coord.0 + camera_target_x + 50.0,
@@ -53,9 +61,9 @@ pub fn draw_gun(
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("gun").width() * 0.7 , 
-                    resources.get_texture("gun").height() * 0.7
-                )), 
+                    resources.get_texture("gun").width() * 0.7,
+                    resources.get_texture("gun").height() * 0.7,
+                )),
                 ..Default::default()
             },
         );
@@ -67,9 +75,9 @@ pub fn draw_gun(
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("gun_icon").width() , 
-                    resources.get_texture("gun_icon").height() 
-                )), 
+                    resources.get_texture("gun_icon").width(),
+                    resources.get_texture("gun_icon").height(),
+                )),
                 ..Default::default()
             },
         );
@@ -78,13 +86,13 @@ pub fn draw_gun(
 
 /// Draws the jetpack pickup and icon/progress bar
 pub fn draw_jetpack(
-    tiled_map: &Map, 
-    jetpack: &GameObject, 
+    tiled_map: &Map,
+    jetpack: &GameObject,
     resources: &Resources,
     player_has_jetpack: bool,
     player_progress: f32,
     message_coord: (f32, f32),
-    camera_target_x: f32
+    camera_target_x: f32,
 ) {
     if jetpack.collected.unwrap_or(false) && player_has_jetpack {
         draw_texture_ex(
@@ -94,9 +102,9 @@ pub fn draw_jetpack(
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("jetpack_over").width() * 0.7, 
-                    resources.get_texture("jetpack_over").height() * 0.7
-                )), 
+                    resources.get_texture("jetpack_over").width() * 0.7,
+                    resources.get_texture("jetpack_over").height() * 0.7,
+                )),
                 ..Default::default()
             },
         );
@@ -108,7 +116,7 @@ pub fn draw_jetpack(
 
         // Define the texture cropping rectangle (shrink from right to left)
         let source_rect = Some(Rect::new(0.0, 0.0, bar_width, height));
-        
+
         draw_texture_ex(
             resources.get_texture("jetpack_progress"),
             message_coord.0 + camera_target_x - 214.0,
@@ -127,14 +135,14 @@ pub fn draw_jetpack(
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("jetpack").width() * 0.7, 
-                    resources.get_texture("jetpack").height() * 0.7
-                )), 
+                    resources.get_texture("jetpack").width() * 0.7,
+                    resources.get_texture("jetpack").height() * 0.7,
+                )),
                 ..Default::default()
             },
         );
     }
-    
+
     if !jetpack.collected.unwrap_or(false) {
         tiled_map.spr_ex(
             "jetpack2",
@@ -150,7 +158,12 @@ pub fn draw_animations(tiled_map: &Map, animations: &Animations) {
     }
 }
 
-pub fn draw_animated(tiled_map: &Map, sheet: &str, animated: &Option<AnimatedSprite>, objects: &[Object]) {
+pub fn draw_animated(
+    tiled_map: &Map,
+    sheet: &str,
+    animated: &Option<AnimatedSprite>,
+    objects: &[Object],
+) {
     if let Some(animated) = animated {
         for object in objects {
             tiled_map.spr_ex(
@@ -166,7 +179,12 @@ pub fn draw_animated(tiled_map: &Map, sheet: &str, animated: &Option<AnimatedSpr
 pub fn draw_tiles(tiled_map: &Map, width_tiles: i32, height_tiles: i32) {
     tiled_map.draw_tiles(
         "platform",
-        Rect::new(0.0, 0.0, (width_tiles * 32) as f32, (height_tiles * 32) as f32),
+        Rect::new(
+            0.0,
+            0.0,
+            (width_tiles * 32) as f32,
+            (height_tiles * 32) as f32,
+        ),
         None,
     );
 }
@@ -174,9 +192,9 @@ pub fn draw_tiles(tiled_map: &Map, width_tiles: i32, height_tiles: i32) {
 /// Draws the victory banner when the game is won
 pub fn draw_door_enable_banner(
     game_won: bool,
-    resources: &Resources, 
+    resources: &Resources,
     message_coord: (f32, f32),
-    camera_target_x: f32
+    camera_target_x: f32,
 ) {
     if game_won {
         draw_texture_ex(
@@ -186,9 +204,9 @@ pub fn draw_door_enable_banner(
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(
-                    resources.get_texture("door_enable_banner").width() , 
-                    resources.get_texture("door_enable_banner").height() * 0.5
-                )), 
+                    resources.get_texture("door_enable_banner").width(),
+                    resources.get_texture("door_enable_banner").height() * 0.5,
+                )),
                 ..Default::default()
             },
         );

@@ -2,16 +2,27 @@ use std::collections::HashMap;
 
 use macroquad::{
     audio::play_sound_once,
-    math::{Rect, Vec2, vec2},
+    math::{
+        Rect,
+        Vec2,
+        vec2,
+    },
     prelude::animation::AnimatedSprite,
 };
-use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
-use macroquad_platformer::Tile;
+use macroquad_particles::{
+    Emitter,
+    EmitterConfig,
+};
 use macroquad_tiled::Object;
 
-use crate::{monster::Monster, player::Player, resources::Resources, score_board::GameObject};
-
-use super::{collectibles::CollectibleType, Game, GameState, EXPLOSION_DURATION};
+use super::{
+    EXPLOSION_DURATION,
+    Game,
+    collectibles::CollectibleType,
+    player::Player,
+    score_board::GameObject,
+};
+use crate::resources::Resources;
 
 // static EXPLOSION_DURATION: f32 = 2.0;
 
@@ -47,7 +58,7 @@ impl CollisionManager {
 
     pub fn check_door_collision(
         door: &GameObject,
-        score_board: &mut crate::score_board::ScoreBoard,
+        score_board: &mut crate::game::score_board::ScoreBoard,
         is_warp_zone: bool,
         player_pos: Vec2,
     ) -> bool {
@@ -77,7 +88,7 @@ impl CollisionManager {
     pub fn check_jetpack_collision(
         player: &mut Player,
         jetpack: &mut Option<GameObject>,
-        score_board: &mut crate::score_board::ScoreBoard,
+        score_board: &mut crate::game::score_board::ScoreBoard,
         player_pos: Vec2,
     ) -> bool {
         // Check for collision between player and jetpack
@@ -103,7 +114,7 @@ impl CollisionManager {
     pub fn check_gun_collision(
         player: &mut Player,
         gun: &Option<GameObject>,
-        score_board: &mut crate::score_board::ScoreBoard,
+        score_board: &mut crate::game::score_board::ScoreBoard,
         player_pos: Vec2,
     ) -> bool {
         // Check for collision between player and gun
@@ -230,8 +241,8 @@ impl CollisionManager {
     //             }
 
     //             monster.bullets.retain(|bullet| {
-    //                 if world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
-    //                     return false;
+    //                 if world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid
+    // {                     return false;
     //                 }
 
     //                 if !bullet.collided && bullet.x > player_pos.x - 100.0 {
@@ -283,7 +294,7 @@ impl CollisionManager {
     pub fn handle_collecting_valuables(
         collectibles: &mut Vec<GameObject>,
         player_pos: Vec2,
-        score_board: &mut crate::score_board::ScoreBoard,
+        score_board: &mut crate::game::score_board::ScoreBoard,
         resources: &Resources,
     ) {
         // Check for collision between player and Jewellery

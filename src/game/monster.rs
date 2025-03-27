@@ -1,10 +1,35 @@
 use std::vec;
 
-use macroquad::{math::Vec2, prelude::{collections::storage, *}};
-use macroquad_particles::Emitter;
+use macroquad::{
+    audio::play_sound_once,
+    math::Vec2,
+    prelude::{
+        collections::storage,
+        *,
+    },
+};
+use macroquad_particles::{
+    Emitter,
+    EmitterConfig,
+};
+use macroquad_platformer::Tile;
 use macroquad_tiled::Map;
 
-use crate::{bullet::{Bullet, BulletDirection}, player::Player, resources::Resources};
+use super::{
+    EXPLOSION_DURATION,
+    Game,
+    game_state::GameState,
+};
+use crate::{
+    game::{
+        bullet::{
+            Bullet,
+            BulletDirection,
+        },
+        player::Player,
+    },
+    resources::Resources,
+};
 
 const MONSTER_SPEED: f32 = 250.0;
 const MONSTER_ROTATION_TIMER: f32 = 2.0;
@@ -12,7 +37,7 @@ const MONSTER_ROTATION_TIMER: f32 = 2.0;
 #[derive(Debug, Clone)]
 pub struct PolyPoint {
     pub x: f32,
-    pub y: f32
+    pub y: f32,
 }
 
 #[derive(Clone)]
@@ -47,7 +72,7 @@ impl Default for Monster {
             rotation_degree: 0.0,
             rotation_timer: 0.0,
             rotate_y_axis: false,
-            kill_value: 200
+            kill_value: 200,
         }
     }
 }
@@ -56,7 +81,7 @@ impl Monster {
     pub fn handle_monster_collisions(
         monsters: &mut Vec<Monster>,
         player: &mut Player,
-        score_board: &mut crate::score_board::ScoreBoard,
+        score_board: &mut crate::game::score_board::ScoreBoard,
         explosions: &mut Vec<(Emitter, Vec2)>,
         game_state: &mut GameState,
         resources: &Resources,
@@ -67,17 +92,17 @@ impl Monster {
             if monster.alive {
                 monster.update(player_pos);
                 monster.draw();
-    
+
                 if Player::overlaps(player_pos, &monster.monster_rectangle()) {
                     player.is_dead = true;
                     monster.alive = false;
                     score_board.score += monster.kill_value;
-    
+
                     game_state.monster_explosion_active = true;
                     game_state.monster_explosion_timer = EXPLOSION_DURATION;
                     game_state.player_explosion_active = true;
                     game_state.player_explosion_timer = EXPLOSION_DURATION;
-    
+
                     if explosions.is_empty() {
                         explosions.push((
                             Emitter::new(EmitterConfig {
@@ -96,11 +121,11 @@ impl Monster {
                             monster.current_location(),
                         ));
                     }
-    
+
                     play_sound_once(resources.get_sound("explosion"));
                     play_sound_once(resources.get_sound("hd-die-dave-7"));
                 }
-    
+
                 for bullet in &mut player.bullets {
                     let bullet_rect = Rect {
                         x: bullet.x,
@@ -108,7 +133,7 @@ impl Monster {
                         w: resources.get_texture("bullet").width(),
                         h: resources.get_texture("bullet").height(),
                     };
-    
+
                     if bullet_rect.overlaps(&monster.monster_rectangle()) {
                         bullet.collided = true;
                         monster.alive = false;
@@ -122,11 +147,11 @@ impl Monster {
                                 monster.current_location(),
                             ));
                         }
-    
+
                         play_sound_once(resources.get_sound("explosion"));
                     }
                 }
-    
+
                 for bullet in &mut monster.bullets {
                     let bullet_rect = Rect {
                         x: bullet.x,
@@ -134,14 +159,14 @@ impl Monster {
                         w: resources.get_texture("monster_bullet").width(),
                         h: resources.get_texture("monster_bullet").height(),
                     };
-    
+
                     if Player::overlaps(player_pos, &bullet_rect) {
                         bullet.collided = true;
                         player.is_dead = true;
-    
+
                         game_state.player_explosion_active = true;
                         game_state.player_explosion_timer = EXPLOSION_DURATION;
-    
+
                         if explosions.is_empty() {
                             explosions.push((
                                 Emitter::new(EmitterConfig {
@@ -152,50 +177,50 @@ impl Monster {
                                 vec2(player_pos.x, player_pos.y),
                             ));
                         }
-    
+
                         play_sound_once(resources.get_sound("explosion"));
                     }
                 }
-    
+
                 monster.bullets.retain(|bullet| {
                     if world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
                         return false;
                     }
-    
+
                     if !bullet.collided && bullet.x > player_pos.x - 100.0 {
                         return true;
                     }
-    
+
                     false
                 });
             }
         });
     }
-    
+
     fn get_line_points_lerp(p1: Vec2, p2: Vec2, steps: usize) -> Vec<Vec2> {
         let mut points = Vec::new();
-    
+
         for i in 0..=steps {
-            let t = i as f32 / steps as f32;  // Interpolation factor (0.0 to 1.0)
+            let t = i as f32 / steps as f32; // Interpolation factor (0.0 to 1.0)
             let interpolated = p1.lerp(p2, t); // Using glam's built-in lerp()
             points.push(interpolated);
         }
-    
+
         points
     }
 
     fn generate_pairs(points: &[Vec2]) -> Vec<(Vec2, Vec2)> {
         let mut pairs = Vec::new();
-        
+
         if points.len() < 2 {
             return pairs; // Not enough points to form pairs
         }
-    
+
         for i in 0..points.len() {
             let next_index = (i + 1) % points.len(); // Wrap around to form a closed loop
             pairs.push((points[i], points[next_index]));
         }
-    
+
         pairs
     }
 
@@ -207,7 +232,7 @@ impl Monster {
                     let mut monster: Self = Self {
                         location: PolyPoint {
                             x: monster_obj.x,
-                            y: monster_obj.y
+                            y: monster_obj.y,
                         },
                         name: monster_obj.name.clone(),
                         rotate: monster_obj.properties.iter().any(|e| e.name == "rotate"),
@@ -217,17 +242,17 @@ impl Monster {
 
                     let polygon_pts = monster_obj.polygon.as_ref().unwrap();
                     let mapped_points = polygon_pts
-                                            .iter()
-                                            .map(|p| Vec2::new(p.x, p.y))
-                                            .collect::<Vec<Vec2>>();
-                    
-                    let pairs = Self::generate_pairs(&mapped_points);    
-                    
+                        .iter()
+                        .map(|p| Vec2::new(p.x, p.y))
+                        .collect::<Vec<Vec2>>();
+
+                    let pairs = Self::generate_pairs(&mapped_points);
+
                     for (p1, p2) in pairs {
                         let points_between = Self::get_line_points_lerp(p1, p2, 10);
                         monster.waypoints.extend(points_between.iter());
                     }
-                    
+
                     monsters.push(monster);
                 }
             }
@@ -246,10 +271,13 @@ impl Monster {
     }
 
     pub fn current_location(&self) -> Vec2 {
-        Vec2::new(self.location.x + self.current_waypoint().x, self.location.y + self.current_waypoint().y)
+        Vec2::new(
+            self.location.x + self.current_waypoint().x,
+            self.location.y + self.current_waypoint().y,
+        )
     }
 
-    pub fn current_waypoint(&self) -> &Vec2  {
+    pub fn current_waypoint(&self) -> &Vec2 {
         &self.waypoints[self.current_waypoint]
     }
 
@@ -257,47 +285,47 @@ impl Monster {
         let resources = storage::get::<Resources>();
         let point = self.waypoints[self.current_waypoint];
         let m = &resources.monsters[self.name.parse::<usize>().unwrap() - 1];
-    
+
         // Create the default draw parameters
         let mut draw_params = DrawTextureParams {
             dest_size: Some(vec2(m.width(), m.height())),
             //flip_y: true,
             ..Default::default()
         };
-    
+
         if self.rotate {
             // If rotating around z-axis (normal rotation)
             if !self.rotate_y_axis {
                 draw_params.rotation = self.rotation_degree;
                 draw_params.pivot = Some(Vec2::new(
-                    self.location.x + point.x + m.width()/2.0, 
-                    self.location.y + point.y + m.height()/2.0
+                    self.location.x + point.x + m.width() / 2.0,
+                    self.location.y + point.y + m.height() / 2.0,
                 ));
             }
         }
-    
-        // Handle y-axis rotation separately 
+
+        // Handle y-axis rotation separately
         if self.rotate_y_axis {
             // Calculate rotation based on time or existing rotation_degree
             let angle = self.rotation_degree * std::f32::consts::PI / 180.0; // Convert to radians
-            
+
             // Calculate scale factor - width narrows as we rotate to the side
             let scale_x = angle.cos().abs();
-            
+
             // Calculate x position offset to keep the texture centered during rotation
             let width = m.width();
             let center_offset = (width - width * scale_x) / 2.0;
-            
+
             // Update draw parameters for y-axis rotation
             draw_params.dest_size = Some(vec2(width * scale_x, m.height()));
-            
+
             // Draw with adjusted position to maintain center point
             draw_texture_ex(
                 m,
                 self.location.x + point.x + center_offset,
                 self.location.y + point.y,
                 WHITE,
-                draw_params
+                draw_params,
             );
         } else {
             // Draw with regular parameters (z-axis rotation or no rotation)
@@ -306,10 +334,10 @@ impl Monster {
                 self.location.x + point.x,
                 self.location.y + point.y,
                 WHITE,
-                draw_params
+                draw_params,
             );
         }
-    
+
         // Draw monster bullets
         for monster_bullet in &self.bullets {
             draw_texture_ex(
@@ -319,20 +347,23 @@ impl Monster {
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture("monster_bullet").width(), 
-                        resources.get_texture("monster_bullet").height()
+                        resources.get_texture("monster_bullet").width(),
+                        resources.get_texture("monster_bullet").height(),
                     )),
-                    rotation: if monster_bullet.direction == BulletDirection::Right { std::f32::consts::PI } else { 0.0 },
+                    rotation: if monster_bullet.direction == BulletDirection::Right {
+                        std::f32::consts::PI
+                    } else {
+                        0.0
+                    },
                     ..Default::default()
                 },
             );
         }
     }
 
-    
     pub fn update(&mut self, player_pos: Vec2) {
         let point = self.waypoints[self.current_waypoint];
-    
+
         if self.rotate {
             self.rotation_timer -= 150.0 * get_frame_time();
             if self.rotation_timer <= 0.0 {
@@ -343,12 +374,10 @@ impl Monster {
 
         if self.move_timer > 0.0 {
             self.move_timer -= MONSTER_SPEED * get_frame_time();
-        }
-        else {
+        } else {
             if self.current_waypoint < self.waypoints.len() - 1 {
                 self.current_waypoint += 1;
-            }    
-            else {
+            } else {
                 self.current_waypoint = 0;
             }
             self.move_timer = 0.1;
@@ -356,8 +385,7 @@ impl Monster {
 
         if self.bullet_timer > 0.0 {
             self.bullet_timer -= get_frame_time();
-        }
-        else {
+        } else {
             //only allow monster to shoot if he is close to the player
             if self.location.x + point.x - player_pos.x < screen_width() * 0.7 {
                 //shoot a bullet
@@ -366,7 +394,11 @@ impl Monster {
                     y: self.location.y + point.y,
                     speed: 250.0,
                     collided: false,
-                    direction: if player_pos.x < self.location.x + point.x {BulletDirection::Left} else {BulletDirection::Right}
+                    direction: if player_pos.x < self.location.x + point.x {
+                        BulletDirection::Left
+                    } else {
+                        BulletDirection::Right
+                    },
                 });
             }
 
@@ -376,12 +408,9 @@ impl Monster {
         for monster_bullet in &mut self.bullets {
             if monster_bullet.direction == BulletDirection::Left {
                 monster_bullet.x -= monster_bullet.speed * get_frame_time();
-            }
-            else {
+            } else {
                 monster_bullet.x += monster_bullet.speed * get_frame_time();
             }
         }
     }
-
-    
 }

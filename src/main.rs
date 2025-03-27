@@ -10,25 +10,23 @@
 //console window in addition to the game window
 //#![windows_subsystem = "windows"]
 
-mod bullet;
 mod complete;
 mod entry_screen;
 mod game;
 mod input_manager;
 mod menu;
-mod monster;
-mod player;
 mod resources;
-mod score_board;
 mod separator;
 mod warp_zone;
-
 
 use complete::Complete;
 use entry_screen::EntryScreen;
 use game::Game;
 use input_manager::InputManager;
-use macroquad::prelude::{collections::storage, *};
+use macroquad::prelude::{
+    collections::storage,
+    *,
+};
 use menu::Menu;
 use resources::Resources;
 use separator::Separator;
@@ -80,12 +78,8 @@ async fn main() {
     let mut input_manager = InputManager::new();
 
     // Create UI menus
-    let mut help_menu = Menu::new(
-        "help", 
-        vec2(-220.0, -120.0), 
-        KeyCode::F1, 
-        None);
-        
+    let mut help_menu = Menu::new("help", vec2(-220.0, -120.0), KeyCode::F1, None);
+
     let mut restart_menu = Menu::new(
         "restart",
         vec2(-190.0, -30.0),
