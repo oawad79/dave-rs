@@ -302,17 +302,11 @@ impl Scene for Game {
             );
         }
 
-        if tiled_map.contains_layer("fallthroughtiles") {
-            tiled_map.draw_tiles(
-                "fallthroughtiles",
-                Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
-                None,
-            );
-        }
-
-        self.player.update(&mut self.game_world.world);
+        
 
         self.animations.update();
+
+        self.player.update(&mut self.game_world.world);
 
         let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
@@ -348,6 +342,14 @@ impl Scene for Game {
         renderer::draw_tiles(&tiled_map, self.game_world.width_tiles, self.game_world.height_tiles);
         renderer::draw_collectibles(&self.collectibles, &tiled_map);
         renderer::draw_door(&self.door, &tiled_map);
+
+        // if tiled_map.contains_layer("tree_collider") {
+        //     tiled_map.draw_tiles(
+        //         "tree_collider",
+        //         Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
+        //         None,
+        //     );
+        // }
         
 
         renderer::draw_animations(&tiled_map, &self.animations);
@@ -381,6 +383,14 @@ impl Scene for Game {
             self.game_state.message_coord, 
             self.game_camera.camera.target.x
         );
+
+        if tiled_map.contains_layer("fallthroughtiles") {
+            tiled_map.draw_tiles(
+                "fallthroughtiles",
+                Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32, (self.game_world.height_tiles * 32) as f32),
+                None,
+            );
+        }
         
     }}
 
