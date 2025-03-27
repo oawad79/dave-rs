@@ -4,6 +4,7 @@ use animations::Animations;
 use camera::GameCamera;
 use collision::CollisionManager;
 use game_state::GameState;
+use initialization::map_width_height;
 use macroquad::prelude::{*, collections::storage};
 use macroquad::audio::{play_sound_once, stop_sound};
 use macroquad_platformer::{Tile, World};
@@ -62,8 +63,7 @@ impl Game {
 
         let tiled_map = storage::get::<Map>();
 
-        let height = tiled_map.layers.get("platform").unwrap().height;
-        let width = tiled_map.layers.get("platform").unwrap().width;
+        let (height, width) = map_width_height(&tiled_map);
         
         let (world, actor) = initialization::create_world(
             width as i32, 
@@ -89,38 +89,53 @@ impl Game {
             initialization::load_objects_in_layer(retry, &score_board, &tiled_map, "collectibles");    
         
         let gun = if tiled_map.contains_layer("gun") {     
-            initialization::load_objects_in_layer(
-                retry, &score_board, &tiled_map, "gun").first().cloned()
+            let gun_object = tiled_map.layers.get("gun").unwrap().objects.first().unwrap();    
+            Some(GameObject {
+                world_x: gun_object.world_x,
+                world_y: gun_object.world_y,
+                width: gun_object.world_w,
+                height: gun_object.world_h,
+                name: gun_object.name.clone(),
+                collected: None,
+                progress: 0.0
+            })
         }
         else {
             None
         };
-
-        let jetpack = if tiled_map.contains_layer("jetpack") {
-            initialization::load_objects_in_layer(
-                retry, &score_board, &tiled_map, "jetpack").first().cloned()
-        }
-        else {
-            None
-        };
-
-        
-
-        // let jetpack = if tiled_map.contains_layer("jetpack") {
-        //     let jetpack_object = tiled_map.layers.get("jetpack").unwrap().objects.first().unwrap();    
-        //     Some(GameObject {
-        //         world_x: jetpack_object.world_x,
-        //         world_y: jetpack_object.world_y,
-        //         width: jetpack_object.world_w,
-        //         height: jetpack_object.world_h,
-        //         name: jetpack_object.name.clone(),
-        //         collected: if score_board.jetpack_captured { Some(true) } else { None },
-        //         progress: 0.0
-        //     })
+        // let gun = if tiled_map.contains_layer("gun") {     
+        //     initialization::load_objects_in_layer(
+        //         retry, &score_board, &tiled_map, "gun").first().cloned()
         // }
         // else {
         //     None
         // };
+
+        // let jetpack = if tiled_map.contains_layer("jetpack") {
+        //     initialization::load_objects_in_layer(
+        //         retry, &score_board, &tiled_map, "jetpack").first().cloned()
+        // }
+        // else {
+        //     None
+        // };
+
+        
+
+        let jetpack = if tiled_map.contains_layer("jetpack") {
+            let jetpack_object = tiled_map.layers.get("jetpack").unwrap().objects.first().unwrap();    
+            Some(GameObject {
+                world_x: jetpack_object.world_x,
+                world_y: jetpack_object.world_y,
+                width: jetpack_object.world_w,
+                height: jetpack_object.world_h,
+                name: jetpack_object.name.clone(),
+                collected: if score_board.jetpack_captured { Some(true) } else { None },
+                progress: 0.0
+            })
+        }
+        else {
+            None
+        };
 
         let monsters: Vec<Monster>  = if retry {
             score_board.monsters.clone()

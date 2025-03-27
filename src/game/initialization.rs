@@ -8,6 +8,12 @@ pub fn should_attach_player(tiled_map: &Map) -> bool {
     tiled_map.layers.get("player").unwrap().objects.first().unwrap().properties.contains_key("attach")
 }
 
+pub fn map_width_height(tiled_map: &Map) -> (u32, u32) {
+    let height = tiled_map.layers.get("platform").unwrap().height;
+    let width = tiled_map.layers.get("platform").unwrap().width;
+    (height, width)
+}
+
 pub fn create_world(
     width: i32,
     tiled_map: &Map,
