@@ -50,7 +50,7 @@ impl Scene for Complete {
         None
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         let resources = storage::get::<Resources>();
         
         self.tiled_map

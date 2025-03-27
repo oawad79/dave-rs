@@ -80,7 +80,7 @@ impl Scene for ScoreBoard {
         None
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         let resources = storage::get::<Resources>();
 
         Self::draw_texture(&resources, "score", self.position.0, 5.0);

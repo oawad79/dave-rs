@@ -93,7 +93,7 @@ impl Scene for Separator {
         None
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();
 

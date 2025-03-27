@@ -105,7 +105,7 @@ impl Scene for WarpZone {
         None
     }
 
-    fn draw(&self) {
+    fn draw(&mut self) {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();
 

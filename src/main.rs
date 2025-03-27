@@ -48,7 +48,7 @@ pub enum SceneChange {
 }
 pub trait Scene {
     fn update(&mut self) -> Option<SceneChange>;
-    fn draw(&self);
+    fn draw(&mut self);
 }
 
 fn window_conf() -> Conf {

@@ -288,10 +288,6 @@ impl Scene for Game {
             
         }
         
-        for (explosion, coords) in &mut self.explosions {
-            explosion.draw(vec2(coords.x, coords.y));
-        }
-
         self.game_state.update();
         
         if tiled_map.contains_layer("tree_collider") {
@@ -302,15 +298,12 @@ impl Scene for Game {
             );
         }
 
-        
-
         self.animations.update();
 
         self.player.update(&mut self.game_world.world);
 
         let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
-
 
         CollisionManager::handle_monster_collisions(
             &mut self.monsters, 
@@ -333,7 +326,7 @@ impl Scene for Game {
 
         None
     }
-    fn draw(&self) {
+    fn draw(&mut self) {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();
 
@@ -342,6 +335,10 @@ impl Scene for Game {
         renderer::draw_tiles(&tiled_map, self.game_world.width_tiles, self.game_world.height_tiles);
         renderer::draw_collectibles(&self.collectibles, &tiled_map);
         renderer::draw_door(&self.door, &tiled_map);
+
+        for (explosion, coords) in &mut self.explosions {
+            explosion.draw(vec2(coords.x, coords.y));
+        }
 
         // if tiled_map.contains_layer("tree_collider") {
         //     tiled_map.draw_tiles(
