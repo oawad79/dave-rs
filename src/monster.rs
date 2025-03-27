@@ -133,26 +133,19 @@ impl Monster {
         &self.waypoints[self.current_waypoint]
     }
 
-    pub fn update(&mut self, player_pos: Vec2) {
+    pub fn draw(&self) {
         let resources = storage::get::<Resources>();
-
         let point = self.waypoints[self.current_waypoint];
         let m = &resources.monsters[self.name.parse::<usize>().unwrap() - 1];
-
+    
         // Create the default draw parameters
         let mut draw_params = DrawTextureParams {
             dest_size: Some(vec2(m.width(), m.height())),
             //flip_y: true,
             ..Default::default()
         };
-
+    
         if self.rotate {
-            self.rotation_timer -= 150.0 * get_frame_time();
-            if self.rotation_timer <= 0.0 {
-                self.rotation_degree += 0.5;
-                self.rotation_timer = MONSTER_ROTATION_TIMER;
-            }
-            
             // If rotating around z-axis (normal rotation)
             if !self.rotate_y_axis {
                 draw_params.rotation = self.rotation_degree;
@@ -162,9 +155,8 @@ impl Monster {
                 ));
             }
         }
-
+    
         // Handle y-axis rotation separately 
-        // Note: Cody AI helped me with this y-axis rotation
         if self.rotate_y_axis {
             // Calculate rotation based on time or existing rotation_degree
             let angle = self.rotation_degree * std::f32::consts::PI / 180.0; // Convert to radians
@@ -198,6 +190,37 @@ impl Monster {
             );
         }
     
+        // Draw monster bullets
+        for monster_bullet in &self.bullets {
+            draw_texture_ex(
+                resources.get_texture("monster_bullet"),
+                monster_bullet.x,
+                monster_bullet.y,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(
+                        resources.get_texture("monster_bullet").width(), 
+                        resources.get_texture("monster_bullet").height()
+                    )),
+                    rotation: if monster_bullet.direction == BulletDirection::Right { std::f32::consts::PI } else { 0.0 },
+                    ..Default::default()
+                },
+            );
+        }
+    }
+
+    
+    pub fn update(&mut self, player_pos: Vec2) {
+        let point = self.waypoints[self.current_waypoint];
+    
+        if self.rotate {
+            self.rotation_timer -= 150.0 * get_frame_time();
+            if self.rotation_timer <= 0.0 {
+                self.rotation_degree += 0.5;
+                self.rotation_timer = MONSTER_ROTATION_TIMER;
+            }
+        }
+
         if self.move_timer > 0.0 {
             self.move_timer -= MONSTER_SPEED * get_frame_time();
         }
@@ -238,22 +261,4 @@ impl Monster {
                 monster_bullet.x += monster_bullet.speed * get_frame_time();
             }
         }
-
-        for monster_bullet in &self.bullets {
-            draw_texture_ex(
-                resources.get_texture("monster_bullet"),
-                monster_bullet.x,
-                monster_bullet.y,
-                WHITE,
-                DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.get_texture("monster_bullet").width(), 
-                        resources.get_texture("monster_bullet").height()
-                    )),
-                    rotation: if monster_bullet.direction == BulletDirection::Right { std::f32::consts::PI } else { 0.0 },
-                    ..Default::default()
-                },
-            );
-        }
-    }
-}
+    }}

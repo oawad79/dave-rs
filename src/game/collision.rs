@@ -141,6 +141,7 @@ impl CollisionManager {
         monsters.iter_mut().for_each(|monster| {
             if monster.alive {
                 monster.update(player_pos);
+                monster.draw();
 
                 if Player::overlaps(player_pos, &monster.monster_rectangle()) {
                     player.is_dead = true;
