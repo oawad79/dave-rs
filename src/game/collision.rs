@@ -2,18 +2,14 @@ use std::collections::HashMap;
 
 use macroquad::{
     audio::play_sound_once,
-    math::{vec2, Rect, Vec2}, prelude::animation::AnimatedSprite,
+    math::{Rect, Vec2, vec2},
+    prelude::animation::AnimatedSprite,
 };
 use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
 use macroquad_platformer::Tile;
 use macroquad_tiled::Object;
 
-use crate::{
-    monster::Monster, 
-    player::Player, 
-    resources::Resources, 
-    score_board::GameObject
-};
+use crate::{monster::Monster, player::Player, resources::Resources, score_board::GameObject};
 
 use super::{GameState, collectibles::CollectibleType};
 
@@ -78,10 +74,12 @@ impl CollisionManager {
         false
     }
 
-    pub fn check_jetpack_collision(player: &mut Player,
+    pub fn check_jetpack_collision(
+        player: &mut Player,
         jetpack: &mut Option<GameObject>,
         score_board: &mut crate::score_board::ScoreBoard,
-        player_pos: Vec2) -> bool {
+        player_pos: Vec2,
+    ) -> bool {
         // Check for collision between player and jetpack
         if let Some(j) = jetpack {
             if !player.has_jetpack
@@ -100,7 +98,6 @@ impl CollisionManager {
         }
 
         false
-
     }
 
     pub fn check_gun_collision(
@@ -256,37 +253,32 @@ impl CollisionManager {
         resources: &Resources,
         player_pos: Vec2,
     ) {
-        
         deadly_objects.iter().for_each(|(_, (_, objects))| {
             objects.iter().for_each(|object| {
-                let deadly_rect = Rect::new(
-                object.world_x + 10.0,
-                object.world_y - 10.0,
-                10.0,
-                7.0,
-            );
+                let deadly_rect =
+                    Rect::new(object.world_x + 10.0, object.world_y - 10.0, 10.0, 7.0);
 
-            if Player::overlaps(player_pos, &deadly_rect) && !player.is_dead {
-                player.is_dead = true;
-                *player_explosion_active = true;
-                *player_explosion_timer = EXPLOSION_DURATION;
+                if Player::overlaps(player_pos, &deadly_rect) && !player.is_dead {
+                    player.is_dead = true;
+                    *player_explosion_active = true;
+                    *player_explosion_timer = EXPLOSION_DURATION;
 
-                if explosions.is_empty() {
-                    explosions.push((
-                        Emitter::new(EmitterConfig {
-                            amount: 40,
-                            texture: Some(resources.get_texture("explosion").clone()),
-                            ..Self::particle_explosion()
-                        }),
-                        vec2(player_pos.x + 32.0, player_pos.y),
-                    ));
+                    if explosions.is_empty() {
+                        explosions.push((
+                            Emitter::new(EmitterConfig {
+                                amount: 40,
+                                texture: Some(resources.get_texture("explosion").clone()),
+                                ..Self::particle_explosion()
+                            }),
+                            vec2(player_pos.x + 32.0, player_pos.y),
+                        ));
+                    }
+                    play_sound_once(resources.get_sound("explosion"));
+                    play_sound_once(resources.get_sound("hd-die-dave-7"));
                 }
-                play_sound_once(resources.get_sound("explosion"));
-                play_sound_once(resources.get_sound("hd-die-dave-7"));
-            }
+            });
         });
-    });
-}
+    }
 
     pub fn handle_collecting_valuables(
         collectibles: &mut Vec<GameObject>,
