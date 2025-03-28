@@ -1,6 +1,7 @@
 use std::vec;
 
 use animations::Animations;
+use bullet::Bullet;
 use camera::GameCamera;
 use collectibles::CollectibleType;
 use collision::CollisionManager;
@@ -220,6 +221,22 @@ impl Game {
             ..Default::default()
         }
     }
+
+    fn should_retain_bullet(game_world: &GameWorld, pos: Vec2, bullet: Bullet) -> bool {
+        if game_world
+            .world
+            .collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10)
+            == Tile::Solid
+        {
+            return false;
+        }
+
+        if !bullet.collided && bullet.x > pos.x - 100.0 {
+            return true;
+        }
+
+        false
+    }
 }
 
 impl Scene for Game {
@@ -369,7 +386,6 @@ impl Scene for Game {
             &mut self.explosions,
             &mut self.game_state,
             &resources,
-            &mut self.game_world.world,
             pos,
         );
 
@@ -386,8 +402,45 @@ impl Scene for Game {
             bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
         });
 
+        for monster in &mut self.monsters {
+            monster
+                .bullets
+                .retain(|bullet| Game::should_retain_bullet(&self.game_world, pos, bullet.clone()));
+
+            for bullet in &mut monster.bullets {
+                let bullet_rect = Rect {
+                    x: bullet.x,
+                    y: bullet.y,
+                    w: resources.get_texture("monster_bullet").width(),
+                    h: resources.get_texture("monster_bullet").height(),
+                };
+
+                if Player::overlaps(pos, &bullet_rect) {
+                    bullet.collided = true;
+                    self.player.is_dead = true;
+
+                    self.game_state.player_explosion_active = true;
+                    self.game_state.player_explosion_timer = EXPLOSION_DURATION;
+
+                    if self.explosions.is_empty() {
+                        self.explosions.push((
+                            Emitter::new(EmitterConfig {
+                                amount: 40,
+                                texture: Some(resources.get_texture("explosion").clone()),
+                                ..Game::particle_explosion()
+                            }),
+                            vec2(pos.x, pos.y),
+                        ));
+                    }
+
+                    play_sound_once(resources.get_sound("explosion"));
+                }
+            }
+        }
+
         None
     }
+
     fn draw(&mut self) {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();

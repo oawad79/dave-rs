@@ -12,7 +12,6 @@ use macroquad_particles::{
     Emitter,
     EmitterConfig,
 };
-use macroquad_platformer::Tile;
 use macroquad_tiled::Map;
 
 use super::{
@@ -79,13 +78,12 @@ impl Default for Monster {
 
 impl Monster {
     pub fn handle_monster_collisions(
-        monsters: &mut Vec<Monster>,
+        monsters: &mut [Monster],
         player: &mut Player,
         score_board: &mut crate::game::score_board::ScoreBoard,
         explosions: &mut Vec<(Emitter, Vec2)>,
         game_state: &mut GameState,
         resources: &Resources,
-        world: &mut macroquad_platformer::World,
         player_pos: Vec2,
     ) {
         monsters.iter_mut().for_each(|monster| {
@@ -151,48 +149,6 @@ impl Monster {
                         play_sound_once(resources.get_sound("explosion"));
                     }
                 }
-
-                for bullet in &mut monster.bullets {
-                    let bullet_rect = Rect {
-                        x: bullet.x,
-                        y: bullet.y,
-                        w: resources.get_texture("monster_bullet").width(),
-                        h: resources.get_texture("monster_bullet").height(),
-                    };
-
-                    if Player::overlaps(player_pos, &bullet_rect) {
-                        bullet.collided = true;
-                        player.is_dead = true;
-
-                        game_state.player_explosion_active = true;
-                        game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-                        if explosions.is_empty() {
-                            explosions.push((
-                                Emitter::new(EmitterConfig {
-                                    amount: 40,
-                                    texture: Some(resources.get_texture("explosion").clone()),
-                                    ..Game::particle_explosion()
-                                }),
-                                vec2(player_pos.x, player_pos.y),
-                            ));
-                        }
-
-                        play_sound_once(resources.get_sound("explosion"));
-                    }
-                }
-
-                monster.bullets.retain(|bullet| {
-                    if world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid {
-                        return false;
-                    }
-
-                    if !bullet.collided && bullet.x > player_pos.x - 100.0 {
-                        return true;
-                    }
-
-                    false
-                });
             }
         });
     }
