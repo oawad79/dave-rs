@@ -18,9 +18,7 @@ use macroquad_tiled::Object;
 use super::{
     EXPLOSION_DURATION,
     Game,
-    bullet::Bullet,
     collectibles::CollectibleType,
-    game_state::GameState,
     player::Player,
     score_board::GameObject,
 };
@@ -71,7 +69,6 @@ impl CollisionManager {
                 &Rect::new(door.world_x, door.world_y - 32.0, 32.0, 32.0),
             )
         {
-            println!("Door collision detected");
             score_board.game_won = false;
             score_board.jetpack_captured = false;
             score_board.gun_captured = false;

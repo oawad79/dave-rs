@@ -237,6 +237,44 @@ impl Game {
 
         false
     }
+
+    fn check_monster_bullet_hit(
+        resources: &Resources,
+        pos: Vec2,
+        bullet: &mut Bullet,
+        player: &mut Player,
+        explosions: &mut Vec<(Emitter, Vec2)>,
+        game_state: &mut GameState,
+    ) {
+        let bullet_rect = Rect {
+            x: bullet.x,
+            y: bullet.y,
+            w: resources.get_texture("monster_bullet").width(),
+            h: resources.get_texture("monster_bullet").height(),
+        };
+
+        if Player::overlaps(pos, &bullet_rect) {
+            bullet.collided = true;
+
+            player.is_dead = true;
+
+            game_state.player_explosion_active = true;
+            game_state.player_explosion_timer = EXPLOSION_DURATION;
+
+            if explosions.is_empty() {
+                explosions.push((
+                    Emitter::new(EmitterConfig {
+                        amount: 40,
+                        texture: Some(resources.get_texture("explosion").clone()),
+                        ..Game::particle_explosion()
+                    }),
+                    vec2(pos.x, pos.y),
+                ));
+            }
+
+            play_sound_once(resources.get_sound("explosion"));
+        }
+    }
 }
 
 impl Scene for Game {
@@ -408,33 +446,14 @@ impl Scene for Game {
                 .retain(|bullet| Game::should_retain_bullet(&self.game_world, pos, bullet));
 
             for bullet in &mut monster.bullets {
-                let bullet_rect = Rect {
-                    x: bullet.x,
-                    y: bullet.y,
-                    w: resources.get_texture("monster_bullet").width(),
-                    h: resources.get_texture("monster_bullet").height(),
-                };
-
-                if Player::overlaps(pos, &bullet_rect) {
-                    bullet.collided = true;
-                    self.player.is_dead = true;
-
-                    self.game_state.player_explosion_active = true;
-                    self.game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-                    if self.explosions.is_empty() {
-                        self.explosions.push((
-                            Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.get_texture("explosion").clone()),
-                                ..Game::particle_explosion()
-                            }),
-                            vec2(pos.x, pos.y),
-                        ));
-                    }
-
-                    play_sound_once(resources.get_sound("explosion"));
-                }
+                Game::check_monster_bullet_hit(
+                    &resources,
+                    pos,
+                    bullet,
+                    &mut self.player,
+                    &mut self.explosions,
+                    &mut self.game_state,
+                );
             }
         }
 
