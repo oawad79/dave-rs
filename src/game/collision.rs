@@ -18,7 +18,9 @@ use macroquad_tiled::Object;
 use super::{
     EXPLOSION_DURATION,
     Game,
+    bullet::Bullet,
     collectibles::CollectibleType,
+    game_state::GameState,
     player::Player,
     score_board::GameObject,
 };

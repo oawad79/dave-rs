@@ -222,7 +222,7 @@ impl Game {
         }
     }
 
-    fn should_retain_bullet(game_world: &GameWorld, pos: Vec2, bullet: Bullet) -> bool {
+    fn should_retain_bullet(game_world: &GameWorld, pos: Vec2, bullet: &Bullet) -> bool {
         if game_world
             .world
             .collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10)
@@ -405,7 +405,7 @@ impl Scene for Game {
         for monster in &mut self.monsters {
             monster
                 .bullets
-                .retain(|bullet| Game::should_retain_bullet(&self.game_world, pos, bullet.clone()));
+                .retain(|bullet| Game::should_retain_bullet(&self.game_world, pos, bullet));
 
             for bullet in &mut monster.bullets {
                 let bullet_rect = Rect {
