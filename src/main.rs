@@ -27,7 +27,11 @@ use macroquad::prelude::{
     collections::storage,
     *,
 };
-use menu::Menu;
+use menu::{
+    Menu,
+    MenuAction,
+    MenuItem,
+};
 use resources::Resources;
 use separator::Separator;
 use warp_zone::WarpZone;
@@ -78,29 +82,48 @@ async fn main() {
     let mut input_manager = InputManager::new();
 
     // Create UI menus
-    let mut help_menu = Menu::new("help", vec2(-220.0, -120.0), KeyCode::F1, None);
-
-    let mut pause_menu = Menu::new("pause", vec2(-190.0, -30.0), KeyCode::F9, None);
-
-    let mut restart_menu = Menu::new(
-        "restart",
-        vec2(-190.0, -30.0),
-        KeyCode::F3,
-        Some(KeyCode::Y),
-    );
-    let mut quit_menu = Menu::new(
-        "exit",
-        vec2(-150.0, -20.0),
-        KeyCode::Escape,
-        Some(KeyCode::Y),
-    );
+    let mut menu = Menu::new(vec![
+        MenuItem {
+            key: KeyCode::F1,
+            texture_name: "help".to_string(),
+            texture_offset: vec2(-220.0, -120.0),
+            confirm_key: Some(KeyCode::Y),
+            action: Some(MenuAction::Help),
+        },
+        MenuItem {
+            key: KeyCode::F9,
+            texture_name: "pause".to_string(),
+            texture_offset: vec2(-190.0, -30.0),
+            confirm_key: Some(KeyCode::Y),
+            action: Some(MenuAction::Pause),
+        },
+        MenuItem {
+            key: KeyCode::F3,
+            texture_name: "restart".to_string(),
+            texture_offset: vec2(-190.0, -30.0),
+            confirm_key: Some(KeyCode::Y),
+            action: Some(MenuAction::Restart),
+        },
+        MenuItem {
+            key: KeyCode::Escape,
+            texture_name: "exit".to_string(),
+            texture_offset: vec2(-150.0, -20.0),
+            confirm_key: Some(KeyCode::Y),
+            action: Some(MenuAction::Exit),
+        },
+    ]);
 
     loop {
         clear_background(BLACK);
 
         set_camera(&main_camera);
 
-        let change = scene.update();
+        let change = if menu.current_menu_item.is_some() {
+            None
+        } else {
+            scene.update()
+        };
+
         if let Some(change) = change {
             scene = match change {
                 SceneChange::EntryScreen => Box::new(EntryScreen::new()),
@@ -118,22 +141,14 @@ async fn main() {
 
         scene.draw();
 
-        // Handle menus
-        help_menu.update();
-        help_menu.draw(&resources);
-
-        pause_menu.update();
-        pause_menu.draw(&resources);
-
-        if restart_menu.update() {
-            scene = Box::new(EntryScreen::new());
+        if let Some(action) = menu.update(&resources) {
+            match action {
+                MenuAction::Exit => break,
+                MenuAction::Pause => {}
+                MenuAction::Restart => scene = Box::new(EntryScreen::new()),
+                MenuAction::Help => {}
+            }
         }
-        restart_menu.draw(&resources);
-
-        if quit_menu.update() {
-            break;
-        }
-        quit_menu.draw(&resources);
 
         InputManager::handle_cheat_code(&mut scene);
 

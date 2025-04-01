@@ -1,67 +1,75 @@
 use macroquad::prelude::*;
+
 use crate::Resources;
 
+#[derive(Clone)]
+pub enum MenuAction {
+    Exit,
+    Pause,
+    Help,
+    Restart,
+}
+
 pub struct Menu {
-    pub visible: bool,
-    texture_name: String,
-    texture_offset: Vec2,
-    confirm_key: Option<KeyCode>,
-    toggle_key: KeyCode,
+    pub current_menu_item: Option<MenuItem>,
+    menu_items: Vec<MenuItem>,
+}
+
+pub struct MenuItem {
+    pub key: KeyCode,
+    pub texture_name: String,
+    pub texture_offset: Vec2,
+    pub confirm_key: Option<KeyCode>,
+    pub action: Option<MenuAction>,
 }
 
 impl Menu {
-    pub fn new(
-        texture_name: &str,
-        texture_offset: Vec2,
-        toggle_key: KeyCode,
-        confirm_key: Option<KeyCode>,
-    ) -> Self {
+    pub fn new(menu_items: Vec<MenuItem>) -> Self {
         Menu {
-            visible: false,
-            texture_name: texture_name.to_string(),
-            texture_offset,
-            confirm_key,
-            toggle_key,
+            current_menu_item: None,
+            menu_items,
         }
     }
-    
-    pub fn update(&mut self) -> bool {
-        if is_key_down(self.toggle_key) {
-            self.visible = true;
-        }
-        
-        if self.visible {
-            if let Some(confirm_key) = self.confirm_key {
-                if is_key_down(confirm_key) {
-                    self.visible = false;
-                    return true;
-                } else if is_key_down(KeyCode::N) {
-                    self.visible = false;
+
+    pub fn update(&mut self, resources: &Resources) -> Option<MenuAction> {
+        if self.current_menu_item.is_none() {
+            for menu_item in self.menu_items.iter() {
+                if is_key_down(menu_item.key) {
+                    self.current_menu_item = Some(MenuItem {
+                        key: menu_item.key,
+                        texture_name: menu_item.texture_name.clone(),
+                        texture_offset: menu_item.texture_offset,
+                        confirm_key: menu_item.confirm_key,
+                        action: menu_item.action.clone(),
+                    });
                 }
-            } else if is_key_pressed(KeyCode::Escape) {
-                self.visible = false;
             }
         }
-        
-        false
-    }
-    
-    pub fn draw(&self, resources: &Resources) {
-        if self.visible {
+
+        if self.current_menu_item.is_some() {
+            let menu_item = self.current_menu_item.as_ref().unwrap();
             set_default_camera();
             draw_texture_ex(
-                resources.get_texture(&self.texture_name),
-                screen_width() / 2.0 + self.texture_offset.x,
-                screen_height() / 2.0 + self.texture_offset.y,
+                resources.get_texture(&menu_item.texture_name),
+                screen_width() / 2.0 + menu_item.texture_offset.x,
+                screen_height() / 2.0 + menu_item.texture_offset.y,
                 WHITE,
                 DrawTextureParams {
                     dest_size: Some(vec2(
-                        resources.get_texture(&self.texture_name).width(),
-                        resources.get_texture(&self.texture_name).height(),
+                        resources.get_texture(&menu_item.texture_name).width(),
+                        resources.get_texture(&menu_item.texture_name).height(),
                     )),
                     ..Default::default()
                 },
             );
+
+            if is_key_down(menu_item.confirm_key.unwrap()) {
+                let m = menu_item.action.clone();
+                self.current_menu_item = None;
+                return m;
+            }
         }
+
+        None
     }
 }
