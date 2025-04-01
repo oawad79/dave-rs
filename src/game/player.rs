@@ -61,10 +61,8 @@ pub struct Player {
     current_state: &'static str,
 }
 
-// In your player.rs file
 impl Collidable for Player {
     fn get_collision_rect(&self) -> Rect {
-        // Implementation for player collision rect
         Rect::new(self.pos.x, self.pos.y, 32.0, 32.0)
     }
 
@@ -100,7 +98,7 @@ impl Player {
             attach,
             jetpack_timer: 0.0,
             jetpack_timer_active: false,
-            progress: 0.0,
+            progress: 1.0,
             pos: vec2(0.0, 0.0),
             current_state: "dave_idle",
         }
@@ -137,11 +135,7 @@ impl Player {
                     self.current_state = "dave_walk";
                 }
 
-                if self.speed.x < 0.0 {
-                    self.facing_left = true;
-                } else {
-                    self.facing_left = false;
-                }
+                self.facing_left = self.speed.x < 0.0;
             } else {
                 self.current_state = "dave_idle";
                 self.animated_player.set_animation(1); // idle
