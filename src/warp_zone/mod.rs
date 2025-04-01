@@ -101,7 +101,7 @@ impl WarpZone {
 
         let score_board = storage::get::<ScoreBoard>().clone();
 
-        let player = Player::new(actor, false, false, false);
+        let player = Player::new(actor, false, false, false, 1.0);
 
         Self {
             player,

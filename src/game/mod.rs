@@ -103,6 +103,11 @@ impl Game {
             score_board.gun_captured,
             score_board.jetpack_captured,
             initialization::should_attach_player(&tiled_map),
+            if retry {
+                score_board.jetpack_progress
+            } else {
+                1.0
+            },
         );
 
         let collectibles =
@@ -255,6 +260,7 @@ impl Scene for Game {
                 self.score_board.collectibles = self.collectibles.clone();
                 self.score_board.monsters = self.monsters.clone();
                 self.score_board.jetpack_captured = self.player.has_jetpack;
+                self.score_board.jetpack_progress = self.player.jetpack_progress;
             }
 
             storage::store(self.score_board.clone());
@@ -371,7 +377,7 @@ impl Scene for Game {
                 j,
                 &resources,
                 self.player.has_jetpack,
-                self.player.progress,
+                self.player.jetpack_progress,
                 self.game_state.message_coord,
                 self.game_camera.camera.target.x,
             );

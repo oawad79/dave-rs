@@ -108,7 +108,7 @@ pub fn draw_jetpack(
     jetpack: &GameObject,
     resources: &Resources,
     player_has_jetpack: bool,
-    player_progress: f32,
+    jetpack_progress: f32,
     message_coord: (f32, f32),
     camera_target_x: f32,
 ) {
@@ -130,7 +130,7 @@ pub fn draw_jetpack(
         let width = resources.get_texture("jetpack_progress").width() * 0.7;
         let height = resources.get_texture("jetpack_progress").height() * 0.7;
 
-        let bar_width = width * player_progress;
+        let bar_width = width * jetpack_progress;
 
         // Define the texture cropping rectangle (shrink from right to left)
         let source_rect = Some(Rect::new(0.0, 0.0, bar_width, height));

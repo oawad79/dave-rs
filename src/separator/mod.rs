@@ -98,6 +98,7 @@ impl Separator {
             score_board.gun_captured,
             score_board.jetpack_captured,
             false,
+            1.0,
         );
 
         Self {

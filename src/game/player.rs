@@ -56,7 +56,7 @@ pub struct Player {
     attach: bool,
     pub jetpack_timer: f32,
     jetpack_timer_active: bool,
-    pub progress: f32,
+    pub jetpack_progress: f32,
     pos: Vec2,
     current_state: &'static str,
 }
@@ -80,7 +80,13 @@ impl Collidable for Player {
 }
 
 impl Player {
-    pub fn new(collider: Actor, has_gun: bool, has_jetpack: bool, attach: bool) -> Self {
+    pub fn new(
+        collider: Actor,
+        has_gun: bool,
+        has_jetpack: bool,
+        attach: bool,
+        jetpack_progress: f32,
+    ) -> Self {
         Self {
             collider,
             speed: vec2(0., 0.),
@@ -98,7 +104,7 @@ impl Player {
             attach,
             jetpack_timer: 0.0,
             jetpack_timer_active: false,
-            progress: 1.0,
+            jetpack_progress,
             pos: vec2(0.0, 0.0),
             current_state: "dave_idle",
         }
@@ -147,7 +153,9 @@ impl Player {
 
         if self.jetpack_active {
             self.jetpack_timer += get_frame_time();
-            self.progress = (1.0 - (self.jetpack_timer / JETPACK_TIMER)).max(0.0);
+            self.jetpack_progress = (1.0 - (self.jetpack_timer / JETPACK_TIMER)).max(0.0);
+
+            //println!("Jetpack progress: {}", self.jetpack_progress);
 
             if self.jetpack_timer >= JETPACK_TIMER {
                 self.jetpack_active = false;

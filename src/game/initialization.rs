@@ -85,7 +85,6 @@ pub fn load_objects_in_layer(
                 height: entry.world_h,
                 name: entry.name.clone(),
                 collected: None,
-                progress: 0.0,
             })
             .collect::<Vec<GameObject>>()
     }
@@ -111,7 +110,6 @@ pub fn load_jetpack(score_board: &ScoreBoard, tiled_map: &Map) -> Option<GameObj
             } else {
                 None
             },
-            progress: 0.0,
         })
     } else {
         None
@@ -134,7 +132,6 @@ pub fn load_gun_in_layer(tiled_map: &Map) -> Option<GameObject> {
             height: gun_object.world_h,
             name: gun_object.name.clone(),
             collected: None,
-            progress: 0.0,
         })
     } else {
         None
@@ -174,7 +171,6 @@ pub fn load_object_in_layer(tiled_map: &Map, layer_name: &str) -> Option<GameObj
             height: entry.world_h,
             name: entry.name.clone(),
             collected: None,
-            progress: 0.0,
         })
         .next()
 }

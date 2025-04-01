@@ -24,7 +24,6 @@ pub struct GameObject {
     pub height: f32,
     pub name: String,
     pub collected: Option<bool>,
-    pub progress: f32,
 }
 
 #[derive(Clone)]
@@ -38,6 +37,7 @@ pub struct ScoreBoard {
     pub gun_captured: bool,
     pub monsters: Vec<Monster>,
     pub jetpack_captured: bool,
+    pub jetpack_progress: f32,
 }
 
 impl ScoreBoard {
@@ -52,6 +52,7 @@ impl ScoreBoard {
             gun_captured: false,
             monsters: vec![],
             jetpack_captured: false,
+            jetpack_progress: 0.0,
         }
     }
 
