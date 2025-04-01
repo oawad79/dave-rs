@@ -105,9 +105,6 @@ impl CollisionManager {
                 continue;
             }
 
-            //monster.update(player_pos);
-            //monster.draw();
-
             // Check player-monster collision
             if Player::overlaps(player_pos, &monster.get_collision_rect()) {
                 Self::handle_player_monster_collision(
