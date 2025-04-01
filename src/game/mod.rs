@@ -298,19 +298,6 @@ impl Scene for Game {
 
         self.player.update(&mut self.game_world.world);
 
-        let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
-        let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
-
-        // Monster::handle_monster_collisions(
-        //     &mut self.monsters,
-        //     &mut self.player,
-        //     &mut self.score_board,
-        //     &mut self.explosions,
-        //     &mut self.game_state,
-        //     &resources,
-        //     pos,
-        // );
-
         CollisionManager::handle_collisions(
             &mut self.monsters,
             &mut self.player,
@@ -319,6 +306,9 @@ impl Scene for Game {
             &mut self.game_state,
             &resources,
         );
+
+        let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
+        let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
 
         self.player.bullets.retain(|bullet| {
             if self
