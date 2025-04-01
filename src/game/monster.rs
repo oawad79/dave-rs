@@ -1,31 +1,19 @@
 use std::vec;
 
 use macroquad::{
-    audio::play_sound_once,
     math::Vec2,
     prelude::{
         collections::storage,
         *,
     },
 };
-use macroquad_particles::{
-    Emitter,
-    EmitterConfig,
-};
 use macroquad_tiled::Map;
 
-use super::{
-    EXPLOSION_DURATION,
-    Game,
-    game_state::GameState,
-};
+use super::collidable::Collidable;
 use crate::{
-    game::{
-        bullet::{
-            Bullet,
-            BulletDirection,
-        },
-        player::Player,
+    game::bullet::{
+        Bullet,
+        BulletDirection,
     },
     resources::Resources,
 };
@@ -76,83 +64,26 @@ impl Default for Monster {
     }
 }
 
-impl Monster {
-    pub fn handle_monster_collisions(
-        monsters: &mut [Monster],
-        player: &mut Player,
-        score_board: &mut crate::game::score_board::ScoreBoard,
-        explosions: &mut Vec<(Emitter, Vec2)>,
-        game_state: &mut GameState,
-        resources: &Resources,
-        player_pos: Vec2,
-    ) {
-        monsters.iter_mut().for_each(|monster| {
-            if monster.alive {
-                monster.update(player_pos);
-                monster.draw();
-
-                if Player::overlaps(player_pos, &monster.monster_rectangle()) {
-                    player.is_dead = true;
-                    monster.alive = false;
-                    score_board.score += monster.kill_value;
-
-                    game_state.monster_explosion_active = true;
-                    game_state.monster_explosion_timer = EXPLOSION_DURATION;
-                    game_state.player_explosion_active = true;
-                    game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-                    if explosions.is_empty() {
-                        explosions.push((
-                            Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.get_texture("explosion").clone()),
-                                ..Game::particle_explosion()
-                            }),
-                            vec2(player_pos.x, player_pos.y),
-                        ));
-                        explosions.push((
-                            Emitter::new(EmitterConfig {
-                                amount: 40,
-                                texture: Some(resources.get_texture("explosion").clone()),
-                                ..Game::particle_explosion()
-                            }),
-                            monster.current_location(),
-                        ));
-                    }
-
-                    play_sound_once(resources.get_sound("explosion"));
-                    play_sound_once(resources.get_sound("hd-die-dave-7"));
-                }
-
-                for bullet in &mut player.bullets {
-                    let bullet_rect = Rect {
-                        x: bullet.x,
-                        y: bullet.y,
-                        w: resources.get_texture("bullet").width(),
-                        h: resources.get_texture("bullet").height(),
-                    };
-
-                    if bullet_rect.overlaps(&monster.monster_rectangle()) {
-                        bullet.collided = true;
-                        monster.alive = false;
-                        if explosions.is_empty() {
-                            explosions.push((
-                                Emitter::new(EmitterConfig {
-                                    amount: 40,
-                                    texture: Some(resources.get_texture("explosion").clone()),
-                                    ..Game::particle_explosion()
-                                }),
-                                monster.current_location(),
-                            ));
-                        }
-
-                        play_sound_once(resources.get_sound("explosion"));
-                    }
-                }
-            }
-        });
+// Add this after the existing Monster implementation
+impl Collidable for Monster {
+    fn get_collision_rect(&self) -> Rect {
+        self.monster_rectangle()
     }
 
+    fn get_position(&self) -> Vec2 {
+        self.current_location()
+    }
+
+    fn on_hit(&mut self) {
+        self.alive = false;
+    }
+
+    fn is_alive(&self) -> bool {
+        self.alive
+    }
+}
+
+impl Monster {
     fn get_line_points_lerp(p1: Vec2, p2: Vec2, steps: usize) -> Vec<Vec2> {
         let mut points = Vec::new();
 

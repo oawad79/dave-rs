@@ -19,33 +19,130 @@ use super::{
     EXPLOSION_DURATION,
     Game,
     collectibles::CollectibleType,
+    collidable::Collidable,
+    game_state::GameState,
+    monster::Monster,
     player::Player,
-    score_board::GameObject,
+    score_board::{
+        GameObject,
+        ScoreBoard,
+    },
 };
 use crate::resources::Resources;
-
-// static EXPLOSION_DURATION: f32 = 2.0;
 
 pub struct CollisionManager {}
 
 impl CollisionManager {
-    // pub fn particle_explosion() -> EmitterConfig {
-    //     EmitterConfig {
-    //         local_coords: false,
-    //         one_shot: true,
-    //         emitting: true,
-    //         lifetime: EXPLOSION_DURATION,
-    //         lifetime_randomness: 0.3,
-    //         explosiveness: 0.65,
-    //         initial_direction_spread: 2.0 * std::f32::consts::PI,
-    //         initial_velocity: 200.0,
-    //         initial_velocity_randomness: 0.8,
-    //         size: 16.0,
-    //         size_randomness: 0.3,
-    //         atlas: Some(AtlasConfig::new(5, 1, 0..)),
-    //         ..Default::default()
-    //     }
-    // }
+    pub fn handle_collisions(
+        monsters: &mut [Monster],
+        player: &mut Player,
+        score_board: &mut ScoreBoard,
+        explosions: &mut Vec<(Emitter, Vec2)>,
+        game_state: &mut GameState,
+        resources: &Resources,
+    ) {
+        let player_pos = player.get_position();
+
+        for monster in monsters.iter_mut() {
+            if !monster.is_alive() {
+                continue;
+            }
+
+            monster.update(player_pos);
+            monster.draw();
+
+            // Check player-monster collision
+            if Player::overlaps(player_pos, &monster.get_collision_rect()) {
+                Self::handle_player_monster_collision(
+                    player,
+                    monster,
+                    score_board,
+                    explosions,
+                    game_state,
+                    resources,
+                    player_pos,
+                );
+            }
+
+            // Check bullet-monster collisions
+            for bullet in &mut player.bullets {
+                let bullet_rect = Rect {
+                    x: bullet.x,
+                    y: bullet.y,
+                    w: resources.get_texture("bullet").width(),
+                    h: resources.get_texture("bullet").height(),
+                };
+
+                if bullet_rect.overlaps(&monster.get_collision_rect()) {
+                    Self::handle_bullet_monster_collision(bullet, monster, explosions, resources);
+                }
+            }
+        }
+    }
+
+    fn handle_player_monster_collision(
+        player: &mut Player,
+        monster: &mut Monster,
+        score_board: &mut ScoreBoard,
+        explosions: &mut Vec<(Emitter, Vec2)>,
+        game_state: &mut GameState,
+        resources: &Resources,
+        player_pos: Vec2,
+    ) {
+        player.is_dead = true;
+        monster.on_hit();
+        score_board.score += monster.kill_value;
+
+        game_state.monster_explosion_active = true;
+        game_state.monster_explosion_timer = EXPLOSION_DURATION;
+        game_state.player_explosion_active = true;
+        game_state.player_explosion_timer = EXPLOSION_DURATION;
+
+        if explosions.is_empty() {
+            explosions.push((
+                Emitter::new(EmitterConfig {
+                    amount: 40,
+                    texture: Some(resources.get_texture("explosion").clone()),
+                    ..Game::particle_explosion()
+                }),
+                player_pos,
+            ));
+            explosions.push((
+                Emitter::new(EmitterConfig {
+                    amount: 40,
+                    texture: Some(resources.get_texture("explosion").clone()),
+                    ..Game::particle_explosion()
+                }),
+                monster.get_position(),
+            ));
+        }
+
+        play_sound_once(resources.get_sound("explosion"));
+        play_sound_once(resources.get_sound("hd-die-dave-7"));
+    }
+
+    fn handle_bullet_monster_collision(
+        bullet: &mut crate::game::bullet::Bullet,
+        monster: &mut Monster,
+        explosions: &mut Vec<(Emitter, Vec2)>,
+        resources: &Resources,
+    ) {
+        bullet.collided = true;
+        monster.on_hit();
+
+        if explosions.is_empty() {
+            explosions.push((
+                Emitter::new(EmitterConfig {
+                    amount: 40,
+                    texture: Some(resources.get_texture("explosion").clone()),
+                    ..Game::particle_explosion()
+                }),
+                monster.get_position(),
+            ));
+        }
+
+        play_sound_once(resources.get_sound("explosion"));
+    }
 
     pub fn check_warp_zone_collision(warp_zone_rect: &Option<Rect>, player_pos: Vec2) -> bool {
         if let Some(wz) = warp_zone_rect {
@@ -134,125 +231,6 @@ impl CollisionManager {
 
         false
     }
-
-    // pub fn handle_monster_collisions(
-    //     monsters: &mut Vec<Monster>,
-    //     player: &mut Player,
-    //     score_board: &mut crate::score_board::ScoreBoard,
-    //     explosions: &mut Vec<(Emitter, Vec2)>,
-    //     game_state: &mut GameState,
-    //     resources: &Resources,
-    //     world: &mut macroquad_platformer::World,
-    //     player_pos: Vec2,
-    // ) {
-    //     monsters.iter_mut().for_each(|monster| {
-    //         if monster.alive {
-    //             monster.update(player_pos);
-    //             monster.draw();
-
-    //             if Player::overlaps(player_pos, &monster.monster_rectangle()) {
-    //                 player.is_dead = true;
-    //                 monster.alive = false;
-    //                 score_board.score += monster.kill_value;
-
-    //                 game_state.monster_explosion_active = true;
-    //                 game_state.monster_explosion_timer = EXPLOSION_DURATION;
-    //                 game_state.player_explosion_active = true;
-    //                 game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-    //                 if explosions.is_empty() {
-    //                     explosions.push((
-    //                         Emitter::new(EmitterConfig {
-    //                             amount: 40,
-    //                             texture: Some(resources.get_texture("explosion").clone()),
-    //                             ..Self::particle_explosion()
-    //                         }),
-    //                         vec2(player_pos.x, player_pos.y),
-    //                     ));
-    //                     explosions.push((
-    //                         Emitter::new(EmitterConfig {
-    //                             amount: 40,
-    //                             texture: Some(resources.get_texture("explosion").clone()),
-    //                             ..Self::particle_explosion()
-    //                         }),
-    //                         monster.current_location(),
-    //                     ));
-    //                 }
-
-    //                 play_sound_once(resources.get_sound("explosion"));
-    //                 play_sound_once(resources.get_sound("hd-die-dave-7"));
-    //             }
-
-    //             for bullet in &mut player.bullets {
-    //                 let bullet_rect = Rect {
-    //                     x: bullet.x,
-    //                     y: bullet.y,
-    //                     w: resources.get_texture("bullet").width(),
-    //                     h: resources.get_texture("bullet").height(),
-    //                 };
-
-    //                 if bullet_rect.overlaps(&monster.monster_rectangle()) {
-    //                     bullet.collided = true;
-    //                     monster.alive = false;
-    //                     if explosions.is_empty() {
-    //                         explosions.push((
-    //                             Emitter::new(EmitterConfig {
-    //                                 amount: 40,
-    //                                 texture: Some(resources.get_texture("explosion").clone()),
-    //                                 ..Self::particle_explosion()
-    //                             }),
-    //                             monster.current_location(),
-    //                         ));
-    //                     }
-
-    //                     play_sound_once(resources.get_sound("explosion"));
-    //                 }
-    //             }
-
-    //             for bullet in &mut monster.bullets {
-    //                 let bullet_rect = Rect {
-    //                     x: bullet.x,
-    //                     y: bullet.y,
-    //                     w: resources.get_texture("monster_bullet").width(),
-    //                     h: resources.get_texture("monster_bullet").height(),
-    //                 };
-
-    //                 if Player::overlaps(player_pos, &bullet_rect) {
-    //                     bullet.collided = true;
-    //                     player.is_dead = true;
-
-    //                     game_state.player_explosion_active = true;
-    //                     game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-    //                     if explosions.is_empty() {
-    //                         explosions.push((
-    //                             Emitter::new(EmitterConfig {
-    //                                 amount: 40,
-    //                                 texture: Some(resources.get_texture("explosion").clone()),
-    //                                 ..Self::particle_explosion()
-    //                             }),
-    //                             vec2(player_pos.x, player_pos.y),
-    //                         ));
-    //                     }
-
-    //                     play_sound_once(resources.get_sound("explosion"));
-    //                 }
-    //             }
-
-    //             monster.bullets.retain(|bullet| {
-    //                 if world.collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10) == Tile::Solid
-    // {                     return false;
-    //                 }
-
-    //                 if !bullet.collided && bullet.x > player_pos.x - 100.0 {
-    //                     return true;
-    //                 }
-
-    //                 false
-    //             });
-    //         }
-    //     });
-    // }
 
     pub fn handle_collision_with_deadly(
         deadly_objects: &HashMap<String, (Option<AnimatedSprite>, Vec<Object>)>,

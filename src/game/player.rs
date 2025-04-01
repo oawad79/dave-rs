@@ -26,9 +26,12 @@ use macroquad_platformer::{
 };
 use macroquad_tiled::Map;
 
-use super::bullet::{
-    Bullet,
-    BulletDirection,
+use super::{
+    bullet::{
+        Bullet,
+        BulletDirection,
+    },
+    collidable::Collidable,
 };
 use crate::Resources;
 
@@ -54,6 +57,27 @@ pub struct Player {
     pub jetpack_timer: f32,
     jetpack_timer_active: bool,
     pub progress: f32,
+    pos: Vec2,
+}
+
+// In your player.rs file
+impl Collidable for Player {
+    fn get_collision_rect(&self) -> Rect {
+        // Implementation for player collision rect
+        Rect::new(self.pos.x, self.pos.y, 32.0, 32.0)
+    }
+
+    fn get_position(&self) -> Vec2 {
+        self.pos
+    }
+
+    fn on_hit(&mut self) {
+        self.is_dead = true;
+    }
+
+    fn is_alive(&self) -> bool {
+        !self.is_dead
+    }
 }
 
 impl Player {
@@ -76,6 +100,7 @@ impl Player {
             jetpack_timer: 0.0,
             jetpack_timer_active: false,
             progress: 0.0,
+            pos: vec2(0.0, 0.0),
         }
     }
 
@@ -90,9 +115,9 @@ impl Player {
 
         let delta = get_frame_time();
 
-        let pos = world.actor_pos(self.collider);
+        self.pos = world.actor_pos(self.collider);
 
-        let on_ground = world.collide_check(self.collider, pos + vec2(0., 1.));
+        let on_ground = world.collide_check(self.collider, self.pos + vec2(0., 1.));
 
         if self.is_dead {
             stop_sound(resources.get_sound("jetPackActivated"));
@@ -163,7 +188,7 @@ impl Player {
         }
 
         if tiled_map.contains_layer("tree_collider") {
-            if world.collide_tag(2, pos, 10, 32) == Tile::JumpThrough {
+            if world.collide_tag(2, self.pos, 10, 32) == Tile::JumpThrough {
                 if is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down) {
                     if !self.climbing {
                         play_sound(
@@ -203,8 +228,8 @@ impl Player {
                 state,
                 self.animated_player.frame().source_rect,
                 Rect::new(
-                    pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
-                    pos.y,
+                    self.pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
+                    self.pos.y,
                     flip,
                     32.0,
                 ),
@@ -245,8 +270,8 @@ impl Player {
 
         if is_key_pressed(KeyCode::LeftControl) && self.has_gun {
             self.bullets.push(Bullet {
-                x: pos.x + 10.0,
-                y: pos.y,
+                x: self.pos.x + 10.0,
+                y: self.pos.y,
                 speed: 250.0,
                 collided: false,
                 direction: if self.facing_left {

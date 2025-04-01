@@ -44,6 +44,7 @@ mod animations;
 mod bullet;
 mod camera;
 mod collectibles;
+mod collidable;
 mod collision;
 mod game_state;
 mod initialization;
@@ -417,14 +418,23 @@ impl Scene for Game {
         let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
         let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
 
-        Monster::handle_monster_collisions(
+        // Monster::handle_monster_collisions(
+        //     &mut self.monsters,
+        //     &mut self.player,
+        //     &mut self.score_board,
+        //     &mut self.explosions,
+        //     &mut self.game_state,
+        //     &resources,
+        //     pos,
+        // );
+
+        CollisionManager::handle_collisions(
             &mut self.monsters,
             &mut self.player,
             &mut self.score_board,
             &mut self.explosions,
             &mut self.game_state,
             &resources,
-            pos,
         );
 
         self.player.bullets.retain(|bullet| {
