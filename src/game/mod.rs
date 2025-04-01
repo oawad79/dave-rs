@@ -20,10 +20,7 @@ use macroquad::{
     },
 };
 use macroquad_particles::Emitter;
-use macroquad_platformer::{
-    Tile,
-    World,
-};
+use macroquad_platformer::World;
 use macroquad_tiled::Map;
 use monster::Monster;
 use player::Player;
@@ -149,6 +146,13 @@ impl Game {
             warp_zone_rect,
         }
     }
+
+    fn persist_state(&mut self) {
+        self.score_board.collectibles = self.collectibles.clone();
+        self.score_board.monsters = self.monsters.clone();
+        self.score_board.jetpack_captured = self.player.has_jetpack;
+        self.score_board.jetpack_timer = self.player.jetpack_timer;
+    }
 }
 
 impl Scene for Game {
@@ -241,10 +245,7 @@ impl Scene for Game {
 
             self.score_board.lives -= 1;
             if !self.game_state.is_warp_zone {
-                self.score_board.collectibles = self.collectibles.clone();
-                self.score_board.monsters = self.monsters.clone();
-                self.score_board.jetpack_captured = self.player.has_jetpack;
-                self.score_board.jetpack_timer = self.player.jetpack_timer;
+                self.persist_state();
             }
 
             storage::store(self.score_board.clone());
@@ -277,20 +278,8 @@ impl Scene for Game {
             &resources,
         );
 
-        let screen_left = self.game_camera.camera.target.x - screen_width() / 2.0;
-        let screen_right = self.game_camera.camera.target.x + screen_width() / 2.0;
-
         self.player.bullets.retain(|bullet| {
-            if self
-                .game_world
-                .world
-                .collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10)
-                == Tile::Solid
-            {
-                return false;
-            }
-
-            bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
+            Player::should_retain_bullet(&self.game_world, &self.game_camera, bullet)
         });
 
         for monster in &mut self.monsters {

@@ -27,10 +27,12 @@ use macroquad_platformer::{
 use macroquad_tiled::Map;
 
 use super::{
+    GameWorld,
     bullet::{
         Bullet,
         BulletDirection,
     },
+    camera::GameCamera,
     collision::Collidable,
 };
 use crate::Resources;
@@ -114,6 +116,25 @@ impl Player {
             pos: vec2(0.0, 0.0),
             current_state: "dave_idle",
         }
+    }
+
+    pub fn should_retain_bullet(
+        game_world: &GameWorld,
+        camera: &GameCamera,
+        bullet: &Bullet,
+    ) -> bool {
+        let screen_left = camera.camera.target.x - screen_width() / 2.0;
+        let screen_right = camera.camera.target.x + screen_width() / 2.0;
+
+        if game_world
+            .world
+            .collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10)
+            == Tile::Solid
+        {
+            return false;
+        }
+
+        bullet.x < screen_right && bullet.x > screen_left && !bullet.collided
     }
 
     pub fn overlaps(pos: Vec2, game_object: &Rect) -> bool {
