@@ -12,7 +12,6 @@ use macroquad_tiled::{
     load_map,
 };
 
-use super::Game;
 use crate::{
     game::score_board::{
         GameObject,

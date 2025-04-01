@@ -10,6 +10,7 @@ use macroquad::{
     prelude::animation::AnimatedSprite,
 };
 use macroquad_particles::{
+    AtlasConfig,
     Emitter,
     EmitterConfig,
 };
@@ -17,7 +18,7 @@ use macroquad_tiled::Object;
 
 use super::{
     EXPLOSION_DURATION,
-    Game,
+    bullet::Bullet,
     collectibles::CollectibleType,
     collidable::Collidable,
     game_state::GameState,
@@ -33,6 +34,62 @@ use crate::resources::Resources;
 pub struct CollisionManager {}
 
 impl CollisionManager {
+    pub fn particle_explosion() -> EmitterConfig {
+        EmitterConfig {
+            local_coords: false,
+            one_shot: true,
+            emitting: true,
+            lifetime: EXPLOSION_DURATION,
+            lifetime_randomness: 0.3,
+            explosiveness: 0.65,
+            initial_direction_spread: 2.0 * std::f32::consts::PI,
+            initial_velocity: 200.0,
+            initial_velocity_randomness: 0.8,
+            size: 16.0,
+            size_randomness: 0.3,
+            atlas: Some(AtlasConfig::new(5, 1, 0..)),
+            ..Default::default()
+        }
+    }
+
+    pub fn check_monster_bullet_hit(
+        resources: &Resources,
+        pos: Vec2,
+        bullet: &mut Bullet,
+        player: &mut Player,
+        explosions: &mut Vec<(Emitter, Vec2)>,
+        game_state: &mut GameState,
+    ) {
+        let bullet_rect = Rect {
+            x: bullet.x,
+            y: bullet.y,
+            w: resources.get_texture("monster_bullet").width(),
+            h: resources.get_texture("monster_bullet").height(),
+        };
+
+        if Player::overlaps(pos, &bullet_rect) {
+            bullet.collided = true;
+
+            player.is_dead = true;
+
+            game_state.player_explosion_active = true;
+            game_state.player_explosion_timer = EXPLOSION_DURATION;
+
+            if explosions.is_empty() {
+                explosions.push((
+                    Emitter::new(EmitterConfig {
+                        amount: 40,
+                        texture: Some(resources.get_texture("explosion").clone()),
+                        ..Self::particle_explosion()
+                    }),
+                    vec2(pos.x, pos.y),
+                ));
+            }
+
+            play_sound_once(resources.get_sound("explosion"));
+        }
+    }
+
     pub fn handle_collisions(
         monsters: &mut [Monster],
         player: &mut Player,
@@ -103,7 +160,7 @@ impl CollisionManager {
                 Emitter::new(EmitterConfig {
                     amount: 40,
                     texture: Some(resources.get_texture("explosion").clone()),
-                    ..Game::particle_explosion()
+                    ..Self::particle_explosion()
                 }),
                 player_pos,
             ));
@@ -111,7 +168,7 @@ impl CollisionManager {
                 Emitter::new(EmitterConfig {
                     amount: 40,
                     texture: Some(resources.get_texture("explosion").clone()),
-                    ..Game::particle_explosion()
+                    ..Self::particle_explosion()
                 }),
                 monster.get_position(),
             ));
@@ -135,7 +192,7 @@ impl CollisionManager {
                 Emitter::new(EmitterConfig {
                     amount: 40,
                     texture: Some(resources.get_texture("explosion").clone()),
-                    ..Game::particle_explosion()
+                    ..Self::particle_explosion()
                 }),
                 monster.get_position(),
             ));
@@ -256,7 +313,7 @@ impl CollisionManager {
                             Emitter::new(EmitterConfig {
                                 amount: 40,
                                 texture: Some(resources.get_texture("explosion").clone()),
-                                ..Game::particle_explosion()
+                                ..Self::particle_explosion()
                             }),
                             vec2(player_pos.x + 32.0, player_pos.y),
                         ));

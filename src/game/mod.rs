@@ -17,11 +17,7 @@ use macroquad::{
         *,
     },
 };
-use macroquad_particles::{
-    AtlasConfig,
-    Emitter,
-    EmitterConfig,
-};
+use macroquad_particles::Emitter;
 use macroquad_platformer::{
     Tile,
     World,
@@ -148,24 +144,6 @@ impl Game {
         }
     }
 
-    pub fn particle_explosion() -> EmitterConfig {
-        EmitterConfig {
-            local_coords: false,
-            one_shot: true,
-            emitting: true,
-            lifetime: EXPLOSION_DURATION,
-            lifetime_randomness: 0.3,
-            explosiveness: 0.65,
-            initial_direction_spread: 2.0 * std::f32::consts::PI,
-            initial_velocity: 200.0,
-            initial_velocity_randomness: 0.8,
-            size: 16.0,
-            size_randomness: 0.3,
-            atlas: Some(AtlasConfig::new(5, 1, 0..)),
-            ..Default::default()
-        }
-    }
-
     fn should_retain_bullet(game_world: &GameWorld, pos: Vec2, bullet: &Bullet) -> bool {
         if game_world
             .world
@@ -180,44 +158,6 @@ impl Game {
         }
 
         false
-    }
-
-    fn check_monster_bullet_hit(
-        resources: &Resources,
-        pos: Vec2,
-        bullet: &mut Bullet,
-        player: &mut Player,
-        explosions: &mut Vec<(Emitter, Vec2)>,
-        game_state: &mut GameState,
-    ) {
-        let bullet_rect = Rect {
-            x: bullet.x,
-            y: bullet.y,
-            w: resources.get_texture("monster_bullet").width(),
-            h: resources.get_texture("monster_bullet").height(),
-        };
-
-        if Player::overlaps(pos, &bullet_rect) {
-            bullet.collided = true;
-
-            player.is_dead = true;
-
-            game_state.player_explosion_active = true;
-            game_state.player_explosion_timer = EXPLOSION_DURATION;
-
-            if explosions.is_empty() {
-                explosions.push((
-                    Emitter::new(EmitterConfig {
-                        amount: 40,
-                        texture: Some(resources.get_texture("explosion").clone()),
-                        ..Game::particle_explosion()
-                    }),
-                    vec2(pos.x, pos.y),
-                ));
-            }
-
-            play_sound_once(resources.get_sound("explosion"));
-        }
     }
 }
 
@@ -399,7 +339,7 @@ impl Scene for Game {
                 .retain(|bullet| Game::should_retain_bullet(&self.game_world, pos, bullet));
 
             for bullet in &mut monster.bullets {
-                Game::check_monster_bullet_hit(
+                CollisionManager::check_monster_bullet_hit(
                     &resources,
                     pos,
                     bullet,
