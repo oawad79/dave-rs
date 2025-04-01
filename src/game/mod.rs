@@ -4,8 +4,10 @@ use animations::Animations;
 use bullet::Bullet;
 use camera::GameCamera;
 use collectibles::CollectibleType;
-use collidable::Collidable;
-use collision::CollisionManager;
+use collision::{
+    Collidable,
+    CollisionManager,
+};
 use game_state::GameState;
 use initialization::map_width_height;
 use macroquad::{
@@ -41,7 +43,6 @@ mod animations;
 mod bullet;
 mod camera;
 mod collectibles;
-mod collidable;
 mod collision;
 mod game_state;
 mod initialization;

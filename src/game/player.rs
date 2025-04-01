@@ -31,7 +31,7 @@ use super::{
         Bullet,
         BulletDirection,
     },
-    collidable::Collidable,
+    collision::Collidable,
 };
 use crate::Resources;
 

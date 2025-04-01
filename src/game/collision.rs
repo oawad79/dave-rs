@@ -20,7 +20,6 @@ use super::{
     EXPLOSION_DURATION,
     bullet::Bullet,
     collectibles::CollectibleType,
-    collidable::Collidable,
     game_state::GameState,
     monster::Monster,
     player::Player,
@@ -30,6 +29,20 @@ use super::{
     },
 };
 use crate::resources::Resources;
+
+pub trait Collidable {
+    /// Returns the collision rectangle for this entity
+    fn get_collision_rect(&self) -> Rect;
+
+    /// Returns the current position of this entity
+    fn get_position(&self) -> Vec2;
+
+    /// Handle being hit by something
+    fn on_hit(&mut self);
+
+    /// Check if this entity is alive
+    fn is_alive(&self) -> bool;
+}
 
 pub struct CollisionManager {}
 

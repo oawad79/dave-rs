@@ -9,7 +9,7 @@ use macroquad::{
 };
 use macroquad_tiled::Map;
 
-use super::collidable::Collidable;
+use super::collision::Collidable;
 use crate::{
     game::bullet::{
         Bullet,
