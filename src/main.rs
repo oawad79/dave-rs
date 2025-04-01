@@ -80,6 +80,8 @@ async fn main() {
     // Create UI menus
     let mut help_menu = Menu::new("help", vec2(-220.0, -120.0), KeyCode::F1, None);
 
+    let mut pause_menu = Menu::new("pause", vec2(-190.0, -30.0), KeyCode::F9, None);
+
     let mut restart_menu = Menu::new(
         "restart",
         vec2(-190.0, -30.0),
@@ -119,6 +121,9 @@ async fn main() {
         // Handle menus
         help_menu.update();
         help_menu.draw(&resources);
+
+        pause_menu.update();
+        pause_menu.draw(&resources);
 
         if restart_menu.update() {
             scene = Box::new(EntryScreen::new());
