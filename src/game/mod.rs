@@ -4,6 +4,7 @@ use animations::Animations;
 use bullet::Bullet;
 use camera::GameCamera;
 use collectibles::CollectibleType;
+use collidable::Collidable;
 use collision::CollisionManager;
 use game_state::GameState;
 use initialization::map_width_height;
@@ -164,23 +165,9 @@ impl Game {
 impl Scene for Game {
     fn update(&mut self) -> Option<SceneChange> {
         let resources = storage::get::<Resources>();
-        let tiled_map = storage::get::<Map>();
 
         // Set the camera to follow the player
         self.game_camera.set_active();
-
-        if tiled_map.contains_layer("night") {
-            tiled_map.draw_tiles(
-                "night",
-                Rect::new(
-                    0.0,
-                    0.0,
-                    (self.game_world.width_tiles * 32) as f32,
-                    (self.game_world.height_tiles * 32) as f32,
-                ),
-                None,
-            );
-        }
 
         let pos = self.game_world.world.actor_pos(self.player.collider);
 
@@ -281,22 +268,28 @@ impl Scene for Game {
 
         self.game_state.update();
 
-        if tiled_map.contains_layer("tree_collider") {
-            tiled_map.draw_tiles(
-                "tree_collider",
-                Rect::new(
-                    0.0,
-                    0.0,
-                    (self.game_world.width_tiles * 32) as f32,
-                    (self.game_world.height_tiles * 32) as f32,
-                ),
-                None,
-            );
-        }
+        // if tiled_map.contains_layer("tree_collider") {
+        //     tiled_map.draw_tiles(
+        //         "tree_collider",
+        //         Rect::new(
+        //             0.0,
+        //             0.0,
+        //             (self.game_world.width_tiles * 32) as f32,
+        //             (self.game_world.height_tiles * 32) as f32,
+        //         ),
+        //         None,
+        //     );
+        // }
 
         self.animations.update();
 
         self.player.update(&mut self.game_world.world);
+
+        for monster in self.monsters.iter_mut() {
+            if monster.is_alive() {
+                monster.update(pos);
+            }
+        }
 
         CollisionManager::handle_collisions(
             &mut self.monsters,
@@ -354,6 +347,26 @@ impl Scene for Game {
             self.game_world.width_tiles,
             self.game_world.height_tiles,
         );
+
+        if tiled_map.contains_layer("night") {
+            tiled_map.draw_tiles(
+                "night",
+                Rect::new(
+                    0.0,
+                    0.0,
+                    (self.game_world.width_tiles * 32) as f32,
+                    (self.game_world.height_tiles * 32) as f32,
+                ),
+                None,
+            );
+        }
+
+        for monster in self.monsters.iter_mut() {
+            if monster.is_alive() {
+                monster.draw();
+            }
+        }
+
         renderer::draw_collectibles(&self.collectibles, &tiled_map);
         renderer::draw_door(&self.door, &tiled_map);
 
@@ -361,13 +374,18 @@ impl Scene for Game {
             explosion.draw(vec2(coords.x, coords.y));
         }
 
-        // if tiled_map.contains_layer("tree_collider") {
-        //     tiled_map.draw_tiles(
-        //         "tree_collider",
-        //         Rect::new(0.0, 0.0, (self.game_world.width_tiles * 32) as f32,
-        // (self.game_world.height_tiles * 32) as f32),         None,
-        //     );
-        // }
+        if tiled_map.contains_layer("tree_collider") {
+            tiled_map.draw_tiles(
+                "tree_collider",
+                Rect::new(
+                    0.0,
+                    0.0,
+                    (self.game_world.width_tiles * 32) as f32,
+                    (self.game_world.height_tiles * 32) as f32,
+                ),
+                None,
+            );
+        }
 
         renderer::draw_animations(&tiled_map, &self.animations);
 
