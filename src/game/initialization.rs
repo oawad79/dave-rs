@@ -12,6 +12,7 @@ use macroquad_tiled::{
     load_map,
 };
 
+use super::Game;
 use crate::{
     game::score_board::{
         GameObject,
@@ -88,6 +89,56 @@ pub fn load_objects_in_layer(
                 progress: 0.0,
             })
             .collect::<Vec<GameObject>>()
+    }
+}
+
+pub fn load_jetpack(score_board: &ScoreBoard, tiled_map: &Map) -> Option<GameObject> {
+    if tiled_map.contains_layer("jetpack") {
+        let jetpack_object = tiled_map
+            .layers
+            .get("jetpack")
+            .unwrap()
+            .objects
+            .first()
+            .unwrap();
+        Some(GameObject {
+            world_x: jetpack_object.world_x,
+            world_y: jetpack_object.world_y,
+            width: jetpack_object.world_w,
+            height: jetpack_object.world_h,
+            name: jetpack_object.name.clone(),
+            collected: if score_board.jetpack_captured {
+                Some(true)
+            } else {
+                None
+            },
+            progress: 0.0,
+        })
+    } else {
+        None
+    }
+}
+
+pub fn load_gun_in_layer(tiled_map: &Map) -> Option<GameObject> {
+    if tiled_map.contains_layer("gun") {
+        let gun_object = tiled_map
+            .layers
+            .get("gun")
+            .unwrap()
+            .objects
+            .first()
+            .unwrap();
+        Some(GameObject {
+            world_x: gun_object.world_x,
+            world_y: gun_object.world_y,
+            width: gun_object.world_w,
+            height: gun_object.world_h,
+            name: gun_object.name.clone(),
+            collected: None,
+            progress: 0.0,
+        })
+    } else {
+        None
     }
 }
 
