@@ -37,7 +37,7 @@ pub struct ScoreBoard {
     pub gun_captured: bool,
     pub monsters: Vec<Monster>,
     pub jetpack_captured: bool,
-    pub jetpack_progress: f32,
+    pub jetpack_timer: f32,
 }
 
 impl ScoreBoard {
@@ -52,7 +52,7 @@ impl ScoreBoard {
             gun_captured: false,
             monsters: vec![],
             jetpack_captured: false,
-            jetpack_progress: 0.0,
+            jetpack_timer: 0.0,
         }
     }
 

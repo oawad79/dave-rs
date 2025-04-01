@@ -35,6 +35,12 @@ use super::{
 };
 use crate::Resources;
 
+macro_rules! calculate_jetpack_progress {
+    ($current_time:expr, $max_time:expr) => {
+        (1.0 - ($current_time / $max_time)).max(0.0)
+    };
+}
+
 const GRAVITY: f32 = 400.0;
 const JUMP_VELOCITY: f32 = -250.0;
 const JETPACK_VELOCITY: f32 = 100.0;
@@ -85,7 +91,7 @@ impl Player {
         has_gun: bool,
         has_jetpack: bool,
         attach: bool,
-        jetpack_progress: f32,
+        jetpack_timer: f32,
     ) -> Self {
         Self {
             collider,
@@ -102,9 +108,9 @@ impl Player {
             climbing: false,
             climbing_active: false,
             attach,
-            jetpack_timer: 0.0,
+            jetpack_timer,
             jetpack_timer_active: false,
-            jetpack_progress,
+            jetpack_progress: calculate_jetpack_progress!(jetpack_timer, JETPACK_TIMER),
             pos: vec2(0.0, 0.0),
             current_state: "dave_idle",
         }
@@ -153,9 +159,7 @@ impl Player {
 
         if self.jetpack_active {
             self.jetpack_timer += get_frame_time();
-            self.jetpack_progress = (1.0 - (self.jetpack_timer / JETPACK_TIMER)).max(0.0);
-
-            //println!("Jetpack progress: {}", self.jetpack_progress);
+            self.jetpack_progress = calculate_jetpack_progress!(self.jetpack_timer, JETPACK_TIMER);
 
             if self.jetpack_timer >= JETPACK_TIMER {
                 self.jetpack_active = false;

@@ -104,9 +104,9 @@ impl Game {
             score_board.jetpack_captured,
             initialization::should_attach_player(&tiled_map),
             if retry {
-                score_board.jetpack_progress
+                score_board.jetpack_timer
             } else {
-                1.0
+                0.0
             },
         );
 
@@ -260,7 +260,7 @@ impl Scene for Game {
                 self.score_board.collectibles = self.collectibles.clone();
                 self.score_board.monsters = self.monsters.clone();
                 self.score_board.jetpack_captured = self.player.has_jetpack;
-                self.score_board.jetpack_progress = self.player.jetpack_progress;
+                self.score_board.jetpack_timer = self.player.jetpack_timer;
             }
 
             storage::store(self.score_board.clone());
