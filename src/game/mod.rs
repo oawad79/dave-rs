@@ -1,7 +1,6 @@
 use std::vec;
 
 use animations::Animations;
-use bullet::Bullet;
 use camera::GameCamera;
 use collectibles::CollectibleType;
 use collision::{
@@ -150,22 +149,6 @@ impl Game {
             warp_zone_rect,
         }
     }
-
-    fn should_retain_bullet(game_world: &GameWorld, pos: Vec2, bullet: &Bullet) -> bool {
-        if game_world
-            .world
-            .collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10)
-            == Tile::Solid
-        {
-            return false;
-        }
-
-        if !bullet.collided && bullet.x > pos.x - 100.0 {
-            return true;
-        }
-
-        false
-    }
 }
 
 impl Scene for Game {
@@ -313,7 +296,7 @@ impl Scene for Game {
         for monster in &mut self.monsters {
             monster
                 .bullets
-                .retain(|bullet| Game::should_retain_bullet(&self.game_world, pos, bullet));
+                .retain(|bullet| Monster::should_retain_bullet(&self.game_world, pos, bullet));
 
             for bullet in &mut monster.bullets {
                 CollisionManager::check_monster_bullet_hit(

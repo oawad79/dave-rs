@@ -7,9 +7,13 @@ use macroquad::{
         *,
     },
 };
+use macroquad_platformer::Tile;
 use macroquad_tiled::Map;
 
-use super::collision::Collidable;
+use super::{
+    GameWorld,
+    collision::Collidable,
+};
 use crate::{
     game::bullet::{
         Bullet,
@@ -84,6 +88,22 @@ impl Collidable for Monster {
 }
 
 impl Monster {
+    pub fn should_retain_bullet(game_world: &GameWorld, pos: Vec2, bullet: &Bullet) -> bool {
+        if game_world
+            .world
+            .collide_solids(Vec2::new(bullet.x, bullet.y), 20, 10)
+            == Tile::Solid
+        {
+            return false;
+        }
+
+        if !bullet.collided && bullet.x > pos.x - 100.0 {
+            return true;
+        }
+
+        false
+    }
+
     fn get_line_points_lerp(p1: Vec2, p2: Vec2, steps: usize) -> Vec<Vec2> {
         let mut points = Vec::new();
 
