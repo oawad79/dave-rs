@@ -59,7 +59,7 @@ pub fn create_world(width: i32, tiled_map: &Map) -> (World, Actor) {
         .first()
         .unwrap();
 
-    let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 31, 31);
+    let actor = world.add_actor(vec2(player_loc.world_x, player_loc.world_y - 32.0), 31, 32);
 
     (world, actor)
 }
