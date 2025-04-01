@@ -119,7 +119,7 @@ async fn main() {
         set_camera(&main_camera);
 
         let change = if menu.current_menu_item.is_some() {
-            None
+            None // pause the game if any menu key pressed
         } else {
             scene.update()
         };
