@@ -181,5 +181,7 @@ impl Scene for Separator {
                 ..Default::default()
             },
         );
+
+        self.player.draw();
     }
 }

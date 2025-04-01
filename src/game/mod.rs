@@ -268,19 +268,6 @@ impl Scene for Game {
 
         self.game_state.update();
 
-        // if tiled_map.contains_layer("tree_collider") {
-        //     tiled_map.draw_tiles(
-        //         "tree_collider",
-        //         Rect::new(
-        //             0.0,
-        //             0.0,
-        //             (self.game_world.width_tiles * 32) as f32,
-        //             (self.game_world.height_tiles * 32) as f32,
-        //         ),
-        //         None,
-        //     );
-        // }
-
         self.animations.update();
 
         self.player.update(&mut self.game_world.world);
@@ -348,18 +335,7 @@ impl Scene for Game {
             self.game_world.height_tiles,
         );
 
-        if tiled_map.contains_layer("night") {
-            tiled_map.draw_tiles(
-                "night",
-                Rect::new(
-                    0.0,
-                    0.0,
-                    (self.game_world.width_tiles * 32) as f32,
-                    (self.game_world.height_tiles * 32) as f32,
-                ),
-                None,
-            );
-        }
+        renderer::draw_layer_if_exists(&tiled_map, &self.game_world, "night");
 
         for monster in self.monsters.iter_mut() {
             if monster.is_alive() {
@@ -374,18 +350,7 @@ impl Scene for Game {
             explosion.draw(vec2(coords.x, coords.y));
         }
 
-        if tiled_map.contains_layer("tree_collider") {
-            tiled_map.draw_tiles(
-                "tree_collider",
-                Rect::new(
-                    0.0,
-                    0.0,
-                    (self.game_world.width_tiles * 32) as f32,
-                    (self.game_world.height_tiles * 32) as f32,
-                ),
-                None,
-            );
-        }
+        renderer::draw_layer_if_exists(&tiled_map, &self.game_world, "tree_collider");
 
         renderer::draw_animations(&tiled_map, &self.animations);
 
@@ -419,17 +384,8 @@ impl Scene for Game {
             self.game_camera.camera.target.x,
         );
 
-        if tiled_map.contains_layer("fallthroughtiles") {
-            tiled_map.draw_tiles(
-                "fallthroughtiles",
-                Rect::new(
-                    0.0,
-                    0.0,
-                    (self.game_world.width_tiles * 32) as f32,
-                    (self.game_world.height_tiles * 32) as f32,
-                ),
-                None,
-            );
-        }
+        renderer::draw_layer_if_exists(&tiled_map, &self.game_world, "fallthroughtiles");
+
+        self.player.draw();
     }
 }

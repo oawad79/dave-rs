@@ -197,5 +197,7 @@ impl Scene for WarpZone {
                 ..Default::default()
             },
         );
+
+        self.player.draw();
     }
 }

@@ -7,7 +7,10 @@ use macroquad_tiled::{
     Object,
 };
 
-use super::animations::Animations;
+use super::{
+    GameWorld,
+    animations::Animations,
+};
 use crate::{
     game::{
         CollectibleType,
@@ -15,6 +18,21 @@ use crate::{
     },
     resources::Resources,
 };
+
+pub fn draw_layer_if_exists(tiled_map: &Map, game_world: &GameWorld, layer_name: &str) {
+    if tiled_map.contains_layer(layer_name) {
+        tiled_map.draw_tiles(
+            layer_name,
+            Rect::new(
+                0.0,
+                0.0,
+                (game_world.width_tiles * 32) as f32,
+                (game_world.height_tiles * 32) as f32,
+            ),
+            None,
+        );
+    }
+}
 
 /// Draws all collectible items on the map
 pub fn draw_collectibles(collectibles: &[GameObject], tiled_map: &Map) {

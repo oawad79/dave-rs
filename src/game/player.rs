@@ -58,6 +58,7 @@ pub struct Player {
     jetpack_timer_active: bool,
     pub progress: f32,
     pos: Vec2,
+    current_state: &'static str,
 }
 
 // In your player.rs file
@@ -101,6 +102,7 @@ impl Player {
             jetpack_timer_active: false,
             progress: 0.0,
             pos: vec2(0.0, 0.0),
+            current_state: "dave_idle",
         }
     }
 
@@ -124,34 +126,28 @@ impl Player {
             stop_sound(resources.get_sound("climb"));
         }
 
-        let mut state: &str;
-        let flip: f32;
-
+        // Update player animation state
         if !self.climbing_active {
             if self.speed.x != 0.0 {
-                state = if !on_ground {
+                if !on_ground {
                     self.animated_player.set_animation(2); // jump
-                    "dave_jump"
+                    self.current_state = "dave_jump";
                 } else {
                     self.animated_player.set_animation(0); // walk
-                    "dave_walk"
-                };
+                    self.current_state = "dave_walk";
+                }
 
                 if self.speed.x < 0.0 {
                     self.facing_left = true;
-                    flip = -32.0;
                 } else {
                     self.facing_left = false;
-                    flip = 32.0;
                 }
             } else {
-                state = "dave_idle";
+                self.current_state = "dave_idle";
                 self.animated_player.set_animation(1); // idle
-                flip = if self.facing_left { -32.0 } else { 32.0 };
             }
         } else {
-            flip = 32.0;
-            state = "climb-sheet";
+            self.current_state = "climb-sheet";
             self.animated_player.set_animation(4);
         }
 
@@ -215,25 +211,12 @@ impl Player {
 
         if self.jetpack_active {
             self.animated_player.set_animation(3);
-            state = "player_jetpack";
+            self.current_state = "player_jetpack";
         }
 
         if self.climbing {
-            state = "climb-sheet";
+            self.current_state = "climb-sheet";
             self.animated_player.set_animation(4);
-        }
-
-        if !self.is_dead {
-            tiled_map.spr_ex(
-                state,
-                self.animated_player.frame().source_rect,
-                Rect::new(
-                    self.pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
-                    self.pos.y,
-                    flip,
-                    32.0,
-                ),
-            );
         }
 
         self.animated_player.update();
@@ -283,6 +266,7 @@ impl Player {
             play_sound_once(resources.get_sound("shoot"));
         }
 
+        // Update bullet positions
         for bullet in &mut self.bullets {
             if bullet.direction == BulletDirection::Left {
                 bullet.x -= bullet.speed * delta;
@@ -291,6 +275,34 @@ impl Player {
             }
         }
 
+        // Update player position
+        world.move_h(self.collider, self.speed.x * delta);
+        world.move_v(self.collider, self.speed.y * delta);
+    }
+
+    pub fn draw(&self) {
+        if self.is_dead {
+            return;
+        }
+
+        let resources = storage::get::<Resources>();
+        let tiled_map = storage::get::<Map>();
+
+        // Draw player sprite
+        let flip: f32 = if self.facing_left { -32.0 } else { 32.0 };
+
+        tiled_map.spr_ex(
+            self.current_state,
+            self.animated_player.frame().source_rect,
+            Rect::new(
+                self.pos.x + if flip < 0.0 { 32.0 } else { 0.0 },
+                self.pos.y,
+                flip,
+                32.0,
+            ),
+        );
+
+        // Draw bullets
         for bullet in &self.bullets {
             draw_texture_ex(
                 resources.get_texture("bullet"),
@@ -311,9 +323,6 @@ impl Player {
                 },
             );
         }
-
-        world.move_h(self.collider, self.speed.x * delta);
-        world.move_v(self.collider, self.speed.y * delta);
     }
 }
 
