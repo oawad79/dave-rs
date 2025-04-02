@@ -24,8 +24,8 @@ pub struct MenuItem {
 }
 
 impl Menu {
-    pub fn new(menu_items: Vec<MenuItem>) -> Self {
-        Menu {
+    pub const fn new(menu_items: Vec<MenuItem>) -> Self {
+        Self {
             current_menu_item: None,
             menu_items,
         }
@@ -33,7 +33,7 @@ impl Menu {
 
     pub fn update(&mut self, resources: &Resources) -> Option<MenuAction> {
         if self.current_menu_item.is_none() {
-            for menu_item in self.menu_items.iter() {
+            for menu_item in &self.menu_items {
                 if is_key_down(menu_item.key) {
                     self.current_menu_item = Some(MenuItem {
                         key: menu_item.key,

@@ -1,16 +1,26 @@
 use macroquad::{
-    input::{KeyCode, is_key_down, is_key_pressed},
-    window::{request_new_screen_size, set_fullscreen},
+    input::{
+        KeyCode,
+        is_key_down,
+        is_key_pressed,
+    },
+    window::{
+        request_new_screen_size,
+        set_fullscreen,
+    },
 };
 
-use crate::{Scene, game::Game};
+use crate::{
+    Scene,
+    game::Game,
+};
 
 pub struct InputManager {
     is_full_screen: bool,
 }
 
 impl InputManager {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             is_full_screen: false,
         }
