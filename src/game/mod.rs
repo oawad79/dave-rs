@@ -55,6 +55,7 @@ pub struct GameWorld {
     pub width_tiles: i32,
 }
 
+#[allow(clippy::struct_field_names)]
 pub struct Game {
     game_world: GameWorld,
     game_state: GameState,
@@ -153,30 +154,28 @@ impl Game {
         self.score_board.jetpack_captured = self.player.has_jetpack;
         self.score_board.jetpack_timer = self.player.jetpack_timer;
     }
-}
 
-impl Scene for Game {
-    fn update(&mut self) -> Option<SceneChange> {
-        let resources = storage::get::<Resources>();
-
+    fn update_camera_and_positions(&mut self, pos: Vec2) {
         // Set the camera to follow the player
         self.game_camera.set_active();
 
-        let pos = self.game_world.world.actor_pos(self.player.collider);
-
-        //Update camera position to follow the player
+        // Update camera position to follow the player
         self.game_camera
             .update(pos, self.score_board.level, self.game_world.width_tiles);
 
         // Update scoreboard position based on camera
         self.score_board.position = self.game_camera.get_score_board_position(pos.y);
 
-        //handle the player falling out of the game so we bring him from top
+        // Handle the player falling out of the game so we bring him from top
         if pos.y > screen_height() && !self.player.is_dead {
             self.game_world
                 .world
                 .set_actor_position(self.player.collider, vec2(pos.x, 0.0));
         }
+    }
+
+    fn handle_collectibles(&mut self, pos: Vec2) {
+        let resources = storage::get::<Resources>();
 
         CollisionManager::handle_collecting_valuables(
             &mut self.collectibles,
@@ -187,12 +186,19 @@ impl Scene for Game {
 
         self.collectibles
             .retain(|jewellery| !jewellery.collected.unwrap_or(false));
+    }
 
+    fn check_warp_zone(&mut self, pos: Vec2) -> Option<SceneChange> {
         if CollisionManager::check_warp_zone_collision(self.warp_zone_rect.as_ref(), pos) {
             self.score_board.jetpack_captured = false;
             storage::store(self.score_board.clone());
             return Some(SceneChange::WarpZone);
         }
+        None
+    }
+
+    fn handle_power_ups(&mut self, pos: Vec2) {
+        let resources = storage::get::<Resources>();
 
         if CollisionManager::check_gun_collision(
             &mut self.player,
@@ -211,6 +217,10 @@ impl Scene for Game {
         ) {
             play_sound_once(resources.get_sound("jetPackActivated"));
         }
+    }
+
+    fn check_door_collision(&mut self, pos: Vec2) -> Option<SceneChange> {
+        let resources = storage::get::<Resources>();
 
         if CollisionManager::check_door_collision(
             &self.door,
@@ -223,9 +233,16 @@ impl Scene for Game {
             stop_sound(resources.get_sound("jetPackActivated"));
             return Some(SceneChange::Separator);
         }
+        None
+    }
 
+    fn update_explosions(&mut self) {
         self.explosions
             .retain(|(explosion, _)| explosion.config.emitting);
+    }
+
+    fn handle_player_collisions(&mut self, pos: Vec2) {
+        let resources = storage::get::<Resources>();
 
         CollisionManager::handle_collision_with_deadly(
             &self.animations.deadly_objects,
@@ -236,6 +253,10 @@ impl Scene for Game {
             &resources,
             pos,
         );
+    }
+
+    fn check_player_death(&mut self) -> Option<SceneChange> {
+        let resources = storage::get::<Resources>();
 
         if !self.game_state.player_explosion_active && self.player.is_dead {
             if self.score_board.lives == 0 {
@@ -256,18 +277,23 @@ impl Scene for Game {
                 warp_zone: false,
             });
         }
+        None
+    }
 
+    fn update_game_entities(&mut self, pos: Vec2) {
         self.game_state.update();
-
         self.animations.update();
-
         self.player.update(&mut self.game_world.world);
 
-        for monster in self.monsters.iter_mut() {
+        for monster in &mut self.monsters {
             if monster.is_alive() {
                 monster.update(pos);
             }
         }
+    }
+
+    fn handle_monster_collisions(&mut self) {
+        let resources = storage::get::<Resources>();
 
         CollisionManager::handle_collisions(
             &mut self.monsters,
@@ -277,6 +303,11 @@ impl Scene for Game {
             &mut self.game_state,
             &resources,
         );
+    }
+
+    fn update_bullets(&mut self) {
+        let pos = self.game_world.world.actor_pos(self.player.collider);
+        let resources = storage::get::<Resources>();
 
         self.player.bullets.retain(|bullet| {
             Player::should_retain_bullet(&self.game_world, &self.game_camera, bullet)
@@ -298,6 +329,51 @@ impl Scene for Game {
                 );
             }
         }
+    }
+}
+
+impl Scene for Game {
+    fn update(&mut self) -> Option<SceneChange> {
+        let pos = self.game_world.world.actor_pos(self.player.collider);
+
+        // Update camera and positions
+        self.update_camera_and_positions(pos);
+
+        // Handle collectibles
+        self.handle_collectibles(pos);
+
+        // Check warp zone collision
+        if let Some(scene_change) = self.check_warp_zone(pos) {
+            return Some(scene_change);
+        }
+
+        // Handle power-ups (gun and jetpack)
+        self.handle_power_ups(pos);
+
+        // Check door collision
+        if let Some(scene_change) = self.check_door_collision(pos) {
+            return Some(scene_change);
+        }
+
+        // Update explosions
+        self.update_explosions();
+
+        // Handle player collisions with deadly objects
+        self.handle_player_collisions(pos);
+
+        // Check player death
+        if let Some(scene_change) = self.check_player_death() {
+            return Some(scene_change);
+        }
+
+        // Update game entities
+        self.update_game_entities(pos);
+
+        // Handle monster collisions
+        self.handle_monster_collisions();
+
+        // Update bullets
+        self.update_bullets();
 
         None
     }
@@ -316,7 +392,7 @@ impl Scene for Game {
 
         renderer::draw_layer_if_exists(&tiled_map, &self.game_world, "night");
 
-        for monster in self.monsters.iter_mut() {
+        for monster in &self.monsters {
             if monster.is_alive() {
                 monster.draw();
             }
