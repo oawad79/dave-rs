@@ -275,7 +275,7 @@ impl Player {
     fn update_shooting(&mut self) {
         let resources = storage::get::<Resources>();
 
-        if is_key_pressed(KeyCode::LeftControl) && self.has_gun {
+        if is_key_pressed(KeyCode::LeftControl) && self.has_gun && self.bullets.is_empty() {
             self.bullets.push(Bullet {
                 x: self.pos.x + 10.0,
                 y: self.pos.y,
