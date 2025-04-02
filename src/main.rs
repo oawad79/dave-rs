@@ -1,14 +1,13 @@
-// #![warn(
-//     clippy::all,
-//     clippy::pedantic,
-//     // clippy::restriction,
-//     clippy::nursery,
-//     clippy::cargo,
-// )]
-
+#![warn(
+    clippy::all,
+    clippy::pedantic,
+    // clippy::restriction,
+    clippy::nursery,
+    clippy::cargo,
+)]
 //this is required to prevent macroquad from opening a
 //console window in addition to the game window
-//#![windows_subsystem = "windows"]
+#![windows_subsystem = "windows"]
 
 mod complete;
 mod entry_screen;
@@ -144,9 +143,8 @@ async fn main() {
         if let Some(action) = menu.update(&resources) {
             match action {
                 MenuAction::Exit => break,
-                MenuAction::Pause => {}
+                MenuAction::Pause | MenuAction::Help => {}
                 MenuAction::Restart => scene = Box::new(EntryScreen::new()),
-                MenuAction::Help => {}
             }
         }
 
