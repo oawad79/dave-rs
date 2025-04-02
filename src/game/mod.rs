@@ -188,7 +188,7 @@ impl Scene for Game {
         self.collectibles
             .retain(|jewellery| !jewellery.collected.unwrap_or(false));
 
-        if CollisionManager::check_warp_zone_collision(&self.warp_zone_rect, pos) {
+        if CollisionManager::check_warp_zone_collision(self.warp_zone_rect.as_ref(), pos) {
             self.score_board.jetpack_captured = false;
             storage::store(self.score_board.clone());
             return Some(SceneChange::WarpZone);

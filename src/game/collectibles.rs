@@ -16,26 +16,47 @@ pub enum CollectibleType {
 impl CollectibleType {
     pub fn from(name: &str) -> Self {
         match name {
-            "ruby" => CollectibleType::Ruby, 
-            "diamond" => CollectibleType::Diamond,
-            "red" => CollectibleType::Red,
-            "loli" => CollectibleType::Loli,
-            "cup" => CollectibleType::Cup,
-            "yussuk" => CollectibleType::Yussuk,
-            "king" => CollectibleType::King,
-            _ => panic!("Invalid collectible type: {}", name),
+            "ruby" => Self::Ruby,
+            "diamond" => Self::Diamond,
+            "red" => Self::Red,
+            "loli" => Self::Loli,
+            "cup" => Self::Cup,
+            "yussuk" => Self::Yussuk,
+            "king" => Self::King,
+            _ => panic!("Invalid collectible type: {name}"),
         }
     }
 
-    pub fn data(&self) -> CollectibleData {
+    pub const fn data(&self) -> CollectibleData {
         match self {
-            CollectibleType::Ruby => CollectibleData { offset: 0.0, value: 50 },
-            CollectibleType::Diamond => CollectibleData { offset: 32.0, value: 100 },
-            CollectibleType::Red => CollectibleData { offset: 64.0, value: 150 },
-            CollectibleType::Loli => CollectibleData { offset: 96.0, value: 400 },
-            CollectibleType::Cup => CollectibleData { offset: 128.0, value: 1000 },
-            CollectibleType::Yussuk => CollectibleData { offset: 160.0, value: 600 },
-            CollectibleType::King => CollectibleData { offset: 192.0, value: 700 },
+            Self::Ruby => CollectibleData {
+                offset: 0.0,
+                value: 50,
+            },
+            Self::Diamond => CollectibleData {
+                offset: 32.0,
+                value: 100,
+            },
+            Self::Red => CollectibleData {
+                offset: 64.0,
+                value: 150,
+            },
+            Self::Loli => CollectibleData {
+                offset: 96.0,
+                value: 400,
+            },
+            Self::Cup => CollectibleData {
+                offset: 128.0,
+                value: 1000,
+            },
+            Self::Yussuk => CollectibleData {
+                offset: 160.0,
+                value: 600,
+            },
+            Self::King => CollectibleData {
+                offset: 192.0,
+                value: 700,
+            },
         }
     }
 }

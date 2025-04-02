@@ -17,10 +17,10 @@ pub struct Animations {
 }
 
 impl Animations {
-    pub fn load_deadly_objects(tiled_map: &Map) -> Animations {
-        let (animated_fire, fires) = Animations::load_animation(tiled_map, "fire", 3);
-        let (animated_water, waters) = Animations::load_animation(tiled_map, "water", 5);
-        let (animated_grass, grasses) = Animations::load_animation(tiled_map, "grass", 4);
+    pub fn load_deadly_objects(tiled_map: &Map) -> Self {
+        let (animated_fire, fires) = Self::load_animation(tiled_map, "fire", 3);
+        let (animated_water, waters) = Self::load_animation(tiled_map, "water", 5);
+        let (animated_grass, grasses) = Self::load_animation(tiled_map, "grass", 4);
 
         let deadly_objects = HashMap::from([
             ("fire1-sheet".to_string(), (animated_fire, fires)),
@@ -28,11 +28,11 @@ impl Animations {
             ("deadly".to_string(), (animated_grass, grasses)),
         ]);
 
-        Animations { deadly_objects }
+        Self { deadly_objects }
     }
 
     pub fn update(&mut self) {
-        for (_, (animated, _)) in self.deadly_objects.iter_mut() {
+        for (animated, _) in self.deadly_objects.values_mut() {
             if let Some(animated) = animated {
                 animated.update();
             }

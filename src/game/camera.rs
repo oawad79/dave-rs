@@ -21,11 +21,19 @@ impl GameCamera {
         }
 
         let screen_width = screen_width();
-        let target_x = if (player_pos.x > screen_width / 2.0) && 
-                         (player_pos.x < (width_tiles * 32) as f32 - screen_width / 3.4) {
+        let target_x = if (player_pos.x > screen_width / 2.0)
+            && (player_pos.x < (width_tiles * 32) as f32 - screen_width / 3.4)
+        {
             player_pos.x
-        } else if player_pos.x > 200.0 && player_pos.x < (width_tiles * 32) as f32 - 
-                         (if screen_width > 1000.0 {screen_width / 5.0} else {screen_width / 3.0}) {
+        } else if player_pos.x > 200.0
+            && player_pos.x
+                < (width_tiles * 32) as f32
+                    - (if screen_width > 1000.0 {
+                        screen_width / 5.0
+                    } else {
+                        screen_width / 3.0
+                    })
+        {
             player_pos.x + 170.0
         } else if player_pos.x < 200.0 {
             305.0
@@ -33,7 +41,7 @@ impl GameCamera {
             self.camera.target.x
         };
 
-        self.camera.target.x = self.camera.target.x + (target_x - self.camera.target.x) * 0.1;
+        self.camera.target.x = (target_x - self.camera.target.x).mul_add(0.1, self.camera.target.x);
     }
 
     pub fn get_score_board_position(&self, player_y: f32) -> (f32, f32) {

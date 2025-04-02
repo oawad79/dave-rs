@@ -211,7 +211,7 @@ impl CollisionManager {
         play_sound_once(resources.get_sound("explosion"));
     }
 
-    pub fn check_warp_zone_collision(warp_zone_rect: &Option<Rect>, player_pos: Vec2) -> bool {
+    pub fn check_warp_zone_collision(warp_zone_rect: Option<&Rect>, player_pos: Vec2) -> bool {
         if let Some(wz) = warp_zone_rect {
             if Player::overlaps(player_pos, wz) {
                 return true;
