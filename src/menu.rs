@@ -4,10 +4,10 @@ use crate::Resources;
 
 #[derive(Clone)]
 pub enum MenuAction {
-    Exit,
-    Pause,
-    Help,
-    Restart,
+    Exit { confirm: bool },
+    Pause { confirm: bool },
+    Help { confirm: bool },
+    Restart { confirm: bool },
 }
 
 pub struct Menu {
@@ -64,9 +64,9 @@ impl Menu {
             );
 
             if is_key_down(menu_item.confirm_key.unwrap()) {
-                let m = menu_item.action.clone();
+                let m = menu_item.action.clone().unwrap();
                 self.current_menu_item = None;
-                return m;
+                return Some(m);
             }
         }
 

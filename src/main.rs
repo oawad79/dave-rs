@@ -87,28 +87,28 @@ async fn main() {
             texture_name: "help".to_string(),
             texture_offset: vec2(-220.0, -120.0),
             confirm_key: Some(KeyCode::Y),
-            action: Some(MenuAction::Help),
+            action: Some(MenuAction::Help { confirm: false }),
         },
         MenuItem {
             key: KeyCode::F9,
             texture_name: "pause".to_string(),
             texture_offset: vec2(-190.0, -30.0),
             confirm_key: Some(KeyCode::Y),
-            action: Some(MenuAction::Pause),
+            action: Some(MenuAction::Pause { confirm: false }),
         },
         MenuItem {
             key: KeyCode::F3,
             texture_name: "restart".to_string(),
             texture_offset: vec2(-190.0, -30.0),
             confirm_key: Some(KeyCode::Y),
-            action: Some(MenuAction::Restart),
+            action: Some(MenuAction::Restart { confirm: false }),
         },
         MenuItem {
             key: KeyCode::Escape,
             texture_name: "exit".to_string(),
             texture_offset: vec2(-150.0, -20.0),
             confirm_key: Some(KeyCode::Y),
-            action: Some(MenuAction::Exit),
+            action: Some(MenuAction::Exit { confirm: false }),
         },
     ]);
 
@@ -142,9 +142,17 @@ async fn main() {
 
         if let Some(action) = menu.update(&resources) {
             match action {
-                MenuAction::Exit => break,
-                MenuAction::Pause | MenuAction::Help => {}
-                MenuAction::Restart => scene = Box::new(EntryScreen::new()),
+                MenuAction::Exit { confirm } => {
+                    if confirm {
+                        break;
+                    }
+                }
+                MenuAction::Pause { confirm } | MenuAction::Help { confirm } => {}
+                MenuAction::Restart { confirm } => {
+                    if confirm {
+                        scene = Box::new(EntryScreen::new());
+                    }
+                }
             }
         }
 

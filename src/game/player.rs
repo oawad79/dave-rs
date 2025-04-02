@@ -303,6 +303,11 @@ impl Player {
     }
 
     fn update_animation(&mut self, on_ground: bool) {
+        // Update facing direction based on horizontal movement regardless of state
+        if self.speed.x != 0.0 {
+            self.facing_left = self.speed.x < 0.0;
+        }
+
         // Update animation state based on player state
         if self.jetpack_active {
             self.animated_player.set_animation(3);
@@ -318,13 +323,12 @@ impl Player {
                 self.animated_player.set_animation(2); // jump
                 self.current_state = "dave_jump";
             }
-            self.facing_left = self.speed.x < 0.0;
         } else {
             self.current_state = "dave_idle";
             self.animated_player.set_animation(1); // idle
         }
 
-        // Always update the animation - this was being skipped for climbing and jetpack
+        // Always update the animation
         self.animated_player.update();
     }
 
