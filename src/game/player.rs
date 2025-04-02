@@ -156,7 +156,7 @@ impl Player {
 
         self.update_jetpack_state(delta);
         self.update_climbing_state(world);
-        self.update_movement_state(world, on_ground, delta);
+        self.update_movement_state(on_ground, delta);
         self.update_shooting();
         self.update_bullets(delta);
         self.update_animation(on_ground);
@@ -237,7 +237,7 @@ impl Player {
         }
     }
 
-    fn update_movement_state(&mut self, world: &World, on_ground: bool, delta: f32) {
+    fn update_movement_state(&mut self, on_ground: bool, delta: f32) {
         let resources = storage::get::<Resources>();
 
         // Vertical movement logic
