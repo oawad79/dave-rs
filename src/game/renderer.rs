@@ -65,13 +65,7 @@ pub fn draw_gun(
     message_coord: (f32, f32),
     camera_target_x: f32,
 ) {
-    if !player_has_gun {
-        tiled_map.spr_ex(
-            "gun_icon",
-            Rect::new(0.0, 0.0, 32.0, 32.0),
-            Rect::new(gun.world_x, gun.world_y - 32.0, 32.0, 32.0),
-        );
-    } else {
+    if player_has_gun {
         draw_texture_ex(
             resources.get_texture("gun"),
             message_coord.0 + camera_target_x + 50.0,
@@ -98,6 +92,12 @@ pub fn draw_gun(
                 )),
                 ..Default::default()
             },
+        );
+    } else {
+        tiled_map.spr_ex(
+            "gun_icon",
+            Rect::new(0.0, 0.0, 32.0, 32.0),
+            Rect::new(gun.world_x, gun.world_y - 32.0, 32.0, 32.0),
         );
     }
 }
@@ -171,15 +171,15 @@ pub fn draw_jetpack(
 }
 
 pub fn draw_animations(tiled_map: &Map, animations: &Animations) {
-    for (sheet, (animated, objects)) in animations.deadly_objects.iter() {
-        draw_animated(tiled_map, sheet, animated, objects);
+    for (sheet, (animated, objects)) in &animations.deadly_objects {
+        draw_animated(tiled_map, sheet.as_str(), animated.as_ref(), objects);
     }
 }
 
 pub fn draw_animated(
     tiled_map: &Map,
     sheet: &str,
-    animated: &Option<AnimatedSprite>,
+    animated: Option<&AnimatedSprite>,
     objects: &[Object],
 ) {
     if let Some(animated) = animated {
