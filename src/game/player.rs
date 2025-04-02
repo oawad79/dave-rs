@@ -47,6 +47,7 @@ const GRAVITY: f32 = 400.0;
 const JUMP_VELOCITY: f32 = -250.0;
 const JETPACK_VELOCITY: f32 = 100.0;
 const JETPACK_TIMER: f32 = 10.0;
+
 pub struct Player {
     pub collider: Actor,
     pub speed: Vec2,
@@ -143,50 +144,45 @@ impl Player {
     }
 
     pub fn update(&mut self, world: &mut World) {
-        let resources = storage::get::<Resources>();
-        let tiled_map = storage::get::<Map>();
-
         let delta = get_frame_time();
-
         self.pos = world.actor_pos(self.collider);
+
+        if self.is_dead {
+            self.update_dead_state();
+            return;
+        }
 
         let on_ground = world.collide_check(self.collider, self.pos + vec2(0., 1.));
 
-        if self.is_dead {
-            stop_sound(resources.get_sound("jetPackActivated"));
-            stop_sound(resources.get_sound("climb"));
-        }
+        self.update_jetpack_state(delta);
+        self.update_climbing_state(world);
+        self.update_movement_state(world, on_ground, delta);
+        self.update_shooting();
+        self.update_bullets(delta);
+        self.update_animation(on_ground);
 
-        // Update player animation state
-        if !self.climbing_active {
-            if self.speed.x != 0.0 {
-                if !on_ground {
-                    self.animated_player.set_animation(2); // jump
-                    self.current_state = "dave_jump";
-                } else {
-                    self.animated_player.set_animation(0); // walk
-                    self.current_state = "dave_walk";
-                }
+        // Update player position
+        world.move_h(self.collider, self.speed.x * delta);
+        world.move_v(self.collider, self.speed.y * delta);
+    }
 
-                self.facing_left = self.speed.x < 0.0;
-            } else {
-                self.current_state = "dave_idle";
-                self.animated_player.set_animation(1); // idle
-            }
-        } else {
-            self.current_state = "climb-sheet";
-            self.animated_player.set_animation(4);
-        }
+    fn update_dead_state(&mut self) {
+        let resources = storage::get::<Resources>();
+        stop_sound(resources.get_sound("jetPackActivated"));
+        stop_sound(resources.get_sound("climb"));
+    }
+
+    fn update_jetpack_state(&mut self, delta: f32) {
+        let resources = storage::get::<Resources>();
 
         if self.jetpack_active {
-            self.jetpack_timer += get_frame_time();
+            self.jetpack_timer += delta;
             self.jetpack_progress = calculate_jetpack_progress!(self.jetpack_timer, JETPACK_TIMER);
 
             if self.jetpack_timer >= JETPACK_TIMER {
                 self.jetpack_active = false;
                 self.jetpack_timer_active = false;
                 self.has_jetpack = false;
-
                 stop_sound(resources.get_sound("jetPackActivated"));
             }
         }
@@ -196,7 +192,6 @@ impl Player {
 
             if self.jetpack_active {
                 self.jetpack_timer_active = true;
-
                 play_sound(
                     resources.get_sound("jetPackActivated"),
                     PlaySoundParams {
@@ -209,6 +204,11 @@ impl Player {
                 stop_sound(resources.get_sound("jetPackActivated"));
             }
         }
+    }
+
+    fn update_climbing_state(&mut self, world: &World) {
+        let resources = storage::get::<Resources>();
+        let tiled_map = storage::get::<Map>();
 
         if tiled_map.contains_layer("tree_collider") {
             if world.collide_tag(2, self.pos, 10, 32) == Tile::JumpThrough {
@@ -235,20 +235,12 @@ impl Player {
                 stop_sound(resources.get_sound("climb"));
             }
         }
+    }
 
-        if self.jetpack_active {
-            self.animated_player.set_animation(3);
-            self.current_state = "player_jetpack";
-        }
+    fn update_movement_state(&mut self, world: &World, on_ground: bool, delta: f32) {
+        let resources = storage::get::<Resources>();
 
-        if self.climbing {
-            self.current_state = "climb-sheet";
-            self.animated_player.set_animation(4);
-        }
-
-        self.animated_player.update();
-
-        // player movement control
+        // Vertical movement logic
         if !self.attach && !on_ground && !self.jetpack_active && !self.climbing_active {
             self.speed.y += GRAVITY * delta;
         } else if self.jetpack_active || self.climbing_active {
@@ -270,6 +262,7 @@ impl Player {
             self.speed.y = JUMP_VELOCITY;
         }
 
+        // Horizontal movement logic
         if !self.attach && (self.simulate_right || is_key_down(KeyCode::Right)) {
             self.speed.x = 100.0;
         } else if !self.attach && (self.simulate_left || is_key_down(KeyCode::Left)) {
@@ -277,6 +270,10 @@ impl Player {
         } else {
             self.speed.x = 0.;
         }
+    }
+
+    fn update_shooting(&mut self) {
+        let resources = storage::get::<Resources>();
 
         if is_key_pressed(KeyCode::LeftControl) && self.has_gun {
             self.bullets.push(Bullet {
@@ -292,8 +289,9 @@ impl Player {
             });
             play_sound_once(resources.get_sound("shoot"));
         }
+    }
 
-        // Update bullet positions
+    fn update_bullets(&mut self, delta: f32) {
         for bullet in &mut self.bullets {
             if bullet.direction == BulletDirection::Left {
                 bullet.x -= bullet.speed * delta;
@@ -301,10 +299,32 @@ impl Player {
                 bullet.x += bullet.speed * delta;
             }
         }
+    }
 
-        // Update player position
-        world.move_h(self.collider, self.speed.x * delta);
-        world.move_v(self.collider, self.speed.y * delta);
+    fn update_animation(&mut self, on_ground: bool) {
+        // Update animation state based on player state
+        if self.jetpack_active {
+            self.animated_player.set_animation(3);
+            self.current_state = "player_jetpack";
+        } else if self.climbing || self.climbing_active {
+            self.current_state = "climb-sheet";
+            self.animated_player.set_animation(4);
+        } else if self.speed.x != 0.0 {
+            if !on_ground {
+                self.animated_player.set_animation(2); // jump
+                self.current_state = "dave_jump";
+            } else {
+                self.animated_player.set_animation(0); // walk
+                self.current_state = "dave_walk";
+            }
+            self.facing_left = self.speed.x < 0.0;
+        } else {
+            self.current_state = "dave_idle";
+            self.animated_player.set_animation(1); // idle
+        }
+
+        // Always update the animation - this was being skipped for climbing and jetpack
+        self.animated_player.update();
     }
 
     pub fn draw(&self) {
