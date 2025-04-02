@@ -276,7 +276,7 @@ impl CollisionManager {
 
     pub fn check_gun_collision(
         player: &mut Player,
-        gun: &Option<GameObject>,
+        gun: Option<&GameObject>,
         score_board: &mut crate::game::score_board::ScoreBoard,
         player_pos: Vec2,
     ) -> bool {
@@ -308,8 +308,8 @@ impl CollisionManager {
         resources: &Resources,
         player_pos: Vec2,
     ) {
-        deadly_objects.iter().for_each(|(_, (_, objects))| {
-            objects.iter().for_each(|object| {
+        for (_, objects) in deadly_objects.values() {
+            for object in objects {
                 let deadly_rect =
                     Rect::new(object.world_x + 10.0, object.world_y - 10.0, 10.0, 7.0);
 
@@ -331,8 +331,8 @@ impl CollisionManager {
                     play_sound_once(resources.get_sound("explosion"));
                     play_sound_once(resources.get_sound("hd-die-dave-7"));
                 }
-            });
-        });
+            }
+        }
     }
 
     pub fn handle_collecting_valuables(

@@ -196,7 +196,7 @@ impl Scene for Game {
 
         if CollisionManager::check_gun_collision(
             &mut self.player,
-            &self.gun,
+            self.gun.as_ref(),
             &mut self.score_board,
             pos,
         ) {
