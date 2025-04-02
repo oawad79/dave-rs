@@ -48,6 +48,7 @@ const JUMP_VELOCITY: f32 = -250.0;
 const JETPACK_VELOCITY: f32 = 100.0;
 const JETPACK_TIMER: f32 = 10.0;
 
+#[allow(clippy::struct_excessive_bools)]
 pub struct Player {
     pub collider: Actor,
     pub speed: Vec2,
@@ -148,7 +149,7 @@ impl Player {
         self.pos = world.actor_pos(self.collider);
 
         if self.is_dead {
-            self.update_dead_state();
+            Self::update_dead_state();
             return;
         }
 
@@ -166,7 +167,7 @@ impl Player {
         world.move_v(self.collider, self.speed.y * delta);
     }
 
-    fn update_dead_state(&mut self) {
+    fn update_dead_state() {
         let resources = storage::get::<Resources>();
         stop_sound(resources.get_sound("jetPackActivated"));
         stop_sound(resources.get_sound("climb"));
@@ -310,12 +311,12 @@ impl Player {
             self.current_state = "climb-sheet";
             self.animated_player.set_animation(4);
         } else if self.speed.x != 0.0 {
-            if !on_ground {
-                self.animated_player.set_animation(2); // jump
-                self.current_state = "dave_jump";
-            } else {
+            if on_ground {
                 self.animated_player.set_animation(0); // walk
                 self.current_state = "dave_walk";
+            } else {
+                self.animated_player.set_animation(2); // jump
+                self.current_state = "dave_jump";
             }
             self.facing_left = self.speed.x < 0.0;
         } else {

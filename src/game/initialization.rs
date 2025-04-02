@@ -48,8 +48,14 @@ pub fn create_world(width: i32, tiled_map: &Map) -> (World, Actor) {
     };
 
     let mut world = World::new();
-    world.add_static_tiled_layer(static_colliders, 32., 32., width as usize, 1);
-    world.add_static_tiled_layer(tree_static_colliders, 32., 32., width as usize, 2);
+    world.add_static_tiled_layer(static_colliders, 32., 32., width.unsigned_abs() as usize, 1);
+    world.add_static_tiled_layer(
+        tree_static_colliders,
+        32.,
+        32.,
+        width.unsigned_abs() as usize,
+        2,
+    );
 
     let player_loc = tiled_map
         .layers
@@ -63,7 +69,6 @@ pub fn create_world(width: i32, tiled_map: &Map) -> (World, Actor) {
 
     (world, actor)
 }
-
 pub fn load_objects_in_layer(
     retry: bool,
     score_board: &ScoreBoard,

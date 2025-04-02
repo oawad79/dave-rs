@@ -108,8 +108,8 @@ impl Monster {
         let mut points = Vec::new();
 
         for i in 0..=steps {
-            let t = i as f32 / steps as f32; // Interpolation factor (0.0 to 1.0)
-            let interpolated = p1.lerp(p2, t); // Using glam's built-in lerp()
+            let t = i as f64 / steps as f64; // Use f64 for better precision
+            let interpolated = p1.lerp(p2, t as f32); // Convert back to f32 for lerp
             points.push(interpolated);
         }
 

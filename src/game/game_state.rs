@@ -1,6 +1,7 @@
 use macroquad::time::get_frame_time;
 use macroquad_tiled::Map;
 
+#[allow(clippy::struct_excessive_bools)]
 pub struct GameState {
     pub monster_explosion_active: bool,
     pub monster_explosion_timer: f32,
@@ -14,8 +15,8 @@ pub struct GameState {
 impl GameState {
     pub fn new(tiled_map: &Map, cheat: bool, is_warp_zone: bool) -> Self {
         let message_coord = (
-            tiled_map.layers.get("message").unwrap().objects[0].world_x, 
-            tiled_map.layers.get("message").unwrap().objects[0].world_y
+            tiled_map.layers.get("message").unwrap().objects[0].world_x,
+            tiled_map.layers.get("message").unwrap().objects[0].world_y,
         );
 
         Self {
