@@ -94,7 +94,7 @@ impl Scene for ScoreBoard {
         for (i, n) in score.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                self.position.0 + 120.0 + (i as f32 * 20.0),
+                (i as f32).mul_add(20.0, self.position.0 + 120.0),
                 7.0,
                 WHITE,
                 DrawTextureParams {
@@ -113,7 +113,7 @@ impl Scene for ScoreBoard {
         for (i, n) in levels.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                self.position.0 + 340.0 + (i as f32 * 20.0),
+                (i as f32).mul_add(20.0, self.position.0 + 340.0),
                 7.0,
                 WHITE,
                 DrawTextureParams {
@@ -132,7 +132,7 @@ impl Scene for ScoreBoard {
             Self::draw_texture(
                 &resources,
                 "DaveFace",
-                self.position.0 + 510.0 + (i as f32 * 30.0),
+                (i as f32).mul_add(30.0, self.position.0 + 510.0),
                 2.0,
             );
         }
