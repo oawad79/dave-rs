@@ -7,7 +7,7 @@
 )]
 //this is required to prevent macroquad from opening a
 //console window in addition to the game window
-//#![windows_subsystem = "windows"]
+#![windows_subsystem = "windows"]
 
 mod complete;
 mod entry_screen;
