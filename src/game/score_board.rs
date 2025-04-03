@@ -103,13 +103,13 @@ impl Scene for ScoreBoard {
             );
         }
 
-        Self::draw_texture(&resources, "level", screen_width() * 0.35, 5.0);
+        Self::draw_texture(&resources, "level", screen_width() * 0.40, 5.0);
 
         let levels = Self::number_to_vec(if self.level == 0 { 10 } else { self.level });
         for (i, n) in levels.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                (i as f32).mul_add(screen_width() * 0.03, screen_width() * 0.48),
+                (i as f32).mul_add(screen_width() * 0.03, screen_width() * 0.53),
                 7.0,
                 WHITE,
                 DrawTextureParams {
