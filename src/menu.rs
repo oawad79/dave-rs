@@ -64,9 +64,9 @@ impl Menu {
             );
 
             if is_key_down(menu_item.confirm_key.unwrap()) {
-                let m = menu_item.action.clone().unwrap();
+                let m = menu_item.action.clone();
                 self.current_menu_item = None;
-                return Some(m);
+                return m;
             }
         }
 
