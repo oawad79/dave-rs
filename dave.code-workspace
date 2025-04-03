@@ -2,18 +2,6 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../breakout"
-		},
-		{
-			"path": "../hello-rust"
-		},
-		{
-			"path": "../HandsOnRust"
-		},
-		{
-			"path": "../hello-mod"
 		}
 	],
 	"settings": {
