@@ -2,11 +2,11 @@ use macroquad::prelude::*;
 
 use crate::Resources;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum MenuAction {
     Exit { confirm: bool },
-    Pause { confirm: bool },
-    Help { confirm: bool },
+    Pause,
+    Help,
     Restart { confirm: bool },
 }
 
@@ -20,6 +20,7 @@ pub struct MenuItem {
     pub texture_name: String,
     pub texture_offset: Vec2,
     pub confirm_key: Option<KeyCode>,
+    pub negative_key: Option<KeyCode>,
     pub action: Option<MenuAction>,
 }
 
@@ -40,6 +41,7 @@ impl Menu {
                         texture_name: menu_item.texture_name.clone(),
                         texture_offset: menu_item.texture_offset,
                         confirm_key: menu_item.confirm_key,
+                        negative_key: menu_item.negative_key,
                         action: menu_item.action.clone(),
                     });
                 }
@@ -63,10 +65,40 @@ impl Menu {
                 },
             );
 
-            if is_key_down(menu_item.confirm_key.unwrap()) {
-                let m = menu_item.action.clone();
-                self.current_menu_item = None;
-                return m;
+            if let Some(confirm_key) = menu_item.confirm_key {
+                if is_key_down(confirm_key) {
+                    let mut action = menu_item.action.clone();
+
+                    // Set confirm flag to true for actions that have it
+                    if let Some(action_ref) = &mut action {
+                        match action_ref {
+                            MenuAction::Exit { confirm } => *confirm = true,
+                            MenuAction::Restart { confirm } => *confirm = true,
+                            _ => {}
+                        }
+                    }
+
+                    self.current_menu_item = None;
+                    return action;
+                }
+            }
+
+            if let Some(negative_key) = menu_item.negative_key {
+                if is_key_down(negative_key) {
+                    let mut action = menu_item.action.clone();
+
+                    // Set confirm flag to false for actions that have it
+                    if let Some(action_ref) = &mut action {
+                        match action_ref {
+                            MenuAction::Exit { confirm } => *confirm = false,
+                            MenuAction::Restart { confirm } => *confirm = false,
+                            _ => {}
+                        }
+                    }
+
+                    self.current_menu_item = None;
+                    return action;
+                }
             }
         }
 

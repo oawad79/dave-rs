@@ -7,7 +7,7 @@
 )]
 //this is required to prevent macroquad from opening a
 //console window in addition to the game window
-#![windows_subsystem = "windows"]
+//#![windows_subsystem = "windows"]
 
 mod complete;
 mod entry_screen;
@@ -86,20 +86,23 @@ async fn main() {
             texture_name: "help".to_string(),
             texture_offset: vec2(-220.0, -120.0),
             confirm_key: Some(KeyCode::Y),
-            action: Some(MenuAction::Help { confirm: false }),
+            negative_key: Some(KeyCode::N),
+            action: Some(MenuAction::Help),
         },
         MenuItem {
             key: KeyCode::F9,
             texture_name: "pause".to_string(),
             texture_offset: vec2(-190.0, -30.0),
             confirm_key: Some(KeyCode::Y),
-            action: Some(MenuAction::Pause { confirm: false }),
+            negative_key: Some(KeyCode::N),
+            action: Some(MenuAction::Pause),
         },
         MenuItem {
             key: KeyCode::F3,
             texture_name: "restart".to_string(),
             texture_offset: vec2(-190.0, -30.0),
             confirm_key: Some(KeyCode::Y),
+            negative_key: Some(KeyCode::N),
             action: Some(MenuAction::Restart { confirm: false }),
         },
         MenuItem {
@@ -107,6 +110,7 @@ async fn main() {
             texture_name: "exit".to_string(),
             texture_offset: vec2(-150.0, -20.0),
             confirm_key: Some(KeyCode::Y),
+            negative_key: Some(KeyCode::N),
             action: Some(MenuAction::Exit { confirm: false }),
         },
     ]);
@@ -116,8 +120,9 @@ async fn main() {
 
         set_camera(&main_camera);
 
+        // pause the game if any menu key pressed
         let change = if menu.current_menu_item.is_some() {
-            None // pause the game if any menu key pressed
+            None
         } else {
             scene.update()
         };
@@ -146,7 +151,7 @@ async fn main() {
                         break;
                     }
                 }
-                MenuAction::Pause { confirm } | MenuAction::Help { confirm } => {}
+                MenuAction::Pause | MenuAction::Help => {}
                 MenuAction::Restart { confirm } => {
                     if confirm {
                         scene = Box::new(EntryScreen::new());
