@@ -43,8 +43,4 @@ impl GameCamera {
 
         self.camera.target.x = (target_x - self.camera.target.x).mul_add(0.1, self.camera.target.x);
     }
-
-    pub fn get_score_board_position(&self, player_y: f32) -> (f32, f32) {
-        (self.camera.target.x - 300.0, player_y)
-    }
 }

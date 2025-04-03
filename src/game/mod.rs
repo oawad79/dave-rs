@@ -37,7 +37,7 @@ use crate::{
 
 mod animations;
 mod bullet;
-mod camera;
+pub mod camera;
 mod collectibles;
 mod collision;
 mod game_state;
@@ -162,9 +162,6 @@ impl Game {
         // Update camera position to follow the player
         self.game_camera
             .update(pos, self.score_board.level, self.game_world.width_tiles);
-
-        // Update scoreboard position based on camera
-        self.score_board.position = self.game_camera.get_score_board_position(pos.y);
 
         // Handle the player falling out of the game so we bring him from top
         if pos.y > screen_height() && !self.player.is_dead {
@@ -382,7 +379,11 @@ impl Scene for Game {
         let tiled_map = storage::get::<Map>();
         let resources = storage::get::<Resources>();
 
+        set_default_camera();
         self.score_board.draw();
+
+        let pos = self.game_world.world.actor_pos(self.player.collider);
+        self.update_camera_and_positions(pos);
 
         renderer::draw_tiles(
             &tiled_map,

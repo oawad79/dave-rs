@@ -6,6 +6,10 @@ use macroquad::{
         DrawTextureParams,
         draw_texture_ex,
     },
+    window::{
+        screen_height,
+        screen_width,
+    },
 };
 
 use crate::{
@@ -31,7 +35,6 @@ pub struct ScoreBoard {
     pub score: u32,
     pub lives: i32,
     pub level: u32,
-    pub position: (f32, f32),
     pub collectibles: Vec<GameObject>,
     pub game_won: bool,
     pub gun_captured: bool,
@@ -46,7 +49,6 @@ impl ScoreBoard {
             score: 0,
             lives: 3,
             level: 1,
-            position: (5.0, 5.0),
             collectibles: Vec::new(),
             game_won: false,
             gun_captured: false,
@@ -70,10 +72,7 @@ impl ScoreBoard {
             y,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(vec2(
-                    resources.get_texture(texture_key).width(),
-                    resources.get_texture(texture_key).height(),
-                )),
+                dest_size: Some(vec2(screen_width() * 0.12, screen_height() * 0.06)),
                 ..Default::default()
             },
         );
@@ -88,55 +87,62 @@ impl Scene for ScoreBoard {
     fn draw(&mut self) {
         let resources = storage::get::<Resources>();
 
-        Self::draw_texture(&resources, "score", self.position.0, 5.0);
+        Self::draw_texture(&resources, "score", 5.0, 5.0);
 
         let score = Self::number_to_vec(self.score);
         for (i, n) in score.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                (i as f32).mul_add(20.0, self.position.0 + 120.0),
+                (i as f32).mul_add(screen_width() * 0.03, screen_width() * 0.14),
                 7.0,
                 WHITE,
                 DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.numbers[*n as usize].width(),
-                        resources.numbers[*n as usize].height(),
-                    )),
+                    dest_size: Some(vec2(screen_width() * 0.02, screen_height() * 0.06)),
                     ..Default::default()
                 },
             );
         }
 
-        Self::draw_texture(&resources, "level", self.position.0 + 240.0, 5.0);
+        Self::draw_texture(&resources, "level", screen_width() * 0.35, 5.0);
 
         let levels = Self::number_to_vec(if self.level == 0 { 10 } else { self.level });
         for (i, n) in levels.iter().enumerate() {
             draw_texture_ex(
                 &resources.numbers[*n as usize],
-                (i as f32).mul_add(20.0, self.position.0 + 340.0),
+                (i as f32).mul_add(screen_width() * 0.03, screen_width() * 0.48),
                 7.0,
                 WHITE,
                 DrawTextureParams {
-                    dest_size: Some(vec2(
-                        resources.numbers[*n as usize].width(),
-                        resources.numbers[*n as usize].height(),
-                    )),
+                    dest_size: Some(vec2(screen_width() * 0.02, screen_height() * 0.055)),
                     ..Default::default()
                 },
             );
         }
 
-        Self::draw_texture(&resources, "daves", self.position.0 + 400.0, 5.0);
+        Self::draw_texture(&resources, "daves", screen_width() * 0.7, 5.0);
 
         for i in 0..self.lives {
-            Self::draw_texture(
-                &resources,
-                "DaveFace",
-                (i as f32).mul_add(30.0, self.position.0 + 510.0),
+            draw_texture_ex(
+                resources.get_texture("DaveFace"),
+                (i as f32).mul_add(screen_width() * 0.05, screen_width() * 0.83),
                 2.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(vec2(screen_width() * 0.07, screen_height() * 0.07)),
+                    ..Default::default()
+                },
             );
         }
 
-        Self::draw_texture(&resources, "thin", self.position.0, 30.0);
+        draw_texture_ex(
+            resources.get_texture("thin"),
+            1.0,
+            screen_height() * 0.077,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), resources.get_texture("thin").height())),
+                ..Default::default()
+            },
+        );
     }
 }

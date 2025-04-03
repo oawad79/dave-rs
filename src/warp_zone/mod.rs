@@ -4,9 +4,11 @@ use macroquad::{
         play_sound,
         stop_sound,
     },
+    camera::set_default_camera,
     color::Color,
     math::{
         Rect,
+        Vec2,
         vec2,
     },
     prelude::collections::storage,
@@ -15,6 +17,7 @@ use macroquad::{
         draw_text_ex,
     },
     time::get_frame_time,
+    window::screen_height,
 };
 use macroquad_platformer::{
     Tile,
@@ -29,6 +32,7 @@ use crate::{
     Scene,
     SceneChange,
     game::{
+        camera::GameCamera,
         player::Player,
         score_board::ScoreBoard,
     },
@@ -43,6 +47,7 @@ pub struct WarpZone {
     world: World,
     sound_playing: bool,
     timer: f32,
+    game_camera: GameCamera,
 }
 
 impl WarpZone {
@@ -109,6 +114,18 @@ impl WarpZone {
             world,
             sound_playing: false,
             timer: WARP_ZONE_TIME,
+            game_camera: GameCamera::new(),
+        }
+    }
+
+    fn update_camera_and_positions(&mut self, pos: Vec2) {
+        // Set the camera to follow the player
+        self.game_camera.set_active();
+
+        // Handle the player falling out of the game so we bring him from top
+        if pos.y > screen_height() && !self.player.is_dead {
+            self.world
+                .set_actor_position(self.player.collider, vec2(pos.x, 0.0));
         }
     }
 }
@@ -151,8 +168,6 @@ impl Scene for WarpZone {
             });
         }
 
-        self.score_board.position = (5.0, 5.0);
-
         None
     }
 
@@ -162,7 +177,11 @@ impl Scene for WarpZone {
 
         tiled_map.draw_tiles("platform", Rect::new(0.0, 0.0, 608.0, 384.0), None);
 
+        set_default_camera();
         self.score_board.draw();
+
+        let pos = self.world.actor_pos(self.player.collider);
+        self.update_camera_and_positions(pos);
 
         draw_text_ex(
             "WARP",

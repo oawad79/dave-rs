@@ -4,9 +4,11 @@ use macroquad::{
         play_sound,
         stop_sound,
     },
+    camera::set_default_camera,
     color::Color,
     math::{
         Rect,
+        Vec2,
         vec2,
     },
     prelude::collections::storage,
@@ -14,6 +16,7 @@ use macroquad::{
         TextParams,
         draw_text_ex,
     },
+    window::screen_height,
 };
 use macroquad_platformer::{
     Tile,
@@ -28,6 +31,7 @@ use crate::{
     Scene,
     SceneChange,
     game::{
+        camera::GameCamera,
         player::Player,
         score_board::ScoreBoard,
     },
@@ -38,6 +42,7 @@ pub struct Separator {
     score_board: ScoreBoard,
     world: World,
     sound_playing: bool,
+    game_camera: GameCamera,
 }
 
 impl Separator {
@@ -106,6 +111,18 @@ impl Separator {
             score_board,
             world,
             sound_playing: false,
+            game_camera: GameCamera::new(),
+        }
+    }
+
+    fn update_camera_and_positions(&mut self, pos: Vec2) {
+        // Set the camera to follow the player
+        self.game_camera.set_active();
+
+        // Handle the player falling out of the game so we bring him from top
+        if pos.y > screen_height() && !self.player.is_dead {
+            self.world
+                .set_actor_position(self.player.collider, vec2(pos.x, 0.0));
         }
     }
 }
@@ -144,8 +161,6 @@ impl Scene for Separator {
             });
         }
 
-        self.score_board.position = (5.0, 5.0);
-
         None
     }
 
@@ -155,7 +170,11 @@ impl Scene for Separator {
 
         tiled_map.draw_tiles("seperator", Rect::new(0.0, 0.0, 608.0, 352.0), None);
 
+        set_default_camera();
         self.score_board.draw();
+
+        let pos = self.world.actor_pos(self.player.collider);
+        self.update_camera_and_positions(pos);
 
         let m = if self.score_board.level < 10 {
             format!(

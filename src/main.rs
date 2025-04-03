@@ -60,8 +60,7 @@ fn window_conf() -> Conf {
             linux_backend: miniquad::conf::LinuxBackend::WaylandOnly,
             ..Default::default()
         },
-        window_width: 1000,
-        window_height: 650,
+        window_resizable: true,
         ..Default::default()
     }
 }
