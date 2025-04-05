@@ -40,12 +40,6 @@ For development:
 cargo run
 ```
 
-You might encounter an issue with Rust feature 2024, you can maybe just adjust the cargo file to have the 2021 without any issues. otherwise you can do this instead
-
-```bash
-rustup default nightly
-```
-
 ## 🎯 How to Play
 
 - **Arrow Keys**: Move & Jump

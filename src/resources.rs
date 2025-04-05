@@ -1,19 +1,9 @@
 use std::collections::HashMap;
 
-use include_dir::{
-    Dir,
-    include_dir,
-};
+use include_dir::{Dir, include_dir};
 use macroquad::{
-    audio::{
-        Sound,
-        load_sound_from_bytes,
-    },
-    prelude::{
-        collections::storage,
-        coroutines::start_coroutine,
-        *,
-    },
+    audio::{Sound, load_sound_from_bytes},
+    prelude::{collections::storage, coroutines::start_coroutine, *},
 };
 
 static PROJECT_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets");
@@ -118,7 +108,7 @@ impl Resources {
         let file = PROJECT_DIR
             .get_file(path)
             .unwrap_or_else(|| panic!("Unable to load string : {path}"));
-        str::from_utf8(file.contents()).unwrap().to_string()
+        std::str::from_utf8(file.contents()).unwrap().to_string()
     }
 
     fn load_embedded_textures(path: &str) -> HashMap<String, Texture2D> {
