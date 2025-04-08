@@ -241,9 +241,19 @@ impl Player {
     fn update_movement_state(&mut self, on_ground: bool, delta: f32) {
         let resources = storage::get::<Resources>();
 
+        // Check if player just walked off a ledge
+        let was_on_ground = self.speed.y == 0.0 && !self.jetpack_active && !self.climbing_active;
+        let just_left_ledge = was_on_ground && !on_ground;
+
         // Vertical movement logic
         if !self.attach && !on_ground && !self.jetpack_active && !self.climbing_active {
-            self.speed.y += GRAVITY * delta;
+            if just_left_ledge {
+                // Apply an immediate downward velocity when leaving a ledge
+                self.speed.y = GRAVITY * 0.5; // Immediate drop velocity
+            } else {
+                // Normal gravity application
+                self.speed.y += GRAVITY * delta;
+            }
         } else if self.jetpack_active || self.climbing_active {
             if is_key_down(KeyCode::Up) {
                 self.speed.y = -JETPACK_VELOCITY;
@@ -252,6 +262,9 @@ impl Player {
             } else {
                 self.speed.y = 0.0;
             }
+        } else if on_ground && !is_key_down(KeyCode::Up) {
+            // Reset vertical speed when on ground
+            self.speed.y = 0.0;
         }
 
         if is_key_down(KeyCode::Down) {
