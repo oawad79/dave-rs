@@ -2,18 +2,10 @@ use std::collections::HashMap;
 
 use macroquad::{
     audio::play_sound_once,
-    math::{
-        Rect,
-        Vec2,
-        vec2,
-    },
+    math::{Rect, Vec2, vec2},
     prelude::animation::AnimatedSprite,
 };
-use macroquad_particles::{
-    AtlasConfig,
-    Emitter,
-    EmitterConfig,
-};
+use macroquad_particles::{AtlasConfig, Emitter, EmitterConfig};
 use macroquad_tiled::Object;
 
 use super::{
@@ -23,10 +15,7 @@ use super::{
     game_state::GameState,
     monster::Monster,
     player::Player,
-    score_board::{
-        GameObject,
-        ScoreBoard,
-    },
+    score_board::{GameObject, ScoreBoard},
 };
 use crate::resources::Resources;
 

@@ -8,6 +8,11 @@
 		"files.associations": {
 			"iostream": "cpp",
 			"sstream": "cpp"
-		}
+		},
+		"telemetry.feedback.enabled": false,
+		"dotnetAcquisitionExtension.enableTelemetry": false,
+		"editor.experimental.treeSitterTelemetry": false,
+		"docker.lsp.telemetry": "off",
+		"gitlens.telemetry.enabled": false
 	}
 }

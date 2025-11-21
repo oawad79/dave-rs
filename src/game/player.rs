@@ -1,37 +1,18 @@
 use macroquad::{
-    audio::{
-        PlaySoundParams,
-        play_sound,
-        play_sound_once,
-        stop_sound,
-    },
-    math::{
-        Rect,
-        Vec2,
-        vec2,
-    },
+    audio::{PlaySoundParams, play_sound, play_sound_once, stop_sound},
+    math::{Rect, Vec2, vec2},
     prelude::{
-        animation::{
-            AnimatedSprite,
-            Animation,
-        },
+        animation::{AnimatedSprite, Animation},
         collections::storage,
         *,
     },
 };
-use macroquad_platformer::{
-    Actor,
-    Tile,
-    World,
-};
+use macroquad_platformer::{Actor, Tile, World};
 use macroquad_tiled::Map;
 
 use super::{
     GameWorld,
-    bullet::{
-        Bullet,
-        BulletDirection,
-    },
+    bullet::{Bullet, BulletDirection},
     camera::GameCamera,
     collision::Collidable,
 };
@@ -193,13 +174,10 @@ impl Player {
 
             if self.jetpack_active {
                 self.jetpack_timer_active = true;
-                play_sound(
-                    resources.get_sound("jetPackActivated"),
-                    PlaySoundParams {
-                        looped: true,
-                        volume: 1.0,
-                    },
-                );
+                play_sound(resources.get_sound("jetPackActivated"), PlaySoundParams {
+                    looped: true,
+                    volume: 1.0,
+                });
             } else {
                 self.jetpack_timer_active = false;
                 stop_sound(resources.get_sound("jetPackActivated"));
@@ -215,13 +193,10 @@ impl Player {
             if world.collide_tag(2, self.pos, 10, 32) == Tile::JumpThrough {
                 if is_key_down(KeyCode::Up) || is_key_down(KeyCode::Down) {
                     if !self.climbing {
-                        play_sound(
-                            resources.get_sound("climb"),
-                            PlaySoundParams {
-                                looped: true,
-                                volume: 0.2,
-                            },
-                        );
+                        play_sound(resources.get_sound("climb"), PlaySoundParams {
+                            looped: true,
+                            volume: 0.2,
+                        });
                     }
 
                     self.climbing = true;
